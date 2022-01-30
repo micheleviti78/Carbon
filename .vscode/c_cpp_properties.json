@@ -1,0 +1,37 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/michele/Software/Carbon/Drivers/CMSIS/Include",
+                "/home/michele/Software/Carbon/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
+                "/home/michele/Software/Carbon/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy",
+                "/home/michele/Software/Carbon/Drivers/STM32H7xx_HAL_Driver/Inc",
+                "/home/michele/Software/Carbon/CM7/Core/Inc",
+                "/home/michele/Software/Carbon/CM4/Core/Inc"
+            ],
+            "defines": [
+                "CORE_CM7=1",
+                "CORE_CM4=1"
+            ],
+            "compilerPath": "/opt/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "custom tool chain",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/michele/Software/Carbon/Drivers/CMSIS/Include"
+            ],
+            "defines": [],
+            "compilerPath": "/opt/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-gcc-arm"
+        }
+    ],
+    "version": 4
+}

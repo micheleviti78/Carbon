@@ -4,12 +4,12 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/michele/Software/Carbon/Drivers/CMSIS/Include",
-                "/home/michele/Software/Carbon/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
-                "/home/michele/Software/Carbon/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy",
-                "/home/michele/Software/Carbon/Drivers/STM32H7xx_HAL_Driver/Inc",
-                "/home/michele/Software/Carbon/CM7/Core/Inc",
-                "/home/michele/Software/Carbon/CM4/Core/Inc"
+                "/home/michele/Software/Carbon/lib/CMSIS/include",
+                "/home/michele/Software/Carbon/lib/CMSIS/device/ST/STM32H7xx/include",
+                "/home/michele/Software/Carbon/lib/hal/include/Legacy",
+                "/home/michele/Software/Carbon/lib/hal/include",
+                "/home/michele/Software/Carbon/CM7/core/include",
+                "/home/michele/Software/Carbon/CM4/core/include"
             ],
             "defines": [
                 "CORE_CM7=1",

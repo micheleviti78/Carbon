@@ -1,0 +1,10 @@
+set(TOOLCHAIN_PATH /opt/gcc-arm-none-eabi-10.3-2021.10/)
+
+set(CMAKE_C_COMPILER ${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc)
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PATH}/bin/arm-none-eabi-g++)
+set(ARM_SIZE_UTIL ${TOOLCHAIN_PATH}/bin/arm-none-eabi-size)
+set(ARM_OBJCOPY ${TOOLCHAIN_PATH}/bin/arm-none-eabi-objcopy)
+set(ARM_OBJDUMP ${TOOLCHAIN_PATH}/bin/arm-none-eabi-objdump)
+
+set(OPENOCD_PATH /opt/openocd/bin/)
+set(OPENOCD ${OPENOCD_PATH}/openocd)

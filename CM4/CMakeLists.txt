@@ -6,6 +6,8 @@ set(CMAKE_TOOLCHAIN_FILE ${PROJECT_ROOT_DIR}/common/cmake/toolchain.cmake)
 
 project(CARBON_CM4)
 
+set(FLASH_ADDRESS 0x08100000)
+
 set(ARM_FLAGS
     -DCORE_CM4
     -mcpu=cortex-m4

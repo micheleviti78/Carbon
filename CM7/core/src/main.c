@@ -22,7 +22,6 @@
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
-/
 
 UART_HandleTypeDef huart1;
 

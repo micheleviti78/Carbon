@@ -1,3 +1,5 @@
+enable_language(C CXX ASM)
+
 set(WARN_FLAGS
     -Wall
     -Wextra
@@ -49,15 +51,13 @@ add_compile_options(${WARN_FLAGS})
 add_compile_options(${MISC_FLAGS})
 add_compile_options(${HAL_COMMON})
 
-#set(LDSPECS nano.specs)
-
 string(REPLACE ";" " " S_CPP_FLAGS "${CPP_FLAGS}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${S_CPP_FLAGS}")
 
-set(CMAKE_C_COMPILE_OBJECT "${CMAKE_C_COMPILE_OBJECT} -Wa,-a,-ad,-alms=<OBJECT>.lst")
+#set(CMAKE_C_COMPILE_OBJECT "${CMAKE_C_COMPILE_OBJECT} -Wa,-a,-ad,-alms=<OBJECT>.lst")
 
-set(CMAKE_CXX_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT} -Wa,-a,-ad,-alms=<OBJECT>.lst")
+#set(CMAKE_CXX_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT} -Wa,-a,-ad,-alms=<OBJECT>.lst")
 
 set(LDSPECS nano.specs)
 
@@ -65,16 +65,18 @@ set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 
 string(REPLACE ";" " " S_ARM_FLAGS "${ARM_FLAGS}")
 
-set(LINK_FLAGS "${S_ARM_FLAGS} -Wl,--gc-sections \
-    -Wl,--undefined=uxTopUsedPriority,--undefined=freeRTOSMemoryScheme \
-    -Wl,--wrap=malloc,--wrap=free,--wrap=_malloc_r,--wrap=_free_r \
-    -Wl,--wrap=_Znwj \
-    -Wl,-Map=${PROJECT_NAME}.map,--cref")
+#set(LINK_FLAGS "${S_ARM_FLAGS} -Wl,--gc-sections \
+#     -Wl,--undefined=uxTopUsedPriority,--undefined=freeRTOSMemoryScheme \
+#     -Wl,--wrap=malloc,--wrap=free,--wrap=_malloc_r,--wrap=_free_r \
+#     -Wl,--wrap=_Znwj \
+#     -Wl,-Map=${PROJECT_NAME}.map,--cref")
 
 
-set(CMAKE_EXE_LINKER_FLAGS "${LINK_FLAGS} -specs=${LDSPECS} -T${LDSCRIPT}")
+# set(CMAKE_EXE_LINKER_FLAGS "${LINK_FLAGS} -specs=${LDSPECS} -T${LDSCRIPT}")
 
-set(CMAKE_CXX_STANDARD_LIBRARIES "-lc -lm -lnosys")
+set(CMAKE_EXE_LINKER_FLAGS "${S_ARM_FLAGS} -specs=${LDSPECS} -T${LDSCRIPT}")
+
+#set(CMAKE_CXX_STANDARD_LIBRARIES "-lc -lm -lnosys")
 
 SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/sys/syscalls.c

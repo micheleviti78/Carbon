@@ -47,12 +47,12 @@ SET(HAL_SOURCE
 
 add_library(${HAL_LIB} STATIC ${HAL_SOURCE})
 
+target_link_libraries(${HAL_LIB}  cmsis_${PROJECT_NAME})
+
 target_include_directories(${HAL_LIB}
     SYSTEM
     PUBLIC
-    Inc/
-    Inc/Legacy
     ${TARGET_INCLUDE_CONF}
+    Inc/Legacy
+    Inc/
 )
-
-target_link_libraries(${HAL_LIB}  cmsis_${PROJECT_NAME})

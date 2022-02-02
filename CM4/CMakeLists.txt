@@ -14,6 +14,10 @@ set(ARM_FLAGS
     -mfloat-abi=hard
 )
 
+set(LDSCRIPT
+    ${PROJECT_ROOT_DIR}/CM4/STM32H747XIHX_FLASH.ld
+)
+
 include(${PROJECT_ROOT_DIR}/common/cmake/common.cmake)
 
 SET(TARGET_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/core/include)

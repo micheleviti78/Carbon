@@ -1,8 +1,0 @@
-/home/michele/Software/Carbon/CM4/build/CMakeFiles/rebuild_cache.dir
-/home/michele/Software/Carbon/CM4/build/CMakeFiles/edit_cache.dir
-/home/michele/Software/Carbon/CM4/build/CMakeFiles/CARBON_CM4.dir
-/home/michele/Software/Carbon/CM4/build/cmsis/CMakeFiles/edit_cache.dir
-/home/michele/Software/Carbon/CM4/build/cmsis/CMakeFiles/rebuild_cache.dir
-/home/michele/Software/Carbon/CM4/build/hal/CMakeFiles/rebuild_cache.dir
-/home/michele/Software/Carbon/CM4/build/hal/CMakeFiles/edit_cache.dir
-/home/michele/Software/Carbon/CM4/build/hal/CMakeFiles/hal_CARBON_CM4.dir

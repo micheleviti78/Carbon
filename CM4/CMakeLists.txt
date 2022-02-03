@@ -17,7 +17,7 @@ set(ARM_FLAGS
 )
 
 set(LDSCRIPT
-    ${PROJECT_ROOT_DIR}/CM4/STM32H747XIHX_FLASH.ld
+    ${PROJECT_ROOT_DIR}/CM4/STM32H747XIHx_FLASH_CM4.ld
 )
 
 include(${PROJECT_ROOT_DIR}/common/cmake/common.cmake)
@@ -47,6 +47,17 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} cmsis_${PROJECT_NAME} hal_${PROJECT_NAME})
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${ARM_SIZE_UTIL} ${PROJECT_NAME}.elf
+    COMMAND ${ARM_OBJCOPY} -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.bin
+    )
+
+add_custom_target(flash_ocd)
+add_custom_command(
+    TARGET flash_ocd
+    COMMAND ${OPENOCD} -f board/stm32h747i-disco.cfg -c "program ${PROJECT_NAME}.bin reset exit ${FLASH_ADDRESS}"
+ 	)
 
 
 

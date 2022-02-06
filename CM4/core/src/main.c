@@ -17,8 +17,8 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
-#include "string.h"
+#include <main.h>
+#include <pin.hpp>
 
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
@@ -48,9 +48,13 @@
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
+  BSP_LED_Init(LED_BLUE);
+
   /* Infinite loop */
   while (1)
   {
+    HAL_Delay(500);
+    BSP_LED_Toggle(LED_BLUE);
   }
 }
 

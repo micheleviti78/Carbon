@@ -17,7 +17,8 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include <main.h>
+#include <pin.hpp>
 
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
@@ -25,9 +26,7 @@
 
 UART_HandleTypeDef huart1;
 
-void SystemClock_Config(void);
-void PeriphCommonClock_Config(void);
-static void MX_GPIO_Init(void);
+static void SystemClock_Config(void);
 static void MX_USART1_UART_Init(void);
 
 /**
@@ -36,19 +35,19 @@ static void MX_USART1_UART_Init(void);
   */
 int main(void)
 {
-  int32_t timeout;
-  /* Wait until CPU2 boots and enters in stop mode or timeout*/
-  timeout = 0xFFFF;
-  while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0));
-  if ( timeout < 0 )
-  {
-  Error_Handler();
-  }
+int32_t timeout;
+/* Wait until CPU2 boots and enters in stop mode or timeout*/
+timeout = 0xFFFF;
+while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0));
+if ( timeout < 0 )
+{
+Error_Handler();
+}
 
-  HAL_Init();
+HAL_Init();
 
-  /* Configure the system clock */
-  SystemClock_Config();
+/* Configure the system clock */
+SystemClock_Config();
 
 /* When system initialization is finished, Cortex-M7 will release Cortex-M4 by means of
 HSEM notification */
@@ -66,11 +65,14 @@ if ( timeout < 0 )
 Error_Handler();
 }
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
+  BSP_LED_Init(LED_GREEN);
   MX_USART1_UART_Init();
   /* Infinite loop */
   while (1)
-  {}
+  {
+    HAL_Delay(1000);
+    BSP_LED_Toggle(LED_GREEN);
+  }
 }
 
 /**
@@ -205,30 +207,6 @@ static void MX_USART1_UART_Init(void)
   {
     Error_Handler();
   }
-
-}
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
-
-  /*Configure GPIO pin : CEC_CK_MCO1_Pin */
-  GPIO_InitStruct.Pin = CEC_CK_MCO1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF0_MCO;
-  HAL_GPIO_Init(CEC_CK_MCO1_GPIO_Port, &GPIO_InitStruct);
 
 }
 

@@ -19,15 +19,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include <main.h>
 #include <pin.hpp>
+#include <diag.hpp>
 
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
 
-UART_HandleTypeDef huart1;
-
 static void SystemClock_Config(void);
-static void MX_USART1_UART_Init(void);
 
 /**
   * @brief  The application entry point.
@@ -49,6 +47,9 @@ HAL_Init();
 /* Configure the system clock */
 SystemClock_Config();
 
+/* init DIAG*/
+init_diag();
+
 /* When system initialization is finished, Cortex-M7 will release Cortex-M4 by means of
 HSEM notification */
 /*HW semaphore Clock enable*/
@@ -64,9 +65,11 @@ if ( timeout < 0 )
 {
 Error_Handler();
 }
+
+carbon_raw_diag_print("Inizialization complete");
+
   /* Initialize all configured peripherals */
   BSP_LED_Init(LED_GREEN);
-  MX_USART1_UART_Init();
   /* Infinite loop */
   while (1)
   {
@@ -174,43 +177,6 @@ static void SystemClock_Config(void)
 }
 
 /**
-  * @brief USART1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART1_UART_Init(void)
-{
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-}
-
-/**
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
@@ -219,7 +185,10 @@ void Error_Handler(void)
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)
-  {}
+  {
+    HAL_Delay(100);
+    BSP_LED_Toggle(LED_GREEN);
+  }
 }
 
 #ifdef  USE_FULL_ASSERT

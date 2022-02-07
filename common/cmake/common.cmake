@@ -78,11 +78,19 @@ set(CMAKE_EXE_LINKER_FLAGS "${S_ARM_FLAGS} -specs=${LDSPECS} -T${LDSCRIPT}")
 
 #set(CMAKE_CXX_STANDARD_LIBRARIES "-lc -lm -lnosys")
 
+include_directories(${PROJECT_ROOT_DIR}/common/include)
+include_directories(${MAIN_DIR}/core/include)
+
+SET(TARGET_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/core/include)
+
+add_subdirectory(${PROJECT_ROOT_DIR}/lib/CMSIS cmsis)
+add_subdirectory(${PROJECT_ROOT_DIR}/lib/hal hal)
+add_subdirectory(${PROJECT_ROOT_DIR}/lib/printf printf)
+
 SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/sys/syscalls.c
     ${PROJECT_ROOT_DIR}/common/src/sys/sysmem.c
+    ${PROJECT_ROOT_DIR}/common/src/diag.cpp
     ${PROJECT_ROOT_DIR}/common/src/pin.cpp
     ${PROJECT_ROOT_DIR}/common/src/system_stm32h7xx_dualcore_boot_cm4_cm7.c
 )
-
-include_directories(${PROJECT_ROOT_DIR}/common/include)

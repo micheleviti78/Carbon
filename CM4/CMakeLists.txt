@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 get_filename_component(PROJECT_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
+set(MAIN_DIR ${CMAKE_CURRENT_LIST_DIR})
+
 set(CMAKE_TOOLCHAIN_FILE ${PROJECT_ROOT_DIR}/common/cmake/toolchain.cmake)
 
 project(CARBON_CM4)
@@ -22,12 +24,6 @@ set(LDSCRIPT
 
 include(${PROJECT_ROOT_DIR}/common/cmake/common.cmake)
 
-SET(TARGET_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/core/include)
-SET(TARGET_INCLUDE_CONF ${CMAKE_CURRENT_LIST_DIR}/core/include)
-
-add_subdirectory(${PROJECT_ROOT_DIR}/lib/CMSIS cmsis)
-add_subdirectory(${PROJECT_ROOT_DIR}/lib/hal hal)
-
 SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/main.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_hal_msp.c
@@ -43,10 +39,9 @@ add_executable(${PROJECT_NAME} ${STARTUP_SOURCE} ${SOURCE} ${COMMON_SOURCE})
 target_include_directories(${PROJECT_NAME}
     PUBLIC
     ${TARGET_INCLUDE}
-    ${TARGET_INCLUDE_CONF}
 )
 
-target_link_libraries(${PROJECT_NAME} cmsis_${PROJECT_NAME} hal_${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} cmsis_${PROJECT_NAME} hal_${PROJECT_NAME} printf_${PROJECT_NAME})
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${ARM_SIZE_UTIL} ${PROJECT_NAME}.elf

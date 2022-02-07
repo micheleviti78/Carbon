@@ -68,6 +68,8 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+    HAL_Delay(50);
+    BSP_LED_Toggle(LED_BLUE);
   }
 }
 

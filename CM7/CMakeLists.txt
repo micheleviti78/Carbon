@@ -50,6 +50,9 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     )
 
 add_custom_target(flash_ocd)
+
+add_dependencies(flash_ocd ${PROJECT_NAME})
+
 add_custom_command(
     TARGET flash_ocd
     COMMAND ${OPENOCD} -f board/stm32h747i-disco.cfg -c "program ${PROJECT_NAME}.bin reset exit ${FLASH_ADDRESS}"

@@ -1,20 +1,20 @@
 /**
-  ******************************************************************************
-  * @file           main.c
-  * @author         Michele Viti <micheleviti78@gmail.com>
-  * @date           Jan. 2022
-  * @brief          CM4 main program body
-  ******************************************************************************
-  * @attention
-  * Copyright (c) 2022 Michele Viti.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           main.c
+ * @author         Michele Viti <micheleviti78@gmail.com>
+ * @date           Jan. 2022
+ * @brief          CM4 main program body
+ ******************************************************************************
+ * @attention
+ * Copyright (c) 2022 Michele Viti.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 
 /* Includes ------------------------------------------------------------------*/
 #include <main.h>
@@ -25,49 +25,48 @@
 #endif
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-    int main(void)
-{
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
   /*HW semaphore Clock enable*/
   __HAL_RCC_HSEM_CLK_ENABLE();
   /* Activate HSEM notification for Cortex-M4*/
   HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
   /*
   Domain D2 goes to STOP mode (Cortex-M4 in deep-sleep) waiting for Cortex-M7 to
-  perform system initialization (system clock config, external memory configuration.. )
+  perform system initialization (system clock config, external memory
+  configuration.. )
   */
   HAL_PWREx_ClearPendingEvent();
-  HAL_PWREx_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFE, PWR_D2_DOMAIN);
+  HAL_PWREx_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFE,
+                          PWR_D2_DOMAIN);
   /* Clear HSEM flag */
   __HAL_HSEM_CLEAR_FLAG(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
 
   /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
+   */
   HAL_Init();
 
   BSP_LED_Init(LED_BLUE);
 
   /* Infinite loop */
-  while (1)
-  {
+  while (1) {
     HAL_Delay(500);
     BSP_LED_Toggle(LED_BLUE);
   }
 }
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
-  while (1)
-  {
+  while (1) {
     HAL_Delay(50);
     BSP_LED_Toggle(LED_BLUE);
   }
@@ -75,16 +74,16 @@ void Error_Handler(void)
 
 #ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
+void assert_failed(uint8_t *file, uint32_t line) {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
+  /* User can add his own implementation to report the file name and line
+     number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }

@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32h7xx_hal.h"
+#include <stm32h7xx_hal.h>
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);

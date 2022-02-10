@@ -2,3 +2,4 @@ common/cmake/toolchain.cmake
 CM4/build/
 CM7/build/
 .vscode
+CubeCode/

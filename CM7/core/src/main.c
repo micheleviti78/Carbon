@@ -82,13 +82,13 @@ int main(void) {
  *            System Clock source            = PLL (HSE)
  *            SYSCLK(Hz)                     = 400000000 (Cortex-M7 CPU Clock)
  *            HCLK(Hz)                       = 200000000 (Cortex-M4 CPU, Bus
- *                 matrix Clocks) 
- *            AHB Prescaler                  = 2 
- *            D1 APB3 Prescaler              = 2          
- *                (APB3 Clock  100MHz) 
- *            D2 APB1 Prescaler              = 2 (APB1 Clock  100MHz) 
- *            D2 APB2 Prescaler              = 2 (APB2 Clock  100MHz) 
- *            D3 APB4 Prescaler              = 2 (APB4 Clock  100MHz) 
+ *                 matrix Clocks)
+ *            AHB Prescaler                  = 2
+ *            D1 APB3 Prescaler              = 2
+ *                (APB3 Clock  100MHz)
+ *            D2 APB1 Prescaler              = 2 (APB1 Clock  100MHz)
+ *            D2 APB2 Prescaler              = 2 (APB2 Clock  100MHz)
+ *            D3 APB4 Prescaler              = 2 (APB4 Clock  100MHz)
  *            HSE Frequency(Hz)              = 25000000 PLL_M = 5
  *            PLL_N                          = 160
  *            PLL_P                          = 2

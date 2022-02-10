@@ -27,7 +27,7 @@ extern "C" {
 
 void Error_Handler(void);
 
-UART_HandleTypeDef huart1;
+static UART_HandleTypeDef huart1;
 
 void init_diag() {
   huart1.Instance = USART1;

@@ -55,7 +55,7 @@ static const uint32_t LED_PIN[LEDn] = {LED1_PIN, LED2_PIN, LED3_PIN, LED4_PIN};
  */
 int32_t BSP_LED_Init(Led_TypeDef Led) {
   int32_t ret = 0;
-  GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct{0,0,0,0,0};
 
   /* Enable the GPIO_LED clock */
   LEDx_GPIO_CLK_ENABLE();
@@ -85,7 +85,7 @@ int32_t BSP_LED_Init(Led_TypeDef Led) {
  */
 int32_t BSP_LED_DeInit(Led_TypeDef Led) {
   int32_t ret = 0;
-  GPIO_InitTypeDef gpio_init_structure;
+  GPIO_InitTypeDef gpio_init_structure{0,0,0,0,0};
 
   /* DeInit the GPIO_LED pin */
   gpio_init_structure.Pin = LED_PIN[Led];

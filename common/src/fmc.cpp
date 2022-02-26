@@ -200,16 +200,16 @@ void HAL_FMC_MspInit() {
   PI7   ------> FMC_D29
   PE1   ------> FMC_NBL1
   PI2   ------> FMC_D26
-  PH15   ------> FMC_D23
-  PH14   ------> FMC_D22
+  PH15  ------> FMC_D23
+  PH14  ------> FMC_D22
   PE0   ------> FMC_NBL0
   PI3   ------> FMC_D27
-  PG15   ------> FMC_SDNCAS
+  PG15  ------> FMC_SDNCAS
   PD0   ------> FMC_D2
-  PH13   ------> FMC_D21
+  PH13  ------> FMC_D21
   PI9   ------> FMC_D30
   PD1   ------> FMC_D3
-  PI10   ------> FMC_D31
+  PI10  ------> FMC_D31
   PG8   ------> FMC_SDCLK
   PF2   ------> FMC_A2
   PF1   ------> FMC_A1
@@ -219,33 +219,33 @@ void HAL_FMC_MspInit() {
   PG2   ------> FMC_A12
   PF5   ------> FMC_A5
   PF4   ------> FMC_A4
-  PE10   ------> FMC_D7
+  PE10  ------> FMC_D7
   PH5   ------> FMC_SDNWE
-  PF13   ------> FMC_A7
-  PF14   ------> FMC_A8
+  PF13  ------> FMC_A7
+  PF14  ------> FMC_A8
   PE9   ------> FMC_D6
-  PE11   ------> FMC_D8
-  PH10   ------> FMC_D18
-  PH11   ------> FMC_D19
-  PD15   ------> FMC_D1
-  PD14   ------> FMC_D0
-  PF12   ------> FMC_A6
-  PF15   ------> FMC_A9
-  PE12   ------> FMC_D9
-  PE15   ------> FMC_D12
-  PH9   ------> FMC_D17
-  PH12   ------> FMC_D20
-  PF11   ------> FMC_SDNRAS
+  PE11  ------> FMC_D8
+  PH10  ------> FMC_D18
+  PH11  ------> FMC_D19
+  PD15  ------> FMC_D1
+  PD14  ------> FMC_D0
+  PF12  ------> FMC_A6
+  PF15  ------> FMC_A9
+  PE12  ------> FMC_D9
+  PE15  ------> FMC_D12
+  PH9   -----> FMC_D17
+  PH12  ------> FMC_D20
+  PF11  ------> FMC_SDNRAS
   PG0   ------> FMC_A10
   PE8   ------> FMC_D5
-  PE13   ------> FMC_D10
+  PE13  ------> FMC_D10
   PH6   ------> FMC_SDNE1
   PH8   ------> FMC_D16
-  PD10   ------> FMC_D15
+  PD10  ------> FMC_D15
   PD9   ------> FMC_D14
   PG1   ------> FMC_A11
   PE7   ------> FMC_D4
-  PE14   ------> FMC_D11
+  PE14  ------> FMC_D11
   PH7   ------> FMC_SDCKE1
   PD8   ------> FMC_D13
   */

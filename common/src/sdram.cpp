@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file           fmc.cpp
+ * @file           sdram.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Feb. 2022
  * @brief          DISCO-STM32H747 FMC, source file
@@ -16,7 +16,7 @@
  ******************************************************************************
  */
 
-#include <fmc.hpp>
+#include <sdram.hpp>
 #include <main.h>
 
 #include <stm32h7xx_hal.h>
@@ -138,6 +138,10 @@ extern "C" {
 #define FMC_D13_Pin GPIO_PIN_8
 #define FMC_D13_GPIO_Port GPIOD
 
+#define  SDRAM_REFRESH_PERIOD 64.;
+#define  SDRAM_ROWS 4096lu;
+#define  SDRAM_CLOCK 100lu;
+
 static uint32_t FMC_Initialized = 0;
 static GPIO_InitTypeDef GPIO_InitStruct;
 static RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
@@ -170,6 +174,12 @@ void init_fmc(void) {
   SdramTiming.RCDDelay = 6; //TRC
 
   if (HAL_SDRAM_Init(&hsdram1, &SdramTiming) != HAL_OK) {
+    Error_Handler();
+  }
+
+  uint32_t refresh_rate = (SDRAM_REFRESH_PERIOD / SDRAM_ROWS * SDRAM_CLOCK) - 20ul;
+
+  if (HAL_SDRAM_ProgramRefreshRate(&hsdram1, refresh_rate){
     Error_Handler();
   }
 }

@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file           fmc.hpp
+ * @file           sdram.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Feb. 2022
  * @brief          DISCO-STM32H747 FMC, header file

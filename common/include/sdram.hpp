@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-void init_fmc();
+bool init_sdram();
 
 #ifdef __cplusplus
 }

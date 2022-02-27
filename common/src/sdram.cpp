@@ -16,8 +16,8 @@
  ******************************************************************************
  */
 
-#include <sdram.hpp>
 #include <main.h>
+#include <sdram.hpp>
 
 #include <stm32h7xx_hal.h>
 
@@ -138,9 +138,10 @@ extern "C" {
 #define FMC_D13_Pin GPIO_PIN_8
 #define FMC_D13_GPIO_Port GPIOD
 
-#define  SDRAM_REFRESH_PERIOD 64.;
-#define  SDRAM_ROWS 4096lu;
-#define  SDRAM_CLOCK 100lu;
+#define SDRAM_REFRESH_PERIOD 64.
+#define SDRAM_ROWS 4096lu
+#define SDRAM_CLOCK 100lu
+#define SDRAM_REFRESH_COUNT 603lu
 
 static uint32_t FMC_Initialized = 0;
 static GPIO_InitTypeDef GPIO_InitStruct;
@@ -149,7 +150,7 @@ static SDRAM_HandleTypeDef hsdram1;
 static FMC_SDRAM_TimingTypeDef SdramTiming;
 
 /* FMC initialization function */
-void init_fmc(void) {
+static bool init_fmc(void) {
   /** Perform the SDRAM1 memory initialization sequence
    */
   hsdram1.Instance = FMC_SDRAM_DEVICE;
@@ -165,23 +166,19 @@ void init_fmc(void) {
   hsdram1.Init.ReadBurst = FMC_SDRAM_RBURST_DISABLE;
   hsdram1.Init.ReadPipeDelay = FMC_SDRAM_RPIPE_DELAY_0;
   /* SdramTiming */
-  SdramTiming.LoadToActiveDelay = 2; //TMRD
-  SdramTiming.ExitSelfRefreshDelay = 7; //TXSR
-  SdramTiming.SelfRefreshTime = 5; //TRAS
-  SdramTiming.RowCycleDelay = 2; //TRCD
-  SdramTiming.WriteRecoveryTime = 3; //TWR
-  SdramTiming.RPDelay = 2; //TRP
-  SdramTiming.RCDDelay = 6; //TRC
+  SdramTiming.LoadToActiveDelay = 2;    // TMRD
+  SdramTiming.ExitSelfRefreshDelay = 7; // TXSR
+  SdramTiming.SelfRefreshTime = 5;      // TRAS
+  SdramTiming.RowCycleDelay = 2;        // TRCD
+  SdramTiming.WriteRecoveryTime = 3;    // TWR
+  SdramTiming.RPDelay = 2;              // TRP
+  SdramTiming.RCDDelay = 6;             // TRC
 
   if (HAL_SDRAM_Init(&hsdram1, &SdramTiming) != HAL_OK) {
-    Error_Handler();
+    return false;
   }
 
-  uint32_t refresh_rate = (SDRAM_REFRESH_PERIOD / SDRAM_ROWS * SDRAM_CLOCK) - 20ul;
-
-  if (HAL_SDRAM_ProgramRefreshRate(&hsdram1, refresh_rate){
-    Error_Handler();
-  }
+  return true;
 }
 
 void HAL_FMC_MspInit() {
@@ -313,6 +310,67 @@ void HAL_FMC_MspInit() {
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 }
 void HAL_SDRAM_MspInit(SDRAM_HandleTypeDef *hsdram) { HAL_FMC_MspInit(); }
+
+bool init_sdram() {
+  if (!init_fmc()) {
+    return false;
+  }
+
+  /*Enabling Clock and Bank 2*/
+  SET_BIT(hsdram1.Instance->SDCMR, FMC_SDCMR_MODE_0 | FMC_SDCMR_CTB2);
+
+  /*1 ms delay*/
+  HAL_Delay(1);
+
+  /*issuing command precharge all for Bank2*/
+  SET_BIT(hsdram1.Instance->SDCMR, FMC_SDCMR_MODE_1 | FMC_SDCMR_CTB2);
+
+  /*1 ms delay*/
+  HAL_Delay(1);
+
+  /*issuing command auto charge (8 cycles)*/
+  SET_BIT(hsdram1.Instance->SDCMR, FMC_SDCMR_MODE_0 | FMC_SDCMR_MODE_1 |
+                                       FMC_SDCMR_CTB2 | FMC_SDCMR_NRFS_0 |
+                                       FMC_SDCMR_NRFS_1 | FMC_SDCMR_NRFS_3);
+
+  /*1 ms delay*/
+  HAL_Delay(1);
+
+/*issuing command Load Mode Register*/
+#define FMC_SDCMR_MODE_2_FIX 0x3UL
+  /* Mode Registerg
+     M0 = M1 = M2 = 0 Burst Length 1
+     M5 = 1 CAS Latency 2
+     M9 = Single Location Access
+  */
+
+#define SDRAM_MODE_REGISTER 0x220UL << FMC_SDCMR_MRD_Pos
+  SET_BIT(hsdram1.Instance->SDCMR,
+          FMC_SDCMR_MODE_2_FIX | FMC_SDCMR_CTB2 | SDRAM_MODE_REGISTER);
+
+  /*1 ms delay*/
+  HAL_Delay(1);
+
+  /*Set refresh count*/
+  if (HAL_SDRAM_ProgramRefreshRate(&hsdram1, SDRAM_REFRESH_COUNT) != HAL_OK) {
+    return false;
+  }
+
+  /* Disable write protection */
+  if (HAL_SDRAM_WriteProtection_Disable(&hsdram1) != HAL_OK) {
+    return false;
+  }
+
+  /*RES interrupt enable*/
+  __FMC_SDRAM_ENABLE_IT(hsdram1.Instance, FMC_SDRTR_REIE);
+
+  /*FMC controller Enable*/
+  FMC_Bank1_R->BTCR[0] |= 0x80000000; // TODO use low level API
+
+  return true;
+}
+
+void fmc_isr(void) { HAL_SDRAM_IRQHandler(&hsdram1); }
 
 #ifdef __cplusplus
 }

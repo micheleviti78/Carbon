@@ -20,12 +20,14 @@
 #include <diag.hpp>
 #include <main.h>
 #include <pin.hpp>
+#include <sdram.hpp>
 
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
 
 static void SystemClock_Config(void);
+//static uint32_t sdram_buf __attribute__((aligned(4), section(".sdram_bank2")));
 
 /**
  * @brief  The application entry point.
@@ -45,6 +47,9 @@ int main(void) {
 
   /* Configure the system clock */
   SystemClock_Config();
+
+  /*init SDRAM*/
+  init_sdram();
 
   /* init DIAG*/
   init_diag();

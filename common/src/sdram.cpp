@@ -256,6 +256,14 @@ void HAL_FMC_MspInit() {
   PH7   ------> FMC_SDCKE1
   PD8   ------> FMC_D13
   */
+
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOF_CLK_ENABLE();
+  __HAL_RCC_GPIOG_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOI_CLK_ENABLE();
+
   GPIO_InitStruct.Pin = FMC_D28_Pin | FMC_NBL3_Pin | FMC_NBL2_Pin |
                         FMC_D25_Pin | FMC_D24_Pin | FMC_D29_Pin | FMC_D26_Pin |
                         FMC_D27_Pin | FMC_D30_Pin | FMC_D31_Pin;

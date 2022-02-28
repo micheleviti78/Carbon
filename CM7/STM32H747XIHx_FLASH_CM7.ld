@@ -44,9 +44,10 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 1024K
-RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
-ITCMRAM (xrw)      : ORIGIN = 0x00000000, LENGTH = 64K
+FLASH (rx)           : ORIGIN = 0x08000000, LENGTH = 1024K
+AXI_RAM (xrw)        : ORIGIN = 0x24000000, LENGTH = 512K
+ITCMRAM (xrw)        : ORIGIN = 0x00000000, LENGTH = 64K
+FMC_SDRAM_BANK2(xrw) : ORIGIN = 0xD0000000, LENGTH = 64M
 }
 
 /* Define output sections */
@@ -127,7 +128,7 @@ SECTIONS
 
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
-  } >RAM AT> FLASH
+  } >AXI_RAM AT> FLASH
 
   
   /* Uninitialized data section */
@@ -144,7 +145,7 @@ SECTIONS
     . = ALIGN(4);
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
-  } >RAM
+  } >AXI_RAM
 
   /* User_heap_stack section, used to check that there is enough RAM left */
   ._user_heap_stack :
@@ -155,9 +156,14 @@ SECTIONS
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
-  } >RAM
+  } >AXI_RAM
 
-  
+  fmc_sdram_bank2(NOLOAD) :
+  {
+    . = ALIGN(4);
+    KEEP(*(.sdram_bank2))
+    . = ALIGN(4);
+  } >FMC_SDRAM_BANK2
 
   /* Remove information from the standard libraries */
   /DISCARD/ :

@@ -364,6 +364,10 @@ bool init_sdram() {
   /*RES interrupt enable*/
   __FMC_SDRAM_ENABLE_IT(hsdram1.Instance, FMC_SDRTR_REIE);
 
+  /*enable FMC interrupt*/
+  HAL_NVIC_SetPriority(FMC_IRQn, 15, 0);
+  HAL_NVIC_EnableIRQ(FMC_IRQn);
+
   /*FMC controller Enable*/
   FMC_Bank1_R->BTCR[0] |= 0x80000000; // TODO use low level API
 

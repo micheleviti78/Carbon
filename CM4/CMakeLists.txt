@@ -25,7 +25,7 @@ set(LDSCRIPT
 include(${PROJECT_ROOT_DIR}/common/cmake/common.cmake)
 
 SET(SOURCE
-    ${CMAKE_CURRENT_LIST_DIR}/core/src/main.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_hal_msp.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_it.c
 )

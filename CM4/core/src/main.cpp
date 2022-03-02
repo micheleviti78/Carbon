@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file           main.c
+ * @file           main.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Jan. 2022
  * @brief          CM4 main program body
@@ -17,11 +17,15 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include <main.h>
+#include <main.hpp>
 #include <pin.hpp>
 
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /**
@@ -88,3 +92,7 @@ void assert_failed(uint8_t *file, uint32_t line) {
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
+#ifdef __cplusplus
+}
+#endif

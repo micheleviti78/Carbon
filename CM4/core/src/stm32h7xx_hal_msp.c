@@ -17,6 +17,6 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include <main.hpp>
 
 void HAL_MspInit(void) { __HAL_RCC_SYSCFG_CLK_ENABLE(); }

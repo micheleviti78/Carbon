@@ -16,8 +16,8 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32h7xx_it.h"
-#include "main.h"
+#include <stm32h7xx_it.h>
+#include <main.hpp>
 
 /******************************************************************************/
 /*           Cortex Processor Interruption and Exception Handlers          */

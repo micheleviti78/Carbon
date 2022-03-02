@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file           main.c
+ * @file           main.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Jan. 2022
  * @brief          CM7 main program body
@@ -18,7 +18,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <diag.hpp>
-#include <main.h>
+#include <dwt.hpp>
+#include <main.hpp>
 #include <pin.hpp>
 #include <sdram.hpp>
 
@@ -26,8 +27,14 @@
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
 
-static void SystemClock_Config(void);
 //static uint32_t sdram_buf __attribute__((aligned(4), section(".sdram_bank2")));
+static DataWatchpointTraceUnit dwt;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+static void SystemClock_Config(void);
 
 /**
  * @brief  The application entry point.
@@ -54,6 +61,9 @@ int main(void) {
   /* init DIAG*/
   init_diag();
 
+  /*starting dwt counter*/
+  dwt.init();
+
   /* When system initialization is finished, Cortex-M7 will release Cortex-M4 by
   means of HSEM notification */
   /*HW semaphore Clock enable*/
@@ -70,7 +80,8 @@ int main(void) {
     Error_Handler();
   }
 
-  carbon_raw_diag_print("Inizialization complete");
+  RAW_DIAG("Inizialization complete");
+  RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__,__NEWLIB_MINOR__,__NEWLIB_PATCHLEVEL__);
 
   /* Initialize all configured peripherals */
   BSP_LED_Init(LED_GREEN);
@@ -204,3 +215,7 @@ void Error_Handler(void) {
  */
 void assert_failed(uint8_t *file, uint32_t line) {}
 #endif /* USE_FULL_ASSERT */
+
+#ifdef __cplusplus
+}
+#endif

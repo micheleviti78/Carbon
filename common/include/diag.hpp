@@ -25,6 +25,8 @@ extern "C" {
 void init_diag();
 void carbon_raw_diag_print(const char *format, ...);
 
+#define RAW_DIAG(...) carbon_raw_diag_print(__VA_ARGS__)
+
 #ifdef __cplusplus
 }
 #endif

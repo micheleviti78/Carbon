@@ -18,10 +18,12 @@
 
 #include<dwt.hpp>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+DataWatchpointTraceUnit::DataWatchpointTraceUnit() : dwt(DWT){}
 
-#ifdef __cplusplus
+void DataWatchpointTraceUnit::init(){
+    SET_BIT(dwt->CTRL, DWT_CTRL_CYCCNTENA_Msk);
 }
-#endif
+
+uint32_t DataWatchpointTraceUnit::getClkCycles(){
+    return READ_REG(dwt->CYCCNT);
+}

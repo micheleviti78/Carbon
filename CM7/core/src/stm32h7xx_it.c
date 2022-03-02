@@ -17,7 +17,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h7xx_it.h"
-#include "main.h"
+#include "main.hpp"
 
 void fmc_isr(void);
 

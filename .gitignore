@@ -2,3 +2,8 @@ common/cmake/toolchain.cmake
 CM4/build/
 CM7/build/
 CubeCode/
+.cproject
+.project
+.settings/
+Carbon Default.launch
+

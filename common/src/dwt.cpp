@@ -16,14 +16,14 @@
  ******************************************************************************
  */
 
-#include<dwt.hpp>
+#include <dwt.hpp>
 
-DataWatchpointTraceUnit::DataWatchpointTraceUnit() : dwt(DWT){}
+DataWatchpointTraceUnit::DataWatchpointTraceUnit() : dwt(DWT) {}
 
-void DataWatchpointTraceUnit::init(){
-    SET_BIT(dwt->CTRL, DWT_CTRL_CYCCNTENA_Msk);
+void DataWatchpointTraceUnit::init() {
+  SET_BIT(dwt->CTRL, DWT_CTRL_CYCCNTENA_Msk);
 }
 
-uint32_t DataWatchpointTraceUnit::getClkCycles(){
-    return READ_REG(dwt->CYCCNT);
+uint32_t DataWatchpointTraceUnit::getClkCycles() {
+  return READ_REG(dwt->CYCCNT);
 }

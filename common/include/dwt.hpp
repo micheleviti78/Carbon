@@ -20,16 +20,18 @@
 
 #include <stm32h7xx_hal.h>
 
-class DataWatchpointTraceUnit{
-    public:
-    DataWatchpointTraceUnit();
-    ~DataWatchpointTraceUnit() = default;
-    DataWatchpointTraceUnit(const DataWatchpointTraceUnit& dwt) = delete;
-    DataWatchpointTraceUnit(DataWatchpointTraceUnit&& dwt) = delete;
-    DataWatchpointTraceUnit& operator =(const DataWatchpointTraceUnit &dwt) = delete;
-    DataWatchpointTraceUnit& operator =(DataWatchpointTraceUnit&& dwt) = delete;
-    void init();
-    uint32_t getClkCycles();
-    private:
-    DWT_Type *dwt;
+class DataWatchpointTraceUnit {
+public:
+  DataWatchpointTraceUnit();
+  ~DataWatchpointTraceUnit() = default;
+  DataWatchpointTraceUnit(const DataWatchpointTraceUnit &dwt) = delete;
+  DataWatchpointTraceUnit(DataWatchpointTraceUnit &&dwt) = delete;
+  DataWatchpointTraceUnit &
+  operator=(const DataWatchpointTraceUnit &dwt) = delete;
+  DataWatchpointTraceUnit &operator=(DataWatchpointTraceUnit &&dwt) = delete;
+  void init();
+  uint32_t getClkCycles();
+
+private:
+  DWT_Type *dwt;
 };

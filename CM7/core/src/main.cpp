@@ -50,6 +50,10 @@ int main(void) {
     Error_Handler();
   }
 
+  // SCB_EnableICache();
+
+  // SCB_EnableDCache();
+
   HAL_Init();
 
   /* Configure the system clock */

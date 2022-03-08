@@ -27,7 +27,8 @@
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
 
-//static uint32_t sdram_buf __attribute__((aligned(4), section(".sdram_bank2")));
+// static uint32_t sdram_buf __attribute__((aligned(4),
+// section(".sdram_bank2")));
 static DataWatchpointTraceUnit dwt;
 
 #ifdef __cplusplus
@@ -85,7 +86,8 @@ int main(void) {
   }
 
   RAW_DIAG("Inizialization complete");
-  RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__,__NEWLIB_MINOR__,__NEWLIB_PATCHLEVEL__);
+  RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,
+           __NEWLIB_PATCHLEVEL__);
 
   /* Initialize all configured peripherals */
   BSP_LED_Init(LED_GREEN);

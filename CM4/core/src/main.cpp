@@ -52,15 +52,18 @@ int main(void) {
 
   /* MCU Configuration--------------------------------------------------------*/
 
+  /*low level system time initialization*/
+  low_level_system_time();
+
   /* Reset of all peripherals, Initializes the Flash interface and the Systick.
    */
   HAL_Init();
-  
+
   /* Initialize Pin needed by the Error function */
   BSP_LED_Init(LED_BLUE);
   BSP_LED_Init(LED_RED);
 
-  //init_diag();
+  // init_diag();
 
   /* Infinite loop */
   while (1) {

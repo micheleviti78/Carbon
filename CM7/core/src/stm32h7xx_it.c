@@ -92,7 +92,7 @@ void SysTick_Handler(void) {}
 void FMC_IRQHandler(void) { fmc_isr(); }
 
 /**
- * @brief This function handles TIM6.
+ * @brief This function handles TIM2.
  */
 
-void TIM6_DAC_IRQHandler(void) { hal_tick_isr(); }
+void TIM2_IRQHandler(void) { hal_tick_isr(); }

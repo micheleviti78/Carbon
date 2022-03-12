@@ -130,8 +130,6 @@ void carbon_raw_diag_print(const char *format, ...) {
   printf("\n\r");
 }
 
-
-
 #ifdef __cplusplus
 }
 #endif

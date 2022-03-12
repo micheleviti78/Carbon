@@ -86,7 +86,7 @@ void PendSV_Handler(void) {}
 void SysTick_Handler(void) { HAL_IncTick(); }
 
 /**
- * @brief This function handles TIM6.
+ * @brief This function handles TIM5.
  */
 
-// void TIM6_DAC_IRQHandler(void) { hal_tick_isr();}
+void TIM5_IRQHandler(void) { hal_tick_isr(); }

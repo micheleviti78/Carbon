@@ -30,7 +30,8 @@ extern "C" {
 void Error_Handler(void) {
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
-  while (1) ;
+  while (1)
+    ;
 }
 
 #ifdef __cplusplus

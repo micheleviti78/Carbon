@@ -20,6 +20,8 @@
 
 #include <main.hpp>
 
+void hal_tick_isr(void);
+
 /******************************************************************************/
 /*           Cortex Processor Interruption and Exception Handlers          */
 /******************************************************************************/
@@ -82,3 +84,9 @@ void PendSV_Handler(void) {}
  * @brief This function handles System tick timer.
  */
 void SysTick_Handler(void) { HAL_IncTick(); }
+
+/**
+ * @brief This function handles TIM6.
+ */
+
+// void TIM6_DAC_IRQHandler(void) { hal_tick_isr();}

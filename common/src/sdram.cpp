@@ -16,6 +16,8 @@
  ******************************************************************************
  */
 
+#include <diag.hpp>
+#include <error.hpp>
 #include <main.hpp>
 #include <sdram.hpp>
 
@@ -319,9 +321,9 @@ void HAL_FMC_MspInit() {
 }
 void HAL_SDRAM_MspInit(SDRAM_HandleTypeDef *hsdram) { HAL_FMC_MspInit(); }
 
-bool init_sdram() {
+void init_sdram() {
   if (!init_fmc()) {
-    return false;
+    RAW_DIAG("error initialization FMC");
   }
 
   /*Enabling Clock and Bank 2*/
@@ -361,12 +363,7 @@ bool init_sdram() {
 
   /*Set refresh count*/
   if (HAL_SDRAM_ProgramRefreshRate(&hsdram1, SDRAM_REFRESH_COUNT) != HAL_OK) {
-    return false;
-  }
-
-  /* Disable write protection */
-  if (HAL_SDRAM_WriteProtection_Disable(&hsdram1) != HAL_OK) {
-    return false;
+    RAW_DIAG("Error setting SDRAM refresh rate");
   }
 
   /*RES interrupt enable*/
@@ -379,7 +376,7 @@ bool init_sdram() {
   /*FMC controller Enable*/
   FMC_Bank1_R->BTCR[0] |= 0x80000000; // TODO use low level API
 
-  return true;
+  return;
 }
 
 void fmc_isr(void) { HAL_SDRAM_IRQHandler(&hsdram1); }

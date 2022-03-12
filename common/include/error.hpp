@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           sdram.hpp
+ * @file           error.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Feb. 2022
- * @brief          DISCO-STM32H747 FMC, header file
+ * @date           Mar. 2022
+ * @brief          DISCO-STM32H747 error hanndler and type
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -17,13 +17,16 @@
  */
 
 #pragma once
-#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void init_sdram();
+/**
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void);
 
 #ifdef __cplusplus
 }

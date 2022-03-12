@@ -17,8 +17,10 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
+#include <diag.hpp>
 #include <main.hpp>
 #include <pin.hpp>
+#include <systime.hpp>
 
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
@@ -53,25 +55,16 @@ int main(void) {
   /* Reset of all peripherals, Initializes the Flash interface and the Systick.
    */
   HAL_Init();
-
+  
+  /* Initialize Pin needed by the Error function */
   BSP_LED_Init(LED_BLUE);
+  BSP_LED_Init(LED_RED);
+
+  //init_diag();
 
   /* Infinite loop */
   while (1) {
     HAL_Delay(500);
-    BSP_LED_Toggle(LED_BLUE);
-  }
-}
-
-/**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
-void Error_Handler(void) {
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1) {
-    HAL_Delay(50);
     BSP_LED_Toggle(LED_BLUE);
   }
 }

@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           dwt.hpp
+ * @file           systime.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Feb. 2022
- * @brief          DISCO-STM32H747 Data Watchpoint and Trace Unit, header file
+ * @brief          DISCO-STM32H747 system time
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -20,18 +20,14 @@
 
 #include <stm32h7xx_hal.h>
 
-class DataWatchpointTraceUnit {
-public:
-  DataWatchpointTraceUnit();
-  ~DataWatchpointTraceUnit() = default;
-  DataWatchpointTraceUnit(const DataWatchpointTraceUnit &dwt) = delete;
-  DataWatchpointTraceUnit(DataWatchpointTraceUnit &&dwt) = delete;
-  DataWatchpointTraceUnit &
-  operator=(const DataWatchpointTraceUnit &dwt) = delete;
-  DataWatchpointTraceUnit &operator=(DataWatchpointTraceUnit &&dwt) = delete;
-  void init();
-  uint32_t getClkCycles();
+#define DWT_CLOCKS(dwt) dwt->CYCCNT;
 
-private:
-  DWT_Type *dwt;
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void low_level_system_time(void);
+
+#ifdef __cplusplus
+}
+#endif

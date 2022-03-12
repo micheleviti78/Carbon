@@ -18,10 +18,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <diag.hpp>
-#include <dwt.hpp>
+#include <error.hpp>
 #include <main.hpp>
 #include <pin.hpp>
 #include <sdram.hpp>
+#include <systime.hpp>
 
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
@@ -29,7 +30,6 @@
 
 // static uint32_t sdram_buf __attribute__((aligned(4),
 // section(".sdram_bank2")));
-static DataWatchpointTraceUnit dwt;
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,27 +47,34 @@ int main(void) {
   timeout = 0xFFFF;
   while ((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0))
     ;
+
   if (timeout < 0) {
     Error_Handler();
   }
 
-  // SCB_EnableICache();
+  /*activate cache*/
+  SCB_EnableICache();
 
-  // SCB_EnableDCache();
+  SCB_EnableDCache();
 
+  /*low level system time initialization*/
+  low_level_system_time();
+
+  /*HAL low level init*/
   HAL_Init();
 
   /* Configure the system clock */
   SystemClock_Config();
 
-  /*init SDRAM*/
-  init_sdram();
-
   /* init DIAG*/
   init_diag();
 
-  /*starting dwt counter*/
-  dwt.init();
+  /*init SDRAM*/
+  init_sdram();
+
+  /* Initialize Pin needed by the Error function */
+  BSP_LED_Init(LED_GREEN);
+  BSP_LED_Init(LED_ORANGE);
 
   /* When system initialization is finished, Cortex-M7 will release Cortex-M4 by
   means of HSEM notification */
@@ -89,8 +96,6 @@ int main(void) {
   RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,
            __NEWLIB_PATCHLEVEL__);
 
-  /* Initialize all configured peripherals */
-  BSP_LED_Init(LED_GREEN);
   /* Infinite loop */
   while (1) {
     HAL_Delay(1000);
@@ -196,19 +201,6 @@ static void SystemClock_Config(void) {
 
   HAL_EnableCompensationCell();
   */
-}
-
-/**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
-void Error_Handler(void) {
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1) {
-    HAL_Delay(100);
-    BSP_LED_Toggle(LED_GREEN);
-  }
 }
 
 #ifdef USE_FULL_ASSERT

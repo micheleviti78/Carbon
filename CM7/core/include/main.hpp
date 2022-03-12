@@ -35,10 +35,6 @@ void Error_Handler(void);
 #define OSC32_OUT_GPIO_Port GPIOC
 #define OSC32_IN_Pin GPIO_PIN_14
 #define OSC32_IN_GPIO_Port GPIOC
-#define STLINK_TX_Pin GPIO_PIN_10
-#define STLINK_TX_GPIO_Port GPIOA
-#define STLINK_RX_Pin GPIO_PIN_9
-#define STLINK_RX_GPIO_Port GPIOA
 #define CEC_CK_MCO1_Pin GPIO_PIN_8
 #define CEC_CK_MCO1_GPIO_Port GPIOA
 #define OSC_OUT_Pin GPIO_PIN_1

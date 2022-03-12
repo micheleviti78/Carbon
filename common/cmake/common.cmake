@@ -91,7 +91,8 @@ SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/sys/syscalls.c
     ${PROJECT_ROOT_DIR}/common/src/sys/sysmem.c
     ${PROJECT_ROOT_DIR}/common/src/diag.cpp
-    ${PROJECT_ROOT_DIR}/common/src/dwt.cpp
+    ${PROJECT_ROOT_DIR}/common/src/error.cpp
+    ${PROJECT_ROOT_DIR}/common/src/systime.cpp
     ${PROJECT_ROOT_DIR}/common/src/sdram.cpp
     ${PROJECT_ROOT_DIR}/common/src/pin.cpp
     ${PROJECT_ROOT_DIR}/common/src/system_stm32h7xx_dualcore_boot_cm4_cm7.c

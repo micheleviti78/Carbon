@@ -194,13 +194,12 @@ static void SystemClock_Config(void) {
           To do this please uncomment the following code
 */
 
-  /*
+  
   __HAL_RCC_CSI_ENABLE() ;
-
+  
   __HAL_RCC_SYSCFG_CLK_ENABLE() ;
-
+  
   HAL_EnableCompensationCell();
-  */
 }
 
 #ifdef USE_FULL_ASSERT

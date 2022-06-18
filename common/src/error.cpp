@@ -28,10 +28,11 @@ extern "C" {
  * @retval None
  */
 void Error_Handler(void) {
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-    ;
+    /* User can add his own implementation to report the HAL error return state
+     */
+    __disable_irq();
+    while (1)
+        ;
 }
 
 #ifdef __cplusplus

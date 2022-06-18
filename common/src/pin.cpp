@@ -54,23 +54,23 @@ static const uint32_t LED_PIN[LEDn] = {LED1_PIN, LED2_PIN, LED3_PIN, LED4_PIN};
  * @retval BSP status
  */
 int32_t BSP_LED_Init(Led_TypeDef Led) {
-  int32_t ret = 0;
-  GPIO_InitTypeDef GPIO_InitStruct{0, 0, 0, 0, 0};
+    int32_t ret = 0;
+    GPIO_InitTypeDef GPIO_InitStruct{0, 0, 0, 0, 0};
 
-  /* Enable the GPIO_LED clock */
-  LEDx_GPIO_CLK_ENABLE();
+    /* Enable the GPIO_LED clock */
+    LEDx_GPIO_CLK_ENABLE();
 
-  /* Configure the GPIO_LED pin */
-  GPIO_InitStruct.Pin = LED_PIN[Led];
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    /* Configure the GPIO_LED pin */
+    GPIO_InitStruct.Pin = LED_PIN[Led];
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 
-  HAL_GPIO_Init(LED_PORT[Led], &GPIO_InitStruct);
+    HAL_GPIO_Init(LED_PORT[Led], &GPIO_InitStruct);
 
-  /* By default, turn off LED */
-  HAL_GPIO_WritePin(LED_PORT[Led], LED_PIN[Led], GPIO_PIN_SET);
-  return ret;
+    /* By default, turn off LED */
+    HAL_GPIO_WritePin(LED_PORT[Led], LED_PIN[Led], GPIO_PIN_SET);
+    return ret;
 }
 
 /**
@@ -84,15 +84,15 @@ int32_t BSP_LED_Init(Led_TypeDef Led) {
  * @retval BSP status
  */
 int32_t BSP_LED_DeInit(Led_TypeDef Led) {
-  int32_t ret = 0;
-  GPIO_InitTypeDef gpio_init_structure{0, 0, 0, 0, 0};
+    int32_t ret = 0;
+    GPIO_InitTypeDef gpio_init_structure{0, 0, 0, 0, 0};
 
-  /* DeInit the GPIO_LED pin */
-  gpio_init_structure.Pin = LED_PIN[Led];
-  /* Turn off LED */
-  HAL_GPIO_WritePin(LED_PORT[Led], (uint16_t)LED_PIN[Led], GPIO_PIN_SET);
-  HAL_GPIO_DeInit(LED_PORT[Led], gpio_init_structure.Pin);
-  return ret;
+    /* DeInit the GPIO_LED pin */
+    gpio_init_structure.Pin = LED_PIN[Led];
+    /* Turn off LED */
+    HAL_GPIO_WritePin(LED_PORT[Led], (uint16_t)LED_PIN[Led], GPIO_PIN_SET);
+    HAL_GPIO_DeInit(LED_PORT[Led], gpio_init_structure.Pin);
+    return ret;
 }
 
 /**
@@ -106,10 +106,10 @@ int32_t BSP_LED_DeInit(Led_TypeDef Led) {
  * @retval BSP status
  */
 int32_t BSP_LED_On(Led_TypeDef Led) {
-  int32_t ret = 0;
+    int32_t ret = 0;
 
-  HAL_GPIO_WritePin(LED_PORT[Led], (uint16_t)LED_PIN[Led], GPIO_PIN_RESET);
-  return ret;
+    HAL_GPIO_WritePin(LED_PORT[Led], (uint16_t)LED_PIN[Led], GPIO_PIN_RESET);
+    return ret;
 }
 
 /**
@@ -123,9 +123,9 @@ int32_t BSP_LED_On(Led_TypeDef Led) {
  * @retval BSP status
  */
 int32_t BSP_LED_Off(Led_TypeDef Led) {
-  int32_t ret = 0;
-  HAL_GPIO_WritePin(LED_PORT[Led], (uint16_t)LED_PIN[Led], GPIO_PIN_SET);
-  return ret;
+    int32_t ret = 0;
+    HAL_GPIO_WritePin(LED_PORT[Led], (uint16_t)LED_PIN[Led], GPIO_PIN_SET);
+    return ret;
 }
 
 /**
@@ -139,9 +139,9 @@ int32_t BSP_LED_Off(Led_TypeDef Led) {
  * @retval BSP status
  */
 int32_t BSP_LED_Toggle(Led_TypeDef Led) {
-  int32_t ret = 0;
-  HAL_GPIO_TogglePin(LED_PORT[Led], (uint16_t)LED_PIN[Led]);
-  return ret;
+    int32_t ret = 0;
+    HAL_GPIO_TogglePin(LED_PORT[Led], (uint16_t)LED_PIN[Led]);
+    return ret;
 }
 /**
  * @brief  Get the selected LED state.
@@ -154,9 +154,9 @@ int32_t BSP_LED_Toggle(Led_TypeDef Led) {
  * @retval LED status
  */
 int32_t BSP_LED_GetState(Led_TypeDef Led) {
-  int32_t ret = 0;
-  ret = (int32_t)HAL_GPIO_ReadPin(LED_PORT[Led], (uint16_t)LED_PIN[Led]);
-  return ret;
+    int32_t ret = 0;
+    ret = (int32_t)HAL_GPIO_ReadPin(LED_PORT[Led], (uint16_t)LED_PIN[Led]);
+    return ret;
 }
 
 #ifdef __cplusplus

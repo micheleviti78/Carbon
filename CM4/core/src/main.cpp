@@ -35,41 +35,43 @@ extern "C" {
  * @retval int
  */
 int main(void) {
-  /*HW semaphore Clock enable*/
-  __HAL_RCC_HSEM_CLK_ENABLE();
-  /* Activate HSEM notification for Cortex-M4*/
-  HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
-  /*
-  Domain D2 goes to STOP mode (Cortex-M4 in deep-sleep) waiting for Cortex-M7 to
-  perform system initialization (system clock config, external memory
-  configuration.. )
-  */
-  HAL_PWREx_ClearPendingEvent();
-  HAL_PWREx_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFE,
-                          PWR_D2_DOMAIN);
-  /* Clear HSEM flag */
-  __HAL_HSEM_CLEAR_FLAG(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
+    /*HW semaphore Clock enable*/
+    __HAL_RCC_HSEM_CLK_ENABLE();
+    /* Activate HSEM notification for Cortex-M4*/
+    HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
+    /*
+    Domain D2 goes to STOP mode (Cortex-M4 in deep-sleep) waiting for Cortex-M7
+    to perform system initialization (system clock config, external memory
+    configuration.. )
+    */
+    HAL_PWREx_ClearPendingEvent();
+    HAL_PWREx_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFE,
+                            PWR_D2_DOMAIN);
+    /* Clear HSEM flag */
+    __HAL_HSEM_CLEAR_FLAG(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
 
-  /* MCU Configuration--------------------------------------------------------*/
+    /* MCU
+     * Configuration--------------------------------------------------------*/
 
-  /*low level system time initialization*/
-  low_level_system_time();
+    /*low level system time initialization*/
+    low_level_system_time();
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
-   */
-  HAL_Init();
+    /* Reset of all peripherals, Initializes the Flash interface and the
+     * Systick.
+     */
+    HAL_Init();
 
-  /* Initialize Pin needed by the Error function */
-  BSP_LED_Init(LED_BLUE);
-  BSP_LED_Init(LED_RED);
+    /* Initialize Pin needed by the Error function */
+    BSP_LED_Init(LED_BLUE);
+    BSP_LED_Init(LED_RED);
 
-  // init_diag();
+    // init_diag();
 
-  /* Infinite loop */
-  while (1) {
-    HAL_Delay(500);
-    BSP_LED_Toggle(LED_BLUE);
-  }
+    /* Infinite loop */
+    while (1) {
+        HAL_Delay(500);
+        BSP_LED_Toggle(LED_BLUE);
+    }
 }
 
 #ifdef USE_FULL_ASSERT
@@ -81,11 +83,12 @@ int main(void) {
  * @retval None
  */
 void assert_failed(uint8_t *file, uint32_t line) {
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line
-     number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
+    /* USER CODE BEGIN 6 */
+    /* User can add his own implementation to report the file name and line
+       number,
+       ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line)
+     */
+    /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
 

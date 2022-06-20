@@ -21,23 +21,27 @@
 #include <systime.hpp>
 
 #include <stm32h7xx_hal.h>
-#include <stm32h7xx_hal_tim.h>
+#include <stm32h7xx_ll_tim.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-static TIM_HandleTypeDef hal_tick;
+// NOTE: These functions are called during early init before static C++
+// constructors. Do not access any static global classes from these
+// functions!
 
 #ifdef CORE_CM7
-#define TIMx TIM2
-#define TIMx_IRQn TIM2_IRQn
+#define SYSTIME_TIM TIM2
+#define SYSTIME_TIM_PERIOD 0xFFFFFFFF // NOTE: always set to full span
+#define SYSTIME_TIM_IRQ TIM2_IRQn
+#define SYSTIME_TIM_CLK_EN() __HAL_RCC_TIM2_CLK_ENABLE();
 #else
-#define TIMx TIM5
-#define TIMx_IRQn TIM5_IRQn
+#define SYSTIME_TIM TIM5
+#define SYSTIME_TIM_PERIOD 0xFFFFFFFF // NOTE: always set to full span
+#define SYSTIME_TIM_IRQ TIM5_IRQn
+#define SYSTIME_TIM_CLK_EN() __HAL_RCC_TIM5_CLK_ENABLE()
 #endif
 
-void low_level_system_time(void) {
+static bool timRunning;
+
+void low_level_system_time() {
 #ifdef CORE_CM7
     /*
      *Setting DWT counter
@@ -45,9 +49,6 @@ void low_level_system_time(void) {
     DWT_Type *dwt = DWT;
     SET_BIT(dwt->CTRL, DWT_CTRL_CYCCNTENA_Msk);
 #endif
-    /*
-     *Setting HAL tick
-     */
     RCC_ClkInitTypeDef clkConfig{};
 
     uint32_t latency;
@@ -76,117 +77,117 @@ void low_level_system_time(void) {
     auto timPrescaler =
         static_cast<uint32_t>((timClk / 1000000) - 1); // 1MHz clock
 
-    /* Enable the TIMx global Interrupt
-     *  NO priority is set at this point.
-     */
+    LL_TIM_InitTypeDef timInit{};
+    LL_TIM_OC_InitTypeDef ocInit{};
 
-    HAL_NVIC_EnableIRQ(TIMx_IRQn);
+    SYSTIME_TIM_CLK_EN();
 
-#ifdef CORE_CM7
-    __HAL_RCC_TIM2_CLK_ENABLE();
-#else
-    __HAL_RCC_TIM5_CLK_ENABLE();
-#endif
+    LL_TIM_StructInit(&timInit);
+    timInit.Autoreload = SYSTIME_TIM_PERIOD;
+    timInit.Prescaler = timPrescaler;
+    timInit.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    timInit.CounterMode = TIM_COUNTERMODE_UP;
+    LL_TIM_Init(SYSTIME_TIM, &timInit);
 
-    hal_tick.Instance = TIMx;
-    hal_tick.Init.Prescaler = timPrescaler;
-    hal_tick.Init.CounterMode = TIM_COUNTERMODE_UP;
-    hal_tick.Init.Period = 999; // 1 ms period, 1 KHz
-    hal_tick.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    LL_TIM_OC_StructInit(&ocInit);
+    ocInit.CompareValue = SYSTIME_TIM_PERIOD >> 1;
+    ErrorStatus result =
+        LL_TIM_OC_Init(SYSTIME_TIM, LL_TIM_CHANNEL_CH1, &ocInit);
 
-    if (HAL_TIM_Base_Init(&hal_tick) != HAL_OK) {
-        Error_Handler();
-    } else {
-        /* Start the TIM time Base generation in interrupt mode */
-        if (HAL_TIM_Base_Start_IT(&hal_tick) != HAL_OK) {
-            Error_Handler();
-        } else {
-            return;
-        }
+    if (result == ERROR) {
+        while (1)
+            ;
     }
 
-    return;
+    timRunning = true;
+
+    SYSTIME_TIM->DIER |= TIM_DIER_CC1IE;
+    SYSTIME_TIM->CR1 |= TIM_CR1_CEN;
+
+    HAL_NVIC_SetPriority(SYSTIME_TIM_IRQ, TICK_INT_PRIORITY, 0);
+
+    HAL_NVIC_EnableIRQ(SYSTIME_TIM_IRQ);
 }
 
-HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority) {
-    /*
-     *Setting HAL tick prescaler
-     */
-    RCC_ClkInitTypeDef clkConfig{};
+static volatile uint64_t usCounterBase = 0;
+static volatile uint32_t usTimLastCount = 0;
 
-    uint32_t latency;
+static uint64_t usCounterAdjust(uint32_t usTimCnt) {
+    if (usTimCnt < usTimLastCount) {
+        usCounterBase += SYSTIME_TIM_PERIOD;
+    }
+    usTimLastCount = usTimCnt;
+    return usCounterBase + usTimCnt;
+}
 
-    HAL_RCC_GetClockConfig(&clkConfig, &latency);
+uint64_t systimeUs() {
+    __disable_irq();
+    return usCounterAdjust(SYSTIME_TIM->CNT);
+    __enable_irq();
+}
 
-    auto apb1Prescaler = clkConfig.APB1CLKDivider;
+void delayUs(uint32_t us) {
+    uint32_t CNT1 = SYSTIME_TIM->CNT;
+    uint32_t CNT2;
+    uint32_t diff;
+    while (true) {
+        do {
+            CNT2 = SYSTIME_TIM->CNT;
+        } while (CNT2 == CNT1);
+        diff = CNT2 > CNT1 ? (CNT2 - CNT1) : (SYSTIME_TIM_PERIOD - CNT1 + CNT2);
+        if (diff >= us)
+            break;
+        us -= diff;
+        CNT1 = CNT2;
+    }
+}
 
-    auto pclk1Freq = HAL_RCC_GetPCLK1Freq();
+extern "C" {
 
-    uint32_t timClk;
-    switch (apb1Prescaler) {
-    case RCC_APB1_DIV1:
-        timClk = pclk1Freq;
-        break;
-    case RCC_APB1_DIV2:
-        timClk = 2 * pclk1Freq;
-        break;
-    default:
+void carbon_hw_us_systime_tim_isr() {
+    uint32_t sr = SYSTIME_TIM->SR;
+    if (0 != (sr & TIM_SR_UIF)) {
+        SYSTIME_TIM->SR = ~TIM_DIER_UIE;
+    }
+    if (0 != (sr & TIM_SR_CC1IF)) {
+        SYSTIME_TIM->SR = ~TIM_DIER_CC1IE;
+        uint32_t cnt = SYSTIME_TIM->CNT;
+        usCounterAdjust(cnt);
+        cnt += SYSTIME_TIM_PERIOD >> 1;
+        if (cnt > SYSTIME_TIM_PERIOD)
+            cnt -= SYSTIME_TIM_PERIOD;
+        SYSTIME_TIM->CCR1 = cnt;
+    }
+}
+
+/***** HAL Tick withSysTick *****/
+
+HAL_StatusTypeDef HAL_InitTick(uint32_t /*TickPriority*/) {
+    if (uwTickFreq != HAL_TICK_FREQ_1KHZ)
         return HAL_ERROR;
-    }
-
-    if (timClk < 1000000ul) {
-        Error_Handler();
-    }
-
-    auto timPrescaler =
-        static_cast<uint32_t>((timClk / 1000000) - 1); // 1MHz clock
-
-    __HAL_TIM_SET_PRESCALER(&hal_tick, timPrescaler);
-
-    /*Configure the TIMx IRQ priority */
-    HAL_NVIC_SetPriority(TIMx_IRQn, TickPriority, 0);
-
     return HAL_OK;
 }
 
-/**
- * @brief  Period elapsed callback in non blocking mode
- * @note   This function is called  when TIMx interrupt took place, inside
- * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
- * a global variable "uwTick" used as application time base.
- * @param  htim : TIM handle
- * @retval None
- */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-    if (htim->Instance == TIMx) {
-        HAL_IncTick();
+void HAL_IncTick() { Error_Handler(); }
+
+uint32_t HAL_GetTick() {
+    if (timRunning) {
+        return static_cast<uint32_t>(systimeUs() / 1000);
+    } else {
+        return 0;
     }
 }
 
-/**
- * @brief  Suspend Tick increment.
- * @note   Disable the tick increment by disabling TIMx update interrupt.
- * @param  None
- * @retval None
- */
-void HAL_SuspendTick(void) {
-    /* Disable TIM6 update Interrupt */
-    __HAL_TIM_DISABLE_IT(&hal_tick, TIM_IT_UPDATE);
+void HAL_Delay(uint32_t delay) {
+    if (timRunning) {
+        delayUs(delay * 1000);
+    }
 }
 
-/**
- * @brief  Resume Tick increment.
- * @note   Enable the tick increment by Enabling TIMx update interrupt.
- * @param  None
- * @retval None
- */
-void HAL_ResumeTick(void) {
-    /* Enable TIMx Update interrupt */
-    __HAL_TIM_ENABLE_IT(&hal_tick, TIM_IT_UPDATE);
-}
+void HAL_SuspendTick() {}
 
-void hal_tick_isr(void) { HAL_TIM_IRQHandler(&hal_tick); }
+void HAL_ResumeTick() {}
 
-#ifdef __cplusplus
-}
-#endif
+/**********/
+
+} // extern "C"

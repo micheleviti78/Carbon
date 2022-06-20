@@ -20,7 +20,7 @@
 
 #include <main.hpp>
 
-void hal_tick_isr(void);
+void carbon_hw_us_systime_tim_isr(void);
 
 /******************************************************************************/
 /*           Cortex Processor Interruption and Exception Handlers          */
@@ -89,4 +89,4 @@ void SysTick_Handler(void) {}
  * @brief This function handles TIM5.
  */
 
-void TIM5_IRQHandler(void) { hal_tick_isr(); }
+void TIM5_IRQHandler(void) { carbon_hw_us_systime_tim_isr(); }

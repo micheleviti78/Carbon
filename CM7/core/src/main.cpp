@@ -57,9 +57,6 @@ int main(void) {
 
     SCB_EnableDCache();
 
-    /*low level system time initialization*/
-    low_level_system_time();
-
     /*HAL low level init*/
     HAL_Init();
 
@@ -71,6 +68,9 @@ int main(void) {
 
     /*init SDRAM*/
     init_sdram();
+
+    /*init timer*/
+    low_level_system_time();
 
     /* Initialize Pin needed by the Error function */
     BSP_LED_Init(LED_GREEN);
@@ -98,7 +98,7 @@ int main(void) {
 
     /* Infinite loop */
     while (1) {
-        HAL_Delay(500);
+        HAL_Delay(1000);
         BSP_LED_Toggle(LED_GREEN);
     }
 }

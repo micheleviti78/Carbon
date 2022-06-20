@@ -16,7 +16,9 @@
                 "CORE_CM7=1",
                 "CORE_CM4=1",
                 "HAL_TIM_MODULE_ENABLED=1",
-                "DUAL_CORE=1"
+                "DUAL_CORE=1",
+                "TIM2=1",
+                "USE_FULL_LL_DRIVER=1"
             ],
             "compilerPath": "/opt/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gcc",
             "cStandard": "c11",

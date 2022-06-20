@@ -21,7 +21,7 @@
 #include "main.hpp"
 
 void fmc_isr(void);
-void hal_tick_isr(void);
+void mwi_cm7_hw_us_systime_tim_isr(void);
 
 /******************************************************************************/
 /*           Cortex Processor Interruption and Exception Handlers          */
@@ -95,4 +95,4 @@ void FMC_IRQHandler(void) { fmc_isr(); }
  * @brief This function handles TIM2.
  */
 
-void TIM2_IRQHandler(void) { hal_tick_isr(); }
+void TIM2_IRQHandler(void) { mwi_cm7_hw_us_systime_tim_isr(); }

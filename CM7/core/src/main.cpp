@@ -57,14 +57,14 @@ int main(void) {
 
     SCB_EnableDCache();
 
-    /*low level system time initialization*/
-    low_level_system_time();
-
     /*HAL low level init*/
     HAL_Init();
 
     /* Configure the system clock */
     SystemClock_Config();
+
+    /*low level system time initialization*/
+    low_level_system_time();
 
     /* init DIAG*/
     init_diag();

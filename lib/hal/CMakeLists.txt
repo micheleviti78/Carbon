@@ -42,12 +42,17 @@ SET(HAL_SOURCE
     Src/stm32h7xx_ll_delayblock.c
     Src/stm32h7xx_ll_fmc.c
     Src/stm32h7xx_ll_sdmmc.c
+    Src/stm32h7xx_ll_tim.c
     Src/stm32h7xx_ll_usb.c
 )
 
 add_library(${HAL_LIB} STATIC ${HAL_SOURCE})
 
 target_link_libraries(${HAL_LIB}  cmsis_${PROJECT_NAME})
+
+target_compile_definitions(${HAL_LIB} PUBLIC -DSTM32H747xx -DUSE_FULL_LL_DRIVER)
+
+#target_compile_definitions(${HAL_LIB} PUBLIC -DUSE_HAL_DRIVER)
 
 target_include_directories(${HAL_LIB}
     SYSTEM

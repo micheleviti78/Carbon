@@ -20,6 +20,8 @@
 
 #include <stm32h7xx_hal.h>
 
+#include <cstdint>
+
 #define DWT_CLOCKS(dwt) dwt->CYCCNT;
 
 #ifdef __cplusplus
@@ -27,6 +29,10 @@ extern "C" {
 #endif
 
 void low_level_system_time(void);
+
+uint64_t systimeUs();
+
+void delayUs(uint32_t us);
 
 #ifdef __cplusplus
 }

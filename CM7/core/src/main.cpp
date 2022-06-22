@@ -37,6 +37,11 @@ extern "C" {
 
 static void SystemClock_Config(void);
 
+#define GET_HAL_VERSION_MAIN ((HAL_GetHalVersion() >> 24) & 0xFFUL)
+#define GET_HAL_VERSION_SUB1 ((HAL_GetHalVersion() >> 16) & 0xFFUL)
+#define GET_HAL_VERSION_SUB2 ((HAL_GetHalVersion() >> 8) & 0xFFUL)
+#define GET_HAL_VERSION_RC (HAL_GetHalVersion() & 0xFFUL)
+
 /**
  * @brief  The application entry point.
  * @retval int
@@ -95,6 +100,8 @@ int main(void) {
     RAW_DIAG("Inizialization complete");
     RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,
              __NEWLIB_PATCHLEVEL__);
+    RAW_DIAG("HAL version %d.%d.%d.%d", GET_HAL_VERSION_MAIN,
+             GET_HAL_VERSION_SUB1, GET_HAL_VERSION_SUB2, GET_HAL_VERSION_RC);
 
     /* Infinite loop */
     while (1) {

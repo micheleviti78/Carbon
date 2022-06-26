@@ -97,7 +97,7 @@ int main(void) {
         Error_Handler();
     }
 
-    RAW_DIAG("Inizialization complete");
+    RAW_DIAG("Initialization complete");
     RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,
              __NEWLIB_PATCHLEVEL__);
     RAW_DIAG("HAL version %d.%d.%d.%d", GET_HAL_VERSION_MAIN,

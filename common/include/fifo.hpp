@@ -3,7 +3,8 @@
  * @file           fifo.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Mar. 2022
- * @brief          DISCO-STM32H747 fifo template
+ * @brief          DISCO-STM32H747 fifo template. it works for opology like
+ *                 one(many) producers --> one consumer
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -18,48 +19,81 @@
 
 template <typename ObjectType, typename Lock, std::size_t Size> class Fifo {
 public:
-    Fifo() {
-        head = 0;
-        tail = 0;
-    }
+    Fifo() = default;
 
-    ~Fifo();
+    ~Fifo() = default;
 
-    inline bool add(const ObjectType object) {
+    inline bool add(const ObjectType &object) {
+        size_t current_tail{0};
         {
             Lock lock;
             if (!isFull()) {
-                size_t current_tail = this->tail;
-                this->tail = increment(this->tail);
+                current_tail = this->tail_reserved_;
+                this->tail_reserved_ = increment(this->tail_reserved_);
             } else {
-                errorOverflow(object);
+                if (errorOverflow)
+                    errorOverflow(object);
                 return false;
             }
         }
+
         data[current_tail] = object;
+
+        {
+            Lock lock(Lock::signalize);
+            uint8_t bit_pos = static_cast<uint8_t>(1u << (current_tail % 8u));
+            tail_ready[(current_tail / 8u)] |= bit_pos;
+        }
+
+        return true;
     }
 
     inline bool remove(ObjectType &object) {
+        uint8_t tail_ready_bit_pos{0};
+        size_t tail_ready_index{0};
         {
             Lock lock;
-            if (!isEmpty()) {
-                size_t current_head = this->head;
-                this->head = increment(this->head);
-            } else {
-                return errorUnderflow(object);
+            size_t current_head = this->head_;
+            tail_ready_bit_pos =
+                static_cast<uint8_t>(1u << (current_head % 8u));
+            tail_ready_index = current_head / 8u;
+            if (tail_ready[tail_ready_index] == 0) {
+                if (errorUnderflow)
+                    errorUnderflow();
+                return false;
             }
         }
+
         object = data[current_head];
+
+        {
+            Lock lock(Lock::signalize);
+            this->head_ = increment(this->head_);
+            tail_ready[tail_ready_index] == 0;
+        }
     }
 
     inline bool isEmpty() {
-        bool res = (head == tail);
+        size_t current_head = this->head_;
+        uint8_t bit_pos = static_cast<uint8_t>(1u << (current_head % 8u));
+        bool res = (tail_ready[(current_head / 8u)] & bit_pos == 0);
         return res;
     }
+
     inline bool isFull() {
-        size_t tail = increment(this->tail);:
-        bool res = (head == tail);
+        size_t tail = increment(this->tail_reserved_);:
+        bool res = (head_ == tail);
         return res;
+    }
+
+    typedef void (*CallbackOverFlow)(const ObjectType &object);
+    typedef void (*CallbackUnderFlow)(ObjectType object);
+
+    void setCallbackOverFlow(CallbackOverFlow callback) {
+        callbackOverFlow = callback;
+    }
+    void setCallbackUnderFlow(CallbackUnderFlow callback) {
+        callbackUnderFlow = callback;
     }
 
 private:
@@ -71,10 +105,12 @@ private:
         }
     }
 
-    inline void errorOverflow(const ObjectType /*object*/) { return false; };
-    inline void errorUnderflow(ObjectType & /*object*/) { return false; };
+    CallbackOverFlow callbackOverFlow{nullptr};
+    CallbackUnderFlow callbackUnderFlow{nullptr};
 
-    ObjectType data[Size + 1];
-    size_t head{0};
-    size_t tail{0};
+    ObjectType data_[Size + 1];
+    size_t tail_reserved_{0};
+    size_t head_{0};
+    constexpr auto bit_field_size = (Size + 1) / 8u + 1u;
+    uint8_t tail_ready[bit_field_size]{0};
 };

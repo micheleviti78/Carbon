@@ -122,8 +122,9 @@ static uint64_t usCounterAdjust(uint32_t usTimCnt) {
 
 uint64_t systimeUs() {
     __disable_irq();
-    return usCounterAdjust(SYSTIME_TIM->CNT);
+    uint64_t count = usCounterAdjust(SYSTIME_TIM->CNT);
     __enable_irq();
+    return count;
 }
 
 void delayUs(uint32_t us) {

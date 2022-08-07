@@ -3,8 +3,8 @@
  * @file           fifo.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Mar. 2022
- * @brief          DISCO-STM32H747 fifo template. it works for opology like
- *                 one(many) producers --> one consumer
+ * @brief          DISCO-STM32H747 fifo template. it works for topology like
+ *                 one(many) producer(s) --> one consumer
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -25,16 +25,21 @@ public:
 
     inline bool add(const ObjectType &object) {
         size_t current_tail{0};
+        bool isOverflow = false;
         {
             Lock lock;
             if (!isFull()) {
                 current_tail = this->tail_reserved_;
                 this->tail_reserved_ = increment(this->tail_reserved_);
             } else {
-                if (errorOverflow)
-                    errorOverflow(object);
-                return false;
+                isOverflow = true;
             }
+        }
+
+        if (isOverflow) {
+            if (callbackOverflow)
+                callbackOverflow(object);
+            return false;
         }
 
         data[current_tail] = object;
@@ -51,6 +56,7 @@ public:
     inline bool remove(ObjectType &object) {
         uint8_t tail_ready_bit_pos{0};
         size_t tail_ready_index{0};
+        bool isUnderflow = false;
         {
             Lock lock;
             size_t current_head = this->head_;
@@ -58,10 +64,14 @@ public:
                 static_cast<uint8_t>(1u << (current_head % 8u));
             tail_ready_index = current_head / 8u;
             if (tail_ready[tail_ready_index] == 0) {
-                if (errorUnderflow)
-                    errorUnderflow();
-                return false;
+                isUnderflow = true
             }
+        }
+
+        if (isUnderflow) {
+            if (callbackUnderflow)
+                callbackUnderflow(object);
+            return false;
         }
 
         object = data[current_head];
@@ -86,14 +96,14 @@ public:
         return res;
     }
 
-    typedef void (*CallbackOverFlow)(const ObjectType &object);
-    typedef void (*CallbackUnderFlow)(ObjectType object);
+    typedef void (*CallbackOverflow)(const ObjectType &object);
+    typedef void (*CallbackUnderflow)(ObjectType object);
 
-    void setCallbackOverFlow(CallbackOverFlow callback) {
-        callbackOverFlow = callback;
+    void setCallbackOverflow(CallbackOverflow callback) {
+        callbackOverflow = callback;
     }
-    void setCallbackUnderFlow(CallbackUnderFlow callback) {
-        callbackUnderFlow = callback;
+    void setCallbackUnderflow(CallbackUnderflow callback) {
+        callbackUnderflow = callback;
     }
 
 private:
@@ -105,8 +115,8 @@ private:
         }
     }
 
-    CallbackOverFlow callbackOverFlow{nullptr};
-    CallbackUnderFlow callbackUnderFlow{nullptr};
+    CallbackOverflow callbackOverflow{nullptr};
+    CallbackUnderflow callbackUnderflow{nullptr};
 
     ObjectType data_[Size + 1];
     size_t tail_reserved_{0};

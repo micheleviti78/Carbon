@@ -18,6 +18,19 @@
 
 template <typename Mutex> class Lock {
 public:
-    inline Lock() { Mutex::get(); }
-    inline ~Lock() { Mutex::release(); }
-}
+    enum SignalizeOption { signalize, notSignalize };
+
+    inline Lock(SignalizeOption option = SignalizeOption::notSignalize)
+        : signalizeOption_(option) {
+        mutex_.get();
+    }
+    inline ~Lock() {
+        mutex_.release();
+        if (signalizeOption_ == SignalizeOption::signalize)
+            mutex_.signalize();
+    }
+
+private:
+    SignalizeOption signalizeOption_;
+    Mutex mutex_;
+};

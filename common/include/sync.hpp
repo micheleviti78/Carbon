@@ -16,8 +16,16 @@
  ******************************************************************************
  */
 
+#include <common.hpp>
+
 template <typename Mutex> class Lock {
 public:
+    Lock() = default;
+
+    ~Lock() = default;
+
+    PREVENT_COPY_AND_MOVE(Lock)
+
     enum SignalizeOption { signalize, notSignalize };
 
     inline Lock(SignalizeOption option = SignalizeOption::notSignalize)
@@ -34,3 +42,32 @@ private:
     SignalizeOption signalizeOption_;
     Mutex mutex_;
 };
+
+class BaseMutex {
+public:
+    BaseMutex() = default;
+
+    ~BaseMutex() = default;
+
+    PREVENT_COPY_AND_MOVE(BaseMutex)
+
+    void get() = 0;
+
+    void release() = 0;
+
+    void signalize() = 0;
+}
+
+class DummyMutex()
+    : public BaseMutex {
+public:
+    DummyMutex() = default;
+
+    inline void get() {}
+
+    inline void release() {}
+
+    inline void signalize() {}
+}
+
+Lock<DummyMutex> DummyLock;

@@ -17,14 +17,18 @@
  ******************************************************************************
  */
 
+#include <common.hpp>
+
 template <typename ObjectType, typename Lock, std::size_t Size> class Fifo {
 public:
     Fifo() = default;
 
     ~Fifo() = default;
 
+    PREVENT_COPY_AND_MOVE(Fifo)
+
     inline bool add(const ObjectType &object) {
-        size_t current_tail{0};
+        std::size_t current_tail{0};
         bool isOverflow = false;
         {
             Lock lock;
@@ -55,11 +59,11 @@ public:
 
     inline bool remove(ObjectType &object) {
         uint8_t tail_ready_bit_pos{0};
-        size_t tail_ready_index{0};
+        std::size_t tail_ready_index{0};
         bool isUnderflow = false;
         {
             Lock lock;
-            size_t current_head = this->head_;
+            std::size_t current_head = this->head_;
             tail_ready_bit_pos =
                 static_cast<uint8_t>(1u << (current_head % 8u));
             tail_ready_index = current_head / 8u;
@@ -84,14 +88,14 @@ public:
     }
 
     inline bool isEmpty() {
-        size_t current_head = this->head_;
+        std::size_t current_head = this->head_;
         uint8_t bit_pos = static_cast<uint8_t>(1u << (current_head % 8u));
         bool res = (tail_ready[(current_head / 8u)] & bit_pos == 0);
         return res;
     }
 
     inline bool isFull() {
-        size_t tail = increment(this->tail_reserved_);:
+        std::size_t tail = increment(this->tail_reserved_);:
         bool res = (head_ == tail);
         return res;
     }
@@ -107,7 +111,7 @@ public:
     }
 
 private:
-    inline size_t increment(size_t index) {
+    inline std::size_t increment(std::size_t index) {
         if (index < Size) {
             return (index + 1);
         } else {
@@ -119,8 +123,8 @@ private:
     CallbackUnderflow callbackUnderflow{nullptr};
 
     ObjectType data_[Size + 1];
-    size_t tail_reserved_{0};
-    size_t head_{0};
+    std::size_t tail_reserved_{0};
+    std::size_t head_{0};
     constexpr auto bit_field_size = (Size + 1) / 8u + 1u;
     uint8_t tail_ready[bit_field_size]{0};
 };

@@ -18,6 +18,7 @@
  */
 
 #include <common.hpp>
+#include <pool.hpp>
 
 template <typename ObjectType, typename Lock, std::size_t Size> class Fifo {
 public:
@@ -27,7 +28,7 @@ public:
 
     PREVENT_COPY_AND_MOVE(Fifo)
 
-    inline bool add(const ObjectType &object) {
+    inline bool push(const ObjectType &object) {
         std::size_t current_tail{0};
         bool isOverflow = false;
         {
@@ -57,7 +58,7 @@ public:
         return true;
     }
 
-    inline bool remove(ObjectType &object) {
+    inline bool pop(ObjectType &object) {
         uint8_t tail_ready_bit_pos{0};
         std::size_t tail_ready_index{0};
         bool isUnderflow = false;

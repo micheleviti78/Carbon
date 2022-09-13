@@ -24,6 +24,8 @@
 #include <sdram.hpp>
 #include <systime.hpp>
 
+#include <pool.hpp>
+
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
@@ -34,6 +36,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+static uint8_t data[128];
+static uint32_t dataPtr = reinterpret_cast<uint32_t>(&data[0]);
 
 static void SystemClock_Config(void);
 
@@ -104,6 +109,17 @@ int main(void) {
              GET_HAL_VERSION_SUB1, GET_HAL_VERSION_SUB2, GET_HAL_VERSION_RC);
 
     /* Infinite loop */
+
+    MemoryRegion memoryRegion{dataPtr, 128};
+    MemoryAllocatorRaw<2, 2> memoryAllocatorRaw(memoryRegion);
+    MemoryPoolRaw<DummyMutex, 12, MemoryAllocatorRaw<2, 2>> memoryPoolRaw{
+        memoryAllocatorRaw};
+    Buffer<uint8_t, MemoryAllocatorRaw<2, 2>> buffer{memoryAllocatorRaw};
+
+    uint8_t dummyData = 8;
+
+    buffer.insert(dummyData, 0);
+
     while (1) {
         HAL_Delay(1000);
         BSP_LED_Toggle(LED_GREEN);

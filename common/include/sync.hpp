@@ -20,10 +20,6 @@
 
 template <typename Mutex> class Lock {
 public:
-    Lock() = default;
-
-    ~Lock() = default;
-
     PREVENT_COPY_AND_MOVE(Lock)
 
     enum SignalizeOption { signalize, notSignalize };
@@ -51,23 +47,20 @@ public:
 
     PREVENT_COPY_AND_MOVE(BaseMutex)
 
-    void get() = 0;
+    virtual void get() = 0;
 
-    void release() = 0;
+    virtual void release() = 0;
 
-    void signalize() = 0;
-}
+    virtual void signalize() = 0;
+};
 
-class DummyMutex()
-    : public BaseMutex {
+class DummyMutex : public BaseMutex {
 public:
-    DummyMutex() = default;
+    DummyMutex() : BaseMutex(){};
 
-    inline void get() {}
+    inline void get() override {}
 
-    inline void release() {}
+    inline void release() override {}
 
-    inline void signalize() {}
-}
-
-Lock<DummyMutex> DummyLock;
+    inline void signalize() override {}
+};

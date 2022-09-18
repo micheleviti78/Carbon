@@ -40,19 +40,25 @@ public:
 private:
     uint8_t *data_{nullptr};
     uint32_t size_;
+    bool isInitialized{false};
 };
 
-template <uint32_t blockSize, uint32_t alignment> class MemoryAllocatorRaw {
+template <size_t blockSize, uint32_t alignment> class MemoryAllocatorRaw {
 public:
-    MemoryAllocatorRaw(MemoryRegion &region) : memoryRegion_(region) {
-        alignedBlockSize_ = alignBlockSize(blockSize, alignment);
-        firstAlignedAddress_ = alignAddress(startAddress_, alignment);
-        alignedAddress_ = firstAlignedAddress_;
-    }
+    MemoryAllocatorRaw(uint32_t startAddress, uint32_t size)
+        : memoryRegion_(startAddress, size) {}
 
     ~MemoryAllocatorRaw() = default;
 
     PREVENT_COPY_AND_MOVE(MemoryAllocatorRaw)
+
+    void init() {
+        sizeTotalBytes_ = memoryRegion_.getSize();
+        startAddress_ = memoryRegion_.getAddress();
+        alignedBlockSize_ = alignBlockSize(blockSize, alignment);
+        firstAlignedAddress_ = alignAddress(startAddress_, alignment);
+        alignedAddress_ = firstAlignedAddress_;
+    }
 
     bool getBlock(uint8_t **block) {
         if (alignedAddress_ >= startAddress_ + sizeTotalBytes_) {
@@ -86,26 +92,52 @@ public:
 
     const MemoryRegion &getMemoryRegion() { return memoryRegion_; }
 
+    uint32_t getTotalSize() const { return sizeTotalBytes_; }
+
+    uint32_t getAlignedBlockSize() const { return alignedBlockSize_; }
+
+    uint32_t getStartAddress() const { return startAddress_; }
+
+    uint32_t getAlignedStartAddress() const { return firstAlignedAddress_; }
+
+    uint32_t getNumberOfAlignedElements() const {
+        return getNumberOfElements(startAddress_, sizeTotalBytes_, blockSize,
+                                   alignment);
+    }
+
     static constexpr uint32_t predictAlignedBlockSize(uint32_t objectSize,
                                                       uint32_t memAlignment) {
         return alignBlockSize(objectSize, memAlignment);
     }
 
     static constexpr uint32_t getNumberOfElements(uint8_t *address,
-                                                  uint32_t elementSize,
+                                                  uint32_t bufferSize,
+                                                  uint32_t objectSize,
                                                   uint32_t memAlignment) {
+        RAW_DIAG(
+            "address %lu, bufferSize %lu, objectSize %lu, memAlignment %lu",
+            reinterpret_cast<uint32_t>(address), bufferSize, objectSize,
+            memAlignment);
         uint8_t *startAddr = alignAddress(address, memAlignment);
-        uint8_t *endAddr = address + elementSize;
+        uint32_t objectSizeAligned =
+            predictAlignedBlockSize(objectSize, memAlignment);
+        uint8_t *endAddr = (address + bufferSize) > startAddr
+                               ? (address + bufferSize)
+                               : startAddr;
         uint32_t actualSize = reinterpret_cast<uint32_t>(endAddr) -
                               reinterpret_cast<uint32_t>(startAddr);
-        return (actualSize / elementSize);
+        RAW_DIAG(
+            "startAddr %lu, objectSizeAligned %lu, endAddr %lu, actualSize %lu",
+            reinterpret_cast<uint32_t>(startAddr), objectSizeAligned,
+            reinterpret_cast<uint32_t>(endAddr), actualSize);
+        return (actualSize / objectSizeAligned);
     }
 
 private:
-    const MemoryRegion &memoryRegion_;
-    uint32_t sizeTotalBytes_{memoryRegion_.getSize()};
+    MemoryRegion memoryRegion_;
+    uint32_t sizeTotalBytes_{0};
     uint32_t alignedBlockSize_{0};
-    uint8_t *startAddress_{memoryRegion_.getAddress()};
+    uint8_t *startAddress_{nullptr};
     uint8_t *firstAlignedAddress_{nullptr};
     uint8_t *alignedAddress_{nullptr};
 
@@ -143,10 +175,10 @@ protected:
     uint32_t top_;
 };
 
-template <typename ObjectType, typename Lock, uint32_t Size>
+template <typename ObjectType, typename Lock, uint32_t NElements>
 class Stack : public StackBase {
 public:
-    Stack() : StackBase(Size) {}
+    Stack() : StackBase(NElements) {}
 
     ~Stack() = default;
 
@@ -177,14 +209,19 @@ public:
     }
 
 private:
-    ObjectType *data[Size + 1];
+    ObjectType *data[NElements + 1];
 };
 
-template <typename LockType, uint32_t Size, typename MemoryAllocatorRaw>
+template <typename MemoryAllocatorRaw, typename LockType, uint32_t NElements>
 class MemoryPoolRaw {
 public:
     MemoryPoolRaw(MemoryAllocatorRaw &memoryAllocator)
-        : memoryAllocator_(memoryAllocator) {}
+        : memoryAllocator_(memoryAllocator) {
+        memoryAllocator_.init();
+        if (memoryAllocator_.getNumberOfAlignedElements() < NElements + 1) {
+            RAW_DIAG("memomy buffer too small");
+        }
+    }
 
     ~MemoryPoolRaw() { memoryAllocator_.reset(); }
 
@@ -236,25 +273,32 @@ protected:
     volatile bool isInitislized_{false};
     uint32_t size_{0};
     MemoryAllocatorRaw &memoryAllocator_;
-    Stack<uint8_t, Lock<DummyMutex>, Size> pool_;
+    Stack<uint8_t, Lock<DummyMutex>, NElements> pool_;
 };
 
-template <typename ObjectType, typename MemoryAllocatorRaw> class Buffer {
+template <typename ObjectType, uint32_t aligment> class Buffer {
 public:
-    Buffer(MemoryAllocatorRaw &memoryAllocatorRaw)
-        : memoryAllocatorRaw_(memoryAllocatorRaw) {}
+    Buffer(uint32_t startAddress, uint32_t size)
+        : memoryAllocatorRaw_(startAddress, size) {}
 
     ~Buffer() = default;
 
     PREVENT_COPY_AND_MOVE(Buffer)
+
+    void init() { memoryAllocatorRaw_.init(); }
 
     inline bool insert(const ObjectType &object, const uint32_t index) {
         uint8_t *data;
         if (!(memoryAllocatorRaw_.getBlock(&data, index))) {
             return false;
         }
-        std::memcpy(reinterpret_cast<void *>(&data),
-                    reinterpret_cast<const void *>(object), sizeof(object));
+        std::memcpy(reinterpret_cast<void *>(data),
+                    reinterpret_cast<const void *>(&object), sizeof(object));
+#ifdef TEST_FIFO
+        RAW_DIAG("inserted value at %lu, from the address %lu, length %lu",
+                 reinterpret_cast<uint32_t>(data),
+                 reinterpret_cast<uint32_t>(&object), sizeof(object));
+#endif
         return true;
     }
 
@@ -265,9 +309,20 @@ public:
         }
         std::memcpy(reinterpret_cast<void *>(&object),
                     reinterpret_cast<const void *>(data), sizeof(object));
+#ifdef TEST_FIFO
+        RAW_DIAG("removed value at %lu, in the address %lu, length %lu",
+                 reinterpret_cast<uint32_t>(data),
+                 reinterpret_cast<uint32_t>(&object), sizeof(object));
+#endif
         return true;
     }
 
+    uint32_t getNumberOfAlignedElements() const {
+        return memoryAllocatorRaw_.getNumberOfAlignedElements();
+    }
+
+    typedef ObjectType Type;
+
 private:
-    MemoryAllocatorRaw &memoryAllocatorRaw_;
+    MemoryAllocatorRaw<sizeof(ObjectType), aligment> memoryAllocatorRaw_;
 };

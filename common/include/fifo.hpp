@@ -18,18 +18,28 @@
  */
 
 #include <common.hpp>
+#include <diag.hpp>
 #include <pool.hpp>
 
-template <typename ObjectType, typename Lock, std::size_t Size> class Fifo {
+template <typename ObjectType, uint32_t aligment, typename Lock,
+          uint32_t NElements>
+class Fifo {
 public:
-    Fifo() = default;
+    Fifo(Buffer<ObjectType, aligment> &buffer) : buffer_(buffer) {
+        buffer_.init();
+        uint32_t n = buffer_.getNumberOfAlignedElements();
+        if (n < (NElements + 1)) {
+            RAW_DIAG("memomy buffer too small");
+        }
+        RAW_DIAG("memomy buffer with %lu element(s)", n);
+    }
 
     ~Fifo() = default;
 
     PREVENT_COPY_AND_MOVE(Fifo)
 
     inline bool push(const ObjectType &object) {
-        std::size_t current_tail{0};
+        uint32_t current_tail{0};
         bool isOverflow = false;
         {
             Lock lock;
@@ -47,7 +57,7 @@ public:
             return false;
         }
 
-        data[current_tail] = object;
+        buffer_.insert(object, current_tail);
 
         {
             Lock lock(Lock::signalize);
@@ -60,16 +70,17 @@ public:
 
     inline bool pop(ObjectType &object) {
         uint8_t tail_ready_bit_pos{0};
-        std::size_t tail_ready_index{0};
+        uint32_t tail_ready_index{0};
+        uint32_t current_head;
         bool isUnderflow = false;
         {
             Lock lock;
-            std::size_t current_head = this->head_;
+            current_head = this->head_;
             tail_ready_bit_pos =
                 static_cast<uint8_t>(1u << (current_head % 8u));
             tail_ready_index = current_head / 8u;
-            if (tail_ready[tail_ready_index] == 0) {
-                isUnderflow = true
+            if ((tail_ready[tail_ready_index] & tail_ready_bit_pos) == 0) {
+                isUnderflow = true;
             }
         }
 
@@ -79,24 +90,26 @@ public:
             return false;
         }
 
-        object = data[current_head];
+        buffer_.remove(object, current_head);
 
         {
             Lock lock(Lock::signalize);
             this->head_ = increment(this->head_);
-            tail_ready[tail_ready_index] == 0;
+            tail_ready[tail_ready_index] &= ~tail_ready_bit_pos;
         }
+
+        return true;
     }
 
     inline bool isEmpty() {
-        std::size_t current_head = this->head_;
+        uint32_t current_head = this->head_;
         uint8_t bit_pos = static_cast<uint8_t>(1u << (current_head % 8u));
         bool res = (tail_ready[(current_head / 8u)] & bit_pos == 0);
         return res;
     }
 
     inline bool isFull() {
-        std::size_t tail = increment(this->tail_reserved_);:
+        uint32_t tail = increment(this->tail_reserved_);
         bool res = (head_ == tail);
         return res;
     }
@@ -112,8 +125,8 @@ public:
     }
 
 private:
-    inline std::size_t increment(std::size_t index) {
-        if (index < Size) {
+    inline uint32_t increment(uint32_t index) {
+        if (index < NElements) {
             return (index + 1);
         } else {
             return 0;
@@ -123,9 +136,9 @@ private:
     CallbackOverflow callbackOverflow{nullptr};
     CallbackUnderflow callbackUnderflow{nullptr};
 
-    ObjectType data_[Size + 1];
-    std::size_t tail_reserved_{0};
-    std::size_t head_{0};
-    constexpr auto bit_field_size = (Size + 1) / 8u + 1u;
+    Buffer<ObjectType, aligment> &buffer_;
+    uint32_t tail_reserved_{0};
+    uint32_t head_{0};
+    static constexpr auto bit_field_size = (NElements + 1) / 8u + 1u;
     uint8_t tail_ready[bit_field_size]{0};
 };

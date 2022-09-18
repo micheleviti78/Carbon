@@ -37,7 +37,17 @@
 extern "C" {
 #endif
 
-static uint8_t data[128];
+#pragma pack(push, 1)
+struct TestStruct {
+    uint8_t var1{0};
+    uint16_t var2{0};
+};
+#pragma pack(pop)
+
+static constexpr auto dataAlignment = uint32_t{4};
+static constexpr auto dataElements = uint32_t{4};
+
+static TestStruct data[128];
 static uint32_t dataPtr = reinterpret_cast<uint32_t>(&data[0]);
 
 static void SystemClock_Config(void);
@@ -114,18 +124,76 @@ int main(void) {
     // MemoryAllocatorRaw< sizeof(uint32_t), 4 > memoryAllocatorRaw{dataPtr,
     // 128}; MemoryPoolRaw< DummyMutex, 12, MemoryAllocatorRaw<sizeof(uint32_t),
     // 4> > memoryPoolRaw{memoryAllocatorRaw};
-    Buffer<uint16_t, 4> buffer{dataPtr, 128};
+    Buffer<TestStruct, dataAlignment> buffer{dataPtr + 1, 90};
 
-    Fifo<uint16_t, 4, Lock<DummyMutex>, 16> fifo{buffer};
+    Fifo<TestStruct, dataAlignment, Lock<DummyMutex>, dataElements> fifo{
+        buffer};
 
-    uint16_t dummyDataWrite = 8;
-    uint16_t dummyDataRead = 0;
+    TestStruct structWrite;
+    TestStruct structRead;
+    unsigned i;
 
-    fifo.push(dummyDataWrite);
+    for (i = 0; i < dataElements + 1; i++) {
+        structWrite.var1 = i + 1;
+        structWrite.var2 = i * 10 + 3;
 
-    fifo.pop(dummyDataRead);
+        if (!fifo.push(structWrite)) {
+            RAW_DIAG("Overflow at %u", i);
+        }
+    }
 
-    RAW_DIAG("data written %u, data read %u", dummyDataWrite, dummyDataRead);
+    for (i = 0; i < dataElements + 1; i++) {
+        if (!fifo.pop(structRead)) {
+            RAW_DIAG("Underflow at %u", i);
+        } else {
+            if ((structRead.var1 != i + 1) || (structRead.var2 != i * 10 + 3)) {
+                RAW_DIAG("read wrong data");
+            }
+        }
+    }
+
+    for (i = 0; i < dataElements + 1; i++) {
+        structWrite.var1 = i + 67;
+        structWrite.var2 = i * 10 + 954;
+
+        if (!fifo.push(structWrite)) {
+            RAW_DIAG("Overflow at %u", i);
+        }
+    }
+
+    if (!fifo.pop(structRead)) {
+        RAW_DIAG("Underflow at %u", i);
+    } else {
+        if ((structRead.var1 != 0 + 67) || (structRead.var2 != 0 * 10 + 954)) {
+            RAW_DIAG("read wrong data");
+        }
+    }
+
+    structWrite.var1 = 0xA5;
+    structWrite.var2 = 65000;
+
+    if (!fifo.push(structWrite)) {
+        RAW_DIAG("Overflow at %u", i);
+    }
+
+    for (i = 1; i < dataElements; i++) {
+        if (!fifo.pop(structRead)) {
+            RAW_DIAG("Underflow at %u", i);
+        } else {
+            if ((structRead.var1 != i + 67) ||
+                (structRead.var2 != i * 10 + 954)) {
+                RAW_DIAG("read wrong data");
+            }
+        }
+    }
+
+    if (!fifo.pop(structRead)) {
+        RAW_DIAG("Underflow at %u", i);
+    } else {
+        if ((structRead.var1 != 0xA5) || (structRead.var2 != 65000)) {
+            RAW_DIAG("read wrong data");
+        }
+    }
 
     while (1) {
         HAL_Delay(1000);

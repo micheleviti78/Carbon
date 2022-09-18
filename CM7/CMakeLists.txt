@@ -26,16 +26,25 @@ set(LDSCRIPT
 include(${PROJECT_ROOT_DIR}/common/cmake/common.cmake)
 
 SET(SOURCE
-    ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_hal_msp.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_it.c
 )
+
+            
+if(TEST_FIFO)
+    SET(SOURCE_MAIN ${CMAKE_CURRENT_LIST_DIR}/test/src/main_fifo.cpp)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTEST_FIFO")
+    message("testing fifo interface")
+else()
+    SET(SOURCE_MAIN ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp)
+endif(TEST_FIFO)
+
 
 SET(STARTUP_SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/startup/startup_stm32h747xihx.s
 )
 
-add_executable(${PROJECT_NAME} ${STARTUP_SOURCE} ${SOURCE} ${COMMON_SOURCE})
+add_executable(${PROJECT_NAME} ${STARTUP_SOURCE} ${SOURCE_MAIN} ${SOURCE} ${COMMON_SOURCE})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC

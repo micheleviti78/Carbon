@@ -24,7 +24,8 @@ template <typename Lock> class LockGuard {
 public:
     PREVENT_COPY_AND_MOVE(LockGuard)
 
-    inline LockGuard(Lock &lock, LockGuardSignalizeOption option = LockGuardSignalizeOption::NotSignalize)
+    inline LockGuard(Lock &lock, LockGuardSignalizeOption option =
+                                     LockGuardSignalizeOption::NotSignalize)
         : lock_(lock), signalizeOption_(option) {
         lock_.get();
     }
@@ -35,7 +36,7 @@ public:
     }
 
 private:
-    Lock& lock_;
+    Lock &lock_;
     LockGuardSignalizeOption signalizeOption_;
 };
 

@@ -62,7 +62,8 @@ public:
         buffer_.insert(object, current_tail);
 
         {
-            LockGuard<Lock> lockGuard(lock_, LockGuardSignalizeOption::Signalize);
+            LockGuard<Lock> lockGuard(lock_,
+                                      LockGuardSignalizeOption::Signalize);
             uint8_t bit_pos = static_cast<uint8_t>(1u << (current_tail % 8u));
             tail_ready[(current_tail / 8u)] |= bit_pos;
         }
@@ -76,7 +77,7 @@ public:
         uint32_t current_head;
         bool isUnderflow = false;
         {
-            LockGuard<Lock> lockGuard(lock_);;
+            LockGuard<Lock> lockGuard(lock_);
             current_head = this->head_;
             tail_ready_bit_pos =
                 static_cast<uint8_t>(1u << (current_head % 8u));

@@ -18,34 +18,34 @@
 
 #include <common.hpp>
 
-template <typename Mutex> class Lock {
+enum class LockGuardSignalizeOption { Signalize, NotSignalize };
+
+template <typename Lock> class LockGuard {
 public:
-    PREVENT_COPY_AND_MOVE(Lock)
+    PREVENT_COPY_AND_MOVE(LockGuard)
 
-    enum SignalizeOption { signalize, notSignalize };
-
-    inline Lock(SignalizeOption option = SignalizeOption::notSignalize)
-        : signalizeOption_(option) {
-        mutex_.get();
+    inline LockGuard(Lock &lock, LockGuardSignalizeOption option = LockGuardSignalizeOption::NotSignalize)
+        : lock_(lock), signalizeOption_(option) {
+        lock_.get();
     }
-    inline ~Lock() {
-        mutex_.release();
-        if (signalizeOption_ == SignalizeOption::signalize)
-            mutex_.signalize();
+    inline ~LockGuard() {
+        lock_.release();
+        if (signalizeOption_ == LockGuardSignalizeOption::Signalize)
+            lock_.signalize();
     }
 
 private:
-    SignalizeOption signalizeOption_;
-    Mutex mutex_;
+    Lock& lock_;
+    LockGuardSignalizeOption signalizeOption_;
 };
 
-class BaseMutex {
+class BaseLock {
 public:
-    BaseMutex() = default;
+    BaseLock() = default;
 
-    ~BaseMutex() = default;
+    ~BaseLock() = default;
 
-    PREVENT_COPY_AND_MOVE(BaseMutex)
+    PREVENT_COPY_AND_MOVE(BaseLock)
 
     virtual void get() = 0;
 
@@ -54,9 +54,9 @@ public:
     virtual void signalize() = 0;
 };
 
-class DummyMutex : public BaseMutex {
+class DummyLock : public BaseLock {
 public:
-    DummyMutex() : BaseMutex(){};
+    DummyLock() : BaseLock(){};
 
     inline void get() override {}
 

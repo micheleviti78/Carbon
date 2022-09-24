@@ -15,6 +15,7 @@
  *
  ******************************************************************************
  */
+#pragma once
 
 #include <common.hpp>
 #include <diag.hpp>
@@ -273,7 +274,7 @@ protected:
     volatile bool isInitislized_{false};
     uint32_t size_{0};
     MemoryAllocatorRaw &memoryAllocator_;
-    Stack<uint8_t, Lock<DummyMutex>, NElements> pool_;
+    Stack<uint8_t, LockGuard<DummyLock>, NElements> pool_;
 };
 
 template <typename ObjectType, uint32_t aligment> class Buffer {

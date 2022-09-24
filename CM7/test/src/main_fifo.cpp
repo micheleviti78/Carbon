@@ -126,7 +126,7 @@ int main(void) {
     // 4> > memoryPoolRaw{memoryAllocatorRaw};
     Buffer<TestStruct, dataAlignment> buffer{dataPtr + 1, 90};
 
-    Fifo<TestStruct, dataAlignment, Lock<DummyMutex>, dataElements> fifo{
+    Fifo<TestStruct, dataAlignment, DummyLock, dataElements> fifo{
         buffer};
 
     TestStruct structWrite;

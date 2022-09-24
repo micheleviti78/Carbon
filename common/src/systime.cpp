@@ -18,6 +18,8 @@
 
 #include <diag.hpp>
 #include <error.hpp>
+#include <irq.hpp>
+#include <sync.hpp>
 #include <systime.hpp>
 
 #include <stm32h7xx_hal.h>
@@ -40,6 +42,8 @@
 #endif
 
 static bool timRunning;
+
+static IRQLockRecursive irqLockRecursive;
 
 void low_level_system_time() {
 #ifdef CORE_CM7
@@ -121,9 +125,8 @@ static uint64_t usCounterAdjust(uint32_t usTimCnt) {
 }
 
 uint64_t systimeUs() {
-    __disable_irq();
+    LockGuard<IRQLockRecursive> lock(irqLockRecursive);
     uint64_t count = usCounterAdjust(SYSTIME_TIM->CNT);
-    __enable_irq();
     return count;
 }
 

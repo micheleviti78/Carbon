@@ -17,6 +17,8 @@
  ******************************************************************************
  */
 
+#pragma once
+
 #include <common.hpp>
 #include <diag.hpp>
 #include <pool.hpp>
@@ -42,7 +44,7 @@ public:
         uint32_t current_tail{0};
         bool isOverflow = false;
         {
-            Lock lock;
+            LockGuard<Lock> lockGuard(lock_);
             if (!isFull()) {
                 current_tail = this->tail_reserved_;
                 this->tail_reserved_ = increment(this->tail_reserved_);
@@ -60,7 +62,7 @@ public:
         buffer_.insert(object, current_tail);
 
         {
-            Lock lock(Lock::signalize);
+            LockGuard<Lock> lockGuard(lock_, LockGuardSignalizeOption::Signalize);
             uint8_t bit_pos = static_cast<uint8_t>(1u << (current_tail % 8u));
             tail_ready[(current_tail / 8u)] |= bit_pos;
         }
@@ -74,7 +76,7 @@ public:
         uint32_t current_head;
         bool isUnderflow = false;
         {
-            Lock lock;
+            LockGuard<Lock> lockGuard(lock_);;
             current_head = this->head_;
             tail_ready_bit_pos =
                 static_cast<uint8_t>(1u << (current_head % 8u));
@@ -93,7 +95,7 @@ public:
         buffer_.remove(object, current_head);
 
         {
-            Lock lock(Lock::signalize);
+            LockGuard<Lock> lockGuard(lock_);
             this->head_ = increment(this->head_);
             tail_ready[tail_ready_index] &= ~tail_ready_bit_pos;
         }
@@ -141,4 +143,5 @@ private:
     uint32_t head_{0};
     static constexpr auto bit_field_size = (NElements + 1) / 8u + 1u;
     uint8_t tail_ready[bit_field_size]{0};
+    Lock lock_;
 };

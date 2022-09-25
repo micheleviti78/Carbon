@@ -49,6 +49,7 @@ public:
                 current_tail = this->tail_reserved_;
                 this->tail_reserved_ = increment(this->tail_reserved_);
             } else {
+                RAW_DIAG("fifo overflow");
                 isOverflow = true;
             }
         }
@@ -71,6 +72,64 @@ public:
         return true;
     }
 
+    inline bool push(const ObjectType *object, uint32_t nObjects) {
+        uint32_t current_start_tail{0};
+        uint32_t current_end_tail{0};
+        bool isOverflow = false;
+        {
+            LockGuard<Lock> lockGuard(lock_);
+            if (!isFull(nObjects)) {
+                current_start_tail = this->tail_reserved_;
+                increment(this->tail_reserved_, nObjects);
+                current_end_tail = this->tail_reserved_ - 1;
+            } else {
+                RAW_DIAG("fifo push array overflow");
+                isOverflow = true;
+            }
+        }
+
+        if (isOverflow) {
+            if (callbackOverflow)
+                callbackOverflow(object);
+            return false;
+        }
+
+        if ((current_start_tail + nObjects) < (NElements + 1)) {
+            buffer_.insert(object, current_start_tail, nObjects);
+        } else {
+            uint32_t length1 = NElements - current_start_tail;
+            uint32_t length2 = current_start_tail + nObjects - NElements;
+            buffer_.insert(object, current_start_tail, length1);
+            buffer_.insert(object + length1, 0, length2);
+        }
+
+        {
+            LockGuard<Lock> lockGuard(lock_,
+                                      LockGuardSignalizeOption::Signalize);
+            uint32_t index1 = current_start_tail / 8u;
+            uint32_t index2 = current_end_tail / 8u;
+            if (index1 == index2) {
+                uint8_t bit_pos1 =
+                    static_cast<uint8_t>(0xFF << (current_start_tail % 8u));
+                uint8_t bit_pos2 =
+                    static_cast<uint8_t>(0xFF >> 7 - (current_end_tail % 8u));
+                bit_pos1 = bit_pos1 & bit_pos2;
+                tail_ready[index1] |= bit_pos1;
+            } else {
+                uint8_t bit_pos1 =
+                    static_cast<uint8_t>(0xFF << (current_start_tail % 8u));
+                tail_ready[index1] |= bit_pos1;
+                for (uint32_t i = index1 + 1; i < index2; i++) {
+                    tail_ready[i] = 0xFF;
+                }
+                uint8_t bit_pos2 =
+                    static_cast<uint8_t>(0xFF >> 7 - (current_end_tail % 8u));
+                tail_ready[index2] |= bit_pos2;
+            }
+        }
+        return true;
+    }
+
     inline bool pop(ObjectType &object) {
         uint8_t tail_ready_bit_pos{0};
         uint32_t tail_ready_index{0};
@@ -83,6 +142,7 @@ public:
                 static_cast<uint8_t>(1u << (current_head % 8u));
             tail_ready_index = current_head / 8u;
             if ((tail_ready[tail_ready_index] & tail_ready_bit_pos) == 0) {
+                RAW_DIAG("fifo underflow");
                 isUnderflow = true;
             }
         }
@@ -117,6 +177,14 @@ public:
         return res;
     }
 
+    inline bool isFull(uint32_t nIncrement) {
+        uint32_t tail = this->tail_reserved_;
+        if (!increment(tail, nIncrement)) {
+            return false;
+        }
+        return (tail == head_);
+    }
+
     typedef void (*CallbackOverflow)(const ObjectType &object);
     typedef void (*CallbackUnderflow)(ObjectType object);
 
@@ -134,6 +202,22 @@ private:
         } else {
             return 0;
         }
+    }
+
+    inline bool increment(uint32_t &index, uint32_t nIncrement) {
+        if (nIncrement > NElements) {
+            RAW_DIAG("increment bigger than fifo size");
+            return false;
+        } else {
+            if ((index + nIncrement) < (NElements + 1)) {
+                index += nIncrement;
+                return true;
+            } else {
+                index = (NElements - nIncrement);
+                return true;
+            }
+        }
+        true;
     }
 
     CallbackOverflow callbackOverflow{nullptr};

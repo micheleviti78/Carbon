@@ -90,17 +90,17 @@ public:
 
         if (isOverflow) {
             if (callbackOverflow)
-                callbackOverflow(object);
+                callbackOverflow(*object);
             return false;
         }
 
         if ((current_start_tail + nObjects) < (NElements + 1)) {
-            buffer_.insert(object, current_start_tail, nObjects);
+            buffer_.insert(*object, current_start_tail, nObjects);
         } else {
             uint32_t length1 = NElements - current_start_tail;
             uint32_t length2 = current_start_tail + nObjects - NElements;
-            buffer_.insert(object, current_start_tail, length1);
-            buffer_.insert(object + length1, 0, length2);
+            buffer_.insert(*object, current_start_tail, length1);
+            buffer_.insert(*object + length1, 0, length2);
         }
 
         {
@@ -112,7 +112,7 @@ public:
                 uint8_t bit_pos1 =
                     static_cast<uint8_t>(0xFF << (current_start_tail % 8u));
                 uint8_t bit_pos2 =
-                    static_cast<uint8_t>(0xFF >> 7 - (current_end_tail % 8u));
+                    static_cast<uint8_t>(0xFF >> (7 - (current_end_tail % 8u)));
                 bit_pos1 = bit_pos1 & bit_pos2;
                 tail_ready[index1] |= bit_pos1;
             } else {
@@ -123,7 +123,7 @@ public:
                     tail_ready[i] = 0xFF;
                 }
                 uint8_t bit_pos2 =
-                    static_cast<uint8_t>(0xFF >> 7 - (current_end_tail % 8u));
+                    static_cast<uint8_t>(0xFF >> (7 - (current_end_tail % 8u)));
                 tail_ready[index2] |= bit_pos2;
             }
         }
@@ -217,7 +217,7 @@ private:
                 return true;
             }
         }
-        true;
+        return true;
     }
 
     CallbackOverflow callbackOverflow{nullptr};

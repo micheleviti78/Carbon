@@ -81,7 +81,7 @@ public:
     }
 
     bool blockBelongs(const void *block) const {
-        uint8_t *blockPtr = reinterpret_cast<uint8_t *>(block);
+        const uint8_t *blockPtr = reinterpret_cast<const uint8_t *>(block);
         bool check = true;
         check = check && (blockPtr >= startAddress_);
         check = check && (blockPtr < (firstAlignedAddress_ + sizeTotalBytes_));
@@ -148,7 +148,7 @@ private:
                 (~(static_cast<uint32_t>(memAlignment) - 1)));
     }
 
-    static constexpr uint8_t *alignAddress(uint8_t *address,
+    static constexpr uint8_t *alignAddress(const uint8_t *address,
                                            uint32_t memAlignment) {
         return (reinterpret_cast<uint8_t *>(
             reinterpret_cast<uint32_t>(address + (memAlignment - 1)) &
@@ -176,7 +176,7 @@ protected:
     uint32_t top_;
 };
 
-template <typename ObjectType, typename Lock, uint32_t NElements>
+template <typename ObjectType, uint32_t NElements>
 class Stack : public StackBase {
 public:
     Stack() : StackBase(NElements) {}
@@ -186,7 +186,6 @@ public:
     PREVENT_COPY_AND_MOVE(Stack);
 
     inline bool push(const ObjectType *object) {
-        Lock lock;
         if (!isFull()) {
             data[this->top_] = object;
             this->top_++;
@@ -198,7 +197,6 @@ public:
     }
 
     inline bool pop(ObjectType **object) {
-        Lock lock;
         if (!isFull()) {
             *object = data[this->top_];
             this->top_--;
@@ -229,7 +227,7 @@ public:
     PREVENT_COPY_AND_MOVE(MemoryPoolRaw)
 
     bool init() {
-        LockType lock;
+        LockGuard<LockType> lockGuard(lock_);
         if (isInitislized_)
             RAW_DIAG("already initialized");
         return true;
@@ -246,7 +244,7 @@ public:
     }
 
     inline bool allocate(uint8_t **block) {
-        LockType lock;
+        LockGuard<LockType> lockGuard(lock_);
         bool res = pool_.pop(block);
         if (!res) {
             RAW_DIAG("bad allocation");
@@ -256,7 +254,7 @@ public:
     }
     /*TODO avoid freeing twice the same block*/
     inline bool free(uint8_t *block) {
-        LockType lock;
+        LockGuard<LockType> lockGuard(lock_);
         bool res = memoryAllocator_.blockBelongs(block);
         if (!res) {
             RAW_DIAG("block does not belong to pool");
@@ -271,10 +269,11 @@ public:
     }
 
 protected:
+    LockType lock_;
     volatile bool isInitislized_{false};
     uint32_t size_{0};
     MemoryAllocatorRaw &memoryAllocator_;
-    Stack<uint8_t, LockGuard<DummyLock>, NElements> pool_;
+    Stack<uint8_t, NElements> pool_;
 };
 
 template <typename ObjectType, uint32_t aligment> class Buffer {
@@ -318,12 +317,7 @@ public:
         std::memcpy(reinterpret_cast<void *>(data),
                     reinterpret_cast<const void *>(&object),
                     sizeof(object) * nObjects);
-#ifdef TEST_FIFO
-        RAW_DIAG("inserted value at %lu, from the address %lu, length %lu",
-                 reinterpret_cast<uint32_t>(data),
-                 reinterpret_cast<uint32_t>(&object),
-                 sizeof(object) * nObjects);
-#endif
+        return true;
     }
 
     inline bool remove(ObjectType &object, const uint32_t index) {
@@ -334,11 +328,6 @@ public:
         }
         std::memcpy(reinterpret_cast<void *>(&object),
                     reinterpret_cast<const void *>(data), sizeof(object));
-#ifdef TEST_FIFO
-        RAW_DIAG("removed value at %lu, in the address %lu, length %lu",
-                 reinterpret_cast<uint32_t>(data),
-                 reinterpret_cast<uint32_t>(&object), sizeof(object));
-#endif
         return true;
     }
 

@@ -24,6 +24,7 @@
 #include <sdram.hpp>
 #include <systime.hpp>
 
+#include <cstring>
 #include <fifo.hpp>
 
 #ifndef HSEM_ID_0
@@ -45,10 +46,15 @@ struct TestStruct {
 #pragma pack(pop)
 
 static constexpr auto dataAlignment = uint32_t{4};
+static constexpr auto OneByteDataAlignment = uint32_t{1};
 static constexpr auto dataElements = uint32_t{4};
+static constexpr auto OneByteDataElements = uint32_t{200};
 
 static TestStruct data[128];
 static uint32_t dataPtr = reinterpret_cast<uint32_t>(&data[0]);
+
+static uint8_t OneByteData[OneByteDataElements + 1];
+static uint32_t OneByteDataPtr = reinterpret_cast<uint32_t>(&OneByteData[0]);
 
 static void SystemClock_Config(void);
 
@@ -56,6 +62,8 @@ static void SystemClock_Config(void);
 #define GET_HAL_VERSION_SUB1 ((HAL_GetHalVersion() >> 16) & 0xFFUL)
 #define GET_HAL_VERSION_SUB2 ((HAL_GetHalVersion() >> 8) & 0xFFUL)
 #define GET_HAL_VERSION_RC (HAL_GetHalVersion() & 0xFFUL)
+
+void _putchar(char ch);
 
 /**
  * @brief  The application entry point.
@@ -120,10 +128,6 @@ int main(void) {
 
     /* Infinite loop */
 
-    // MemoryRegion memoryRegion{dataPtr, 128};
-    // MemoryAllocatorRaw< sizeof(uint32_t), 4 > memoryAllocatorRaw{dataPtr,
-    // 128}; MemoryPoolRaw< DummyMutex, 12, MemoryAllocatorRaw<sizeof(uint32_t),
-    // 4> > memoryPoolRaw{memoryAllocatorRaw};
     Buffer<TestStruct, dataAlignment> buffer{dataPtr + 1, 90};
 
     Fifo<TestStruct, dataAlignment, DummyLock, dataElements> fifo{buffer};
@@ -192,6 +196,35 @@ int main(void) {
         if ((structRead.var1 != 0xA5) || (structRead.var2 != 65000)) {
             RAW_DIAG("read wrong data");
         }
+    }
+
+    Buffer<uint8_t, OneByteDataAlignment> oneByteBuffer{
+        OneByteDataPtr, OneByteDataElements + 1};
+
+    Fifo<uint8_t, OneByteDataAlignment, DummyLock, OneByteDataElements>
+        oneByteFifo{oneByteBuffer};
+
+    const char *text1 = "test text numero 1. oggi siamo stati alla mostra del "
+                        "carro agricolo\r\n";
+
+    const char *text2 =
+        "test text numero 2. oggi abbiamo visto i buoi chianini\r\n";
+
+    const char *text3 = "test text numero 3. E' stata una bella giornata\r\n";
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text1),
+                     std::strlen(text1));
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text2),
+                     std::strlen(text2));
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text3),
+                     std::strlen(text3));
+
+    uint8_t ch;
+
+    while (oneByteFifo.pop(ch)) {
+        _putchar(ch);
     }
 
     while (1) {

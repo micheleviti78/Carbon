@@ -88,6 +88,10 @@ public:
         }
 
         if (isOverflow) {
+            // RAW_DIAG("this->tail_reserved_ %lu", this->tail_reserved_);
+            // RAW_DIAG("nObjects %lu", nObjects);
+            // RAW_DIAG("head %lu", head_);
+            // RAW_DIAG("");
             if (callbackOverflow)
                 callbackOverflow(*object);
             return false;
@@ -108,14 +112,14 @@ public:
             next_end_tail = current_end_tail + 1;
         }
 
-        if (index != next_end_tail) {
-            RAW_DIAG("error: index not matching, index %lu", index);
-            RAW_DIAG("error: index not matching, nObjects %lu", nObjects);
-            RAW_DIAG("error: index not matching, current_start_tail %lu",
-                     current_start_tail);
-            RAW_DIAG("error: index not matching, current_end_tail %lu",
-                     current_end_tail);
-        }
+        // if (index != next_end_tail) {
+        //     RAW_DIAG("error: index not matching, index %lu", index);
+        //     RAW_DIAG("error: index not matching, nObjects %lu", nObjects);
+        //     RAW_DIAG("error: index not matching, current_start_tail %lu",
+        //              current_start_tail);
+        //     RAW_DIAG("error: index not matching, current_end_tail %lu",
+        //              current_end_tail);
+        // }
 
         {
             LockGuard<Lock> lockGuard(lock_,
@@ -215,7 +219,7 @@ public:
             else
                 return false;
         } else if (tail_reserved_ > head_) {
-            if (nIncrement >= (NElements - tail_reserved_ + head_))
+            if (nIncrement >= ((NElements + 1) - tail_reserved_ + head_))
                 return true;
             else
                 return false;

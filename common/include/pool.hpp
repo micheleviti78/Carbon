@@ -295,28 +295,6 @@ public:
         }
         std::memcpy(reinterpret_cast<void *>(data),
                     reinterpret_cast<const void *>(&object), sizeof(object));
-#ifdef TEST_FIFO
-        RAW_DIAG("inserted value at %lu, from the address %lu, length %lu",
-                 reinterpret_cast<uint32_t>(data),
-                 reinterpret_cast<uint32_t>(&object), sizeof(object));
-#endif
-        return true;
-    }
-
-    inline bool insert(const ObjectType &object, const uint32_t index,
-                       const uint32_t nObjects) {
-        uint8_t *data;
-        if (!(memoryAllocatorRaw_.getBlock(&data, index))) {
-            RAW_DIAG("no start block at index %lu", index);
-            return false;
-        }
-        if ((!memoryAllocatorRaw_.blockBelongs((data + nObjects)))) {
-            RAW_DIAG("end block do not belong to pool", index);
-            return false;
-        }
-        std::memcpy(reinterpret_cast<void *>(data),
-                    reinterpret_cast<const void *>(&object),
-                    sizeof(object) * nObjects);
         return true;
     }
 

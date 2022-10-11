@@ -49,7 +49,6 @@ public:
                 current_tail = this->tail_reserved_;
                 this->tail_reserved_ = increment(this->tail_reserved_);
             } else {
-                RAW_DIAG("fifo overflow");
                 isOverflow = true;
             }
         }
@@ -80,10 +79,10 @@ public:
             LockGuard<Lock> lockGuard(lock_);
             if (!isFull(nObjects)) {
                 current_start_tail = this->tail_reserved_;
-                increment(this->tail_reserved_, nObjects);
-                current_end_tail = this->tail_reserved_ - 1;
+                current_end_tail = current_start_tail;
+                increment(current_end_tail, nObjects - 1);
+                this->tail_reserved_ = increment(current_end_tail);
             } else {
-                RAW_DIAG("fifo push array overflow");
                 isOverflow = true;
             }
         }
@@ -94,13 +93,28 @@ public:
             return false;
         }
 
-        if ((current_start_tail + nObjects) < (NElements + 1)) {
-            buffer_.insert(*object, current_start_tail, nObjects);
+        uint8_t index = current_start_tail;
+
+        for (unsigned i = 0; i < nObjects; i++) {
+            buffer_.insert(*(object + i), index);
+            index = increment(index);
+        }
+
+        uint32_t next_end_tail;
+
+        if (current_end_tail == 200) {
+            next_end_tail = 0;
         } else {
-            uint32_t length1 = NElements - current_start_tail;
-            uint32_t length2 = current_start_tail + nObjects - NElements;
-            buffer_.insert(*object, current_start_tail, length1);
-            buffer_.insert(*object + length1, 0, length2);
+            next_end_tail = current_end_tail + 1;
+        }
+
+        if (index != next_end_tail) {
+            RAW_DIAG("error: index not matching, index %lu", index);
+            RAW_DIAG("error: index not matching, nObjects %lu", nObjects);
+            RAW_DIAG("error: index not matching, current_start_tail %lu",
+                     current_start_tail);
+            RAW_DIAG("error: index not matching, current_end_tail %lu",
+                     current_end_tail);
         }
 
         {
@@ -119,12 +133,27 @@ public:
                 uint8_t bit_pos1 =
                     static_cast<uint8_t>(0xFF << (current_start_tail % 8u));
                 tail_ready[index1] |= bit_pos1;
-                for (uint32_t i = index1 + 1; i < index2; i++) {
-                    tail_ready[i] = 0xFF;
-                }
+
                 uint8_t bit_pos2 =
                     static_cast<uint8_t>(0xFF >> (7 - (current_end_tail % 8u)));
                 tail_ready[index2] |= bit_pos2;
+
+                if (index2 > index1) {
+                    for (uint32_t i = (index1 + 1); i < index2; i++) {
+                        tail_ready[i] = 0xFF;
+                    }
+                } else if (index1 > index2) {
+                    uint32_t last_index = (NElements) / 8u;
+                    for (uint32_t i = (index1 + 1); i < (last_index); i++) {
+                        tail_ready[i] = 0xFF;
+                    }
+
+                    tail_ready[last_index] = (0xFF >> (7 - (NElements % 8u)));
+
+                    for (uint32_t i = 0; i < index2; i++) {
+                        tail_ready[i] = 0xFF;
+                    }
+                }
             }
         }
         return true;
@@ -142,7 +171,6 @@ public:
                 static_cast<uint8_t>(1u << (current_head % 8u));
             tail_ready_index = current_head / 8u;
             if ((tail_ready[tail_ready_index] & tail_ready_bit_pos) == 0) {
-                RAW_DIAG("fifo underflow");
                 isUnderflow = true;
             }
         }
@@ -178,11 +206,21 @@ public:
     }
 
     inline bool isFull(uint32_t nIncrement) {
-        uint32_t tail = this->tail_reserved_;
-        if (!increment(tail, nIncrement)) {
+        if (nIncrement > NElements)
             return false;
-        }
-        return (tail == head_);
+
+        if (tail_reserved_ < head_) {
+            if (nIncrement >= (head_ - tail_reserved_))
+                return true;
+            else
+                return false;
+        } else if (tail_reserved_ > head_) {
+            if (nIncrement >= (NElements - tail_reserved_ + head_))
+                return true;
+            else
+                return false;
+        } else
+            return false;
     }
 
     typedef void (*CallbackOverflow)(const ObjectType &object);
@@ -213,7 +251,7 @@ private:
                 index += nIncrement;
                 return true;
             } else {
-                index = (NElements - nIncrement);
+                index = (index + nIncrement) - (NElements + 1);
                 return true;
             }
         }

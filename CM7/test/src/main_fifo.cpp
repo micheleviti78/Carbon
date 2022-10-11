@@ -212,6 +212,9 @@ int main(void) {
 
     const char *text3 = "test text numero 3. E' stata una bella giornata\r\n";
 
+    const char *text4 = "test text numero 4. Sono stato benissimo, posto "
+                        "incantevole e bellissimo panorama\r\n";
+
     oneByteFifo.push(reinterpret_cast<const uint8_t *>(text1),
                      std::strlen(text1));
 
@@ -221,7 +224,112 @@ int main(void) {
     oneByteFifo.push(reinterpret_cast<const uint8_t *>(text3),
                      std::strlen(text3));
 
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text4),
+                     std::strlen(text4));
+
     uint8_t ch;
+
+    for (i = 0; i < std::strlen(text1); i++) {
+        oneByteFifo.pop(ch);
+        _putchar(ch);
+    }
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text4),
+                     std::strlen(text4));
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text1),
+                     std::strlen(text1));
+
+    while (oneByteFifo.pop(ch)) {
+        _putchar(ch);
+    }
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text1),
+                     std::strlen(text1));
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text2),
+                     std::strlen(text2));
+
+    while (oneByteFifo.pop(ch)) {
+        _putchar(ch);
+    }
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text3),
+                     std::strlen(text3));
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text4),
+                     std::strlen(text4));
+
+    while (oneByteFifo.pop(ch)) {
+        _putchar(ch);
+    }
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text1),
+                     std::strlen(text1));
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text2),
+                     std::strlen(text2));
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text3),
+                     std::strlen(text3));
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text4),
+                     std::strlen(text4));
+
+    while (oneByteFifo.pop(ch)) {
+        _putchar(ch);
+    }
+
+    oneByteFifo.push(reinterpret_cast<const uint8_t *>(text4),
+                     std::strlen(text4));
+
+    i = 100000;
+
+    while (i > 0) {
+        oneByteFifo.pop(ch);
+
+        _putchar(ch);
+
+        oneByteFifo.push(reinterpret_cast<const uint8_t *>(text4),
+                         std::strlen(text4));
+        i--;
+    }
+
+    i = 100000;
+
+    while (i > 0) {
+        oneByteFifo.pop(ch);
+
+        _putchar(ch);
+
+        oneByteFifo.push(reinterpret_cast<const uint8_t *>(text3),
+                         std::strlen(text3));
+        i--;
+    }
+
+    i = 100000;
+
+    while (i > 0) {
+        oneByteFifo.pop(ch);
+
+        _putchar(ch);
+
+        oneByteFifo.push(reinterpret_cast<const uint8_t *>(text2),
+                         std::strlen(text2));
+        i--;
+    }
+
+    i = 100000;
+
+    while (i > 0) {
+        oneByteFifo.pop(ch);
+
+        _putchar(ch);
+
+        oneByteFifo.push(reinterpret_cast<const uint8_t *>(text1),
+                         std::strlen(text1));
+        i--;
+    }
 
     while (oneByteFifo.pop(ch)) {
         _putchar(ch);

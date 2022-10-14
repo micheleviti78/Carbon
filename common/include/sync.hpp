@@ -18,33 +18,23 @@
 
 #include <common.hpp>
 
-enum class LockGuardSignalizeOption { Signalize, NotSignalize };
-
 template <typename Lock> class LockGuard {
 public:
     PREVENT_COPY_AND_MOVE(LockGuard)
 
-    inline LockGuard(Lock &lock, LockGuardSignalizeOption option =
-                                     LockGuardSignalizeOption::NotSignalize)
-        : lock_(lock), signalizeOption_(option) {
-        lock_.get();
-    }
-    inline ~LockGuard() {
-        lock_.release();
-        if (signalizeOption_ == LockGuardSignalizeOption::Signalize)
-            lock_.signalize();
-    }
+    inline LockGuard(Lock &lock) : lock_(lock) { lock_.get(); }
+
+    inline ~LockGuard() { lock_.release(); }
 
 private:
     Lock &lock_;
-    LockGuardSignalizeOption signalizeOption_;
 };
 
 class BaseLock {
 public:
     BaseLock() = default;
 
-    ~BaseLock() = default;
+    virtual ~BaseLock() = default;
 
     PREVENT_COPY_AND_MOVE(BaseLock)
 
@@ -52,16 +42,26 @@ public:
 
     virtual void release() = 0;
 
-    virtual void signalize() = 0;
+    virtual void enableNotification() = 0;
+
+    virtual void disableNotification() = 0;
+
+    virtual void clearNotification() = 0;
 };
 
 class DummyLock : public BaseLock {
 public:
     DummyLock() : BaseLock(){};
 
+    ~DummyLock() override = default;
+
     inline void get() override {}
 
     inline void release() override {}
 
-    inline void signalize() override {}
+    inline void enableNotification() override{};
+
+    inline void disableNotification() override{};
+
+    inline void clearNotification() override{};
 };

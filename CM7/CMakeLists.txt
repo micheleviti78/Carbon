@@ -26,6 +26,7 @@ set(LDSCRIPT
 include(${PROJECT_ROOT_DIR}/common/cmake/common.cmake)
 
 SET(SOURCE
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/hsem.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_hal_msp.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_it.c
 )
@@ -35,6 +36,10 @@ if(TEST_FIFO)
     SET(SOURCE_MAIN ${CMAKE_CURRENT_LIST_DIR}/test/src/main_fifo.cpp)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTEST_FIFO")
     message("testing fifo interface")
+elseif(TEST_HSEM)
+    SET(SOURCE_MAIN ${CMAKE_CURRENT_LIST_DIR}/test/src/main_hsem.cpp)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTEST_HSEM")
+    message("testing hsem interface")
 else()
     SET(SOURCE_MAIN ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp)
 endif(TEST_FIFO)

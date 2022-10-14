@@ -22,6 +22,7 @@
 
 void fmc_isr(void);
 void carbon_hw_us_systime_tim_isr(void);
+void hsem_isr(void);
 
 /******************************************************************************/
 /*           Cortex Processor Interruption and Exception Handlers          */
@@ -96,3 +97,9 @@ void FMC_IRQHandler(void) { fmc_isr(); }
  */
 
 void TIM2_IRQHandler(void) { carbon_hw_us_systime_tim_isr(); }
+
+/**
+ * @brief This function handles HSEM1.
+ */
+
+void HSEM1_IRQHandler(void) { hsem_isr(); }

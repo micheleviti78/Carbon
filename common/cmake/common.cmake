@@ -92,6 +92,7 @@ SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/sys/sysmem.c
     ${PROJECT_ROOT_DIR}/common/src/diag.cpp
     ${PROJECT_ROOT_DIR}/common/src/error.cpp
+    ${PROJECT_ROOT_DIR}/common/src/hsem.cpp
     ${PROJECT_ROOT_DIR}/common/src/irq.cpp
     ${PROJECT_ROOT_DIR}/common/src/systime.cpp
     ${PROJECT_ROOT_DIR}/common/src/sdram.cpp

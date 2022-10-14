@@ -18,10 +18,14 @@
 
 #pragma once
 
+#include <common.hpp>
+
 #include <stm32h7xx.h>
 
 class IRQ {
 public:
+    PREVENT_COPY_AND_MOVE(IRQ)
+
     enum LockStatus : bool { Locked = true, Unlocked = false };
 
     static inline void lock() { __disable_irq(); }
@@ -52,6 +56,8 @@ public:
     static inline bool isInIRQ() { return 0 != __get_IPSR(); }
 
 private:
+    IRQ() = default;
+
     static LockStatus irqLockStartStatus;
     static uint32_t irqLockCounter;
 };
@@ -61,6 +67,4 @@ public:
     inline void get() { IRQ::lockRecursive(); }
 
     inline void release() { IRQ::unLockRecursive(); }
-
-    inline void signalize() {}
 };

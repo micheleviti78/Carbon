@@ -45,6 +45,7 @@ public:
         bool isOverflow = false;
         {
             LockGuard<Lock> lockGuard(lock_);
+            lock_.disableNotification();
             if (!isFull()) {
                 current_tail = this->tail_reserved_;
                 this->tail_reserved_ = increment(this->tail_reserved_);
@@ -62,8 +63,8 @@ public:
         buffer_.insert(object, current_tail);
 
         {
-            LockGuard<Lock> lockGuard(lock_,
-                                      LockGuardSignalizeOption::Signalize);
+            LockGuard<Lock> lockGuard(lock_);
+            lock_.enableNotification();
             uint8_t bit_pos = static_cast<uint8_t>(1u << (current_tail % 8u));
             tail_ready[(current_tail / 8u)] |= bit_pos;
         }
@@ -77,6 +78,7 @@ public:
         bool isOverflow = false;
         {
             LockGuard<Lock> lockGuard(lock_);
+            lock_.disableNotification();
             if (!isFull(nObjects)) {
                 current_start_tail = this->tail_reserved_;
                 current_end_tail = current_start_tail;
@@ -88,10 +90,6 @@ public:
         }
 
         if (isOverflow) {
-            // RAW_DIAG("this->tail_reserved_ %lu", this->tail_reserved_);
-            // RAW_DIAG("nObjects %lu", nObjects);
-            // RAW_DIAG("head %lu", head_);
-            // RAW_DIAG("");
             if (callbackOverflow)
                 callbackOverflow(*object);
             return false;
@@ -104,26 +102,9 @@ public:
             index = increment(index);
         }
 
-        uint32_t next_end_tail;
-
-        if (current_end_tail == 200) {
-            next_end_tail = 0;
-        } else {
-            next_end_tail = current_end_tail + 1;
-        }
-
-        // if (index != next_end_tail) {
-        //     RAW_DIAG("error: index not matching, index %lu", index);
-        //     RAW_DIAG("error: index not matching, nObjects %lu", nObjects);
-        //     RAW_DIAG("error: index not matching, current_start_tail %lu",
-        //              current_start_tail);
-        //     RAW_DIAG("error: index not matching, current_end_tail %lu",
-        //              current_end_tail);
-        // }
-
         {
-            LockGuard<Lock> lockGuard(lock_,
-                                      LockGuardSignalizeOption::Signalize);
+            LockGuard<Lock> lockGuard(lock_);
+            lock_.enableNotification();
             uint32_t index1 = current_start_tail / 8u;
             uint32_t index2 = current_end_tail / 8u;
             if (index1 == index2) {
@@ -170,6 +151,7 @@ public:
         bool isUnderflow = false;
         {
             LockGuard<Lock> lockGuard(lock_);
+            lock_.disableNotification();
             current_head = this->head_;
             tail_ready_bit_pos =
                 static_cast<uint8_t>(1u << (current_head % 8u));
@@ -189,6 +171,7 @@ public:
 
         {
             LockGuard<Lock> lockGuard(lock_);
+            lock_.disableNotification();
             this->head_ = increment(this->head_);
             tail_ready[tail_ready_index] &= ~tail_ready_bit_pos;
         }

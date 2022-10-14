@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include <diag.hpp>
 #include <error.hpp>
+#include <hsem.hpp>
 #include <main.hpp>
 #include <pin.hpp>
 #include <sdram.hpp>
@@ -119,6 +120,9 @@ int main(void) {
     if (timeout < 0) {
         Error_Handler();
     }
+
+    /*init hardware semaphore*/
+    hsemInit();
 
     RAW_DIAG("Initialization complete");
     RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,

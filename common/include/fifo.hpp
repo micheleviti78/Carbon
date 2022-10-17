@@ -64,12 +64,17 @@ public:
 
         {
             LockGuard<Lock> lockGuard(lock_);
-            lock_.enableNotification();
+            lock_.disableNotification();
             uint8_t bit_pos = static_cast<uint8_t>(1u << (current_tail % 8u));
             tail_ready[(current_tail / 8u)] |= bit_pos;
         }
 
         return true;
+    }
+
+    {
+        LockGuard<Lock> lockGuard(lock_);
+        lock_.enableNotification();
     }
 
     inline bool push(const ObjectType *object, uint32_t nObjects) {
@@ -104,7 +109,7 @@ public:
 
         {
             LockGuard<Lock> lockGuard(lock_);
-            lock_.enableNotification();
+            lock_.disableNotification();
             uint32_t index1 = current_start_tail / 8u;
             uint32_t index2 = current_end_tail / 8u;
             if (index1 == index2) {
@@ -141,6 +146,12 @@ public:
                 }
             }
         }
+
+        {
+            LockGuard<Lock> lockGuard(lock_);
+            lock_.enableNotification();
+        }
+
         return true;
     }
 

@@ -122,7 +122,7 @@ int main(void) {
     RAW_DIAG("before enable after release MISR %lu, ISR %lu", HSEM_COMMON->MISR,
              HSEM_COMMON->ISR);
 
-    hsemSpinLock.enableNotification();
+    hsemSpinLock.clearNotification();
     RAW_DIAG("after enable MISR %lu, ISR %lu", HSEM_COMMON->MISR,
              HSEM_COMMON->ISR);
 
@@ -132,7 +132,7 @@ int main(void) {
              HSEM_COMMON->ISR);
     __disable_irq();
 
-    hsemSpinLock.clearNotification();
+    hsemSpinLock.enableNotification();
     RAW_DIAG("after clear MISR %lu, ISR %lu", HSEM_COMMON->MISR,
              HSEM_COMMON->ISR);
 
@@ -164,7 +164,7 @@ int main(void) {
              HSEM_COMMON->ISR);
 
     __disable_irq();
-    hsemSpinLock.enablePendingNotification();
+    hsemSpinLock.enableNotification();
     RAW_DIAG("after enable MISR %lu, ISR %lu", HSEM_COMMON->MISR,
              HSEM_COMMON->ISR);
     __enable_irq();
@@ -186,7 +186,24 @@ int main(void) {
     __enable_irq();
     RAW_DIAG("after ISR MISR %lu, ISR %lu", HSEM_COMMON->MISR,
              HSEM_COMMON->ISR);
-
+    RAW_DIAG("");
+    RAW_DIAG("testing notify");
+    hsemSpinLock.disableNotification();
+    hsemSpinLock.get();
+    RAW_DIAG("before enable after get MISR %lu, ISR %lu", HSEM_COMMON->MISR,
+             HSEM_COMMON->ISR);
+    hsemSpinLock.release();
+    RAW_DIAG("after release after notify MISR %lu, ISR %lu", HSEM_COMMON->MISR,
+             HSEM_COMMON->ISR);
+    hsemSpinLock.get();
+    RAW_DIAG("before enable after get MISR %lu, ISR %lu", HSEM_COMMON->MISR,
+             HSEM_COMMON->ISR);
+    hsemSpinLock.enableNotification();
+    RAW_DIAG("after notify MISR %lu, ISR %lu", HSEM_COMMON->MISR,
+             HSEM_COMMON->ISR);
+    hsemSpinLock.release();
+    RAW_DIAG("after release after notify MISR %lu, ISR %lu", HSEM_COMMON->MISR,
+             HSEM_COMMON->ISR);
     while (1) {
         HAL_Delay(1000);
         BSP_LED_Toggle(LED_GREEN);

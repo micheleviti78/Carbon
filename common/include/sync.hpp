@@ -41,12 +41,6 @@ public:
     virtual void get() = 0;
 
     virtual void release() = 0;
-
-    virtual void enableNotification() = 0;
-
-    virtual void disableNotification() = 0;
-
-    virtual void clearNotification() = 0;
 };
 
 class DummyLock : public BaseLock {
@@ -58,10 +52,4 @@ public:
     inline void get() override {}
 
     inline void release() override {}
-
-    inline void enableNotification() override{};
-
-    inline void disableNotification() override{};
-
-    inline void clearNotification() override{};
 };

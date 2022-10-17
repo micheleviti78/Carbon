@@ -38,7 +38,7 @@ public:
 
     PREVENT_COPY_AND_MOVE(HSEMSpinLock);
 
-    inline void get() {
+    static void get() {
         IRQ::lockRecursive();
         uint32_t id = static_cast<uint32_t>(hsemID);
         while (HSEM->RLR[id] != (HSEM_CR_COREID_CURRENT | HSEM_RLR_LOCK)) {
@@ -47,7 +47,7 @@ public:
         __DMB();
     }
 
-    inline void release() {
+    static void release() {
         uint32_t id = static_cast<uint32_t>(hsemID);
         __DMB();
         HSEM->R[id] = HSEM_CR_COREID_CURRENT;
@@ -55,14 +55,6 @@ public:
     }
 
     static inline void enableNotification() {
-        uint32_t semId = static_cast<uint32_t>(hsemID);
-        if (READ_BIT(HSEM_COMMON->MISR, (1U << semId)) == 0) {
-            HSEM_COMMON->ICR = 1U << semId;
-        }
-        HSEM_COMMON->IER |= 1U << semId;
-    }
-
-    static inline void enablePendingNotification() {
         uint32_t semId = static_cast<uint32_t>(hsemID);
         HSEM_COMMON->IER |= 1U << semId;
     }

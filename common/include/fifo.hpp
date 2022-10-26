@@ -45,7 +45,6 @@ public:
         bool isOverflow = false;
         {
             LockGuard<Lock> lockGuard(lock_);
-            lock_.disableNotification();
             if (!isFull()) {
                 current_tail = this->tail_reserved_;
                 this->tail_reserved_ = increment(this->tail_reserved_);
@@ -64,17 +63,11 @@ public:
 
         {
             LockGuard<Lock> lockGuard(lock_);
-            lock_.disableNotification();
             uint8_t bit_pos = static_cast<uint8_t>(1u << (current_tail % 8u));
             tail_ready[(current_tail / 8u)] |= bit_pos;
         }
 
         return true;
-    }
-
-    {
-        LockGuard<Lock> lockGuard(lock_);
-        lock_.enableNotification();
     }
 
     inline bool push(const ObjectType *object, uint32_t nObjects) {
@@ -83,7 +76,6 @@ public:
         bool isOverflow = false;
         {
             LockGuard<Lock> lockGuard(lock_);
-            lock_.disableNotification();
             if (!isFull(nObjects)) {
                 current_start_tail = this->tail_reserved_;
                 current_end_tail = current_start_tail;
@@ -109,7 +101,6 @@ public:
 
         {
             LockGuard<Lock> lockGuard(lock_);
-            lock_.disableNotification();
             uint32_t index1 = current_start_tail / 8u;
             uint32_t index2 = current_end_tail / 8u;
             if (index1 == index2) {
@@ -147,11 +138,6 @@ public:
             }
         }
 
-        {
-            LockGuard<Lock> lockGuard(lock_);
-            lock_.enableNotification();
-        }
-
         return true;
     }
 
@@ -162,7 +148,6 @@ public:
         bool isUnderflow = false;
         {
             LockGuard<Lock> lockGuard(lock_);
-            lock_.disableNotification();
             current_head = this->head_;
             tail_ready_bit_pos =
                 static_cast<uint8_t>(1u << (current_head % 8u));
@@ -182,7 +167,6 @@ public:
 
         {
             LockGuard<Lock> lockGuard(lock_);
-            lock_.disableNotification();
             this->head_ = increment(this->head_);
             tail_ready[tail_ready_index] &= ~tail_ready_bit_pos;
         }

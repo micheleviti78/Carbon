@@ -86,6 +86,7 @@ SET(TARGET_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/core/include)
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/CMSIS cmsis)
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/hal hal)
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/printf printf)
+add_subdirectory(${PROJECT_ROOT_DIR}/lib/freertos freertos)
 
 SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/sys/syscalls.c

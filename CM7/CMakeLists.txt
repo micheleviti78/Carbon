@@ -56,7 +56,7 @@ target_include_directories(${PROJECT_NAME}
     ${TARGET_INCLUDE}
 )
 
-target_link_libraries(${PROJECT_NAME} cmsis_${PROJECT_NAME} hal_${PROJECT_NAME} printf_${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} cmsis_${PROJECT_NAME} hal_${PROJECT_NAME} printf_${PROJECT_NAME} freertos_${PROJECT_NAME})
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${ARM_SIZE_UTIL} ${PROJECT_NAME}.elf

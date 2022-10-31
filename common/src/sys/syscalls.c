@@ -30,12 +30,26 @@
 #include <sys/times.h>
 #include <time.h>
 
+#include <diag.hpp>
+
 /* Variables */
 extern int __io_putchar(int ch) __attribute__((weak));
 extern int __io_getchar(void) __attribute__((weak));
 
-char *__env[1] = {0};
-char **environ = __env;
+caddr_t _sbrk(int incr) {
+    void *caller __attribute__((unused)) = __builtin_return_address(0);
+    RAW_DIAG("Call to _sbrk at %p incr=%d", caller, incr);
+    errno = ENOMEM;
+    return (caddr_t)-1;
+}
+
+int _gettimeofday(struct timeval *tp, struct timezone *tzp) {
+    if (tzp) {
+        tzp->tz_minuteswest = 0;
+        tzp->tz_dsttime = 0;
+    }
+    return 0;
+}
 
 /* Functions */
 void initialise_monitor_handles() {}

@@ -16,9 +16,11 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32h7xx_it.h"
+#include <stm32h7xx_it.h>
 
-#include "main.hpp"
+#include <cmsis_os.h>
+
+#include <main.hpp>
 
 void fmc_isr(void);
 void carbon_hw_us_systime_tim_isr(void);
@@ -67,25 +69,25 @@ void UsageFault_Handler(void) {
     }
 }
 
-/**
- * @brief This function handles System service call via SWI instruction.
- */
-void SVC_Handler(void) {}
+// /**
+//  * @brief This function handles System service call via SWI instruction.
+//  */
+// void SVC_Handler(void) {}
 
 /**
  * @brief This function handles Debug monitor.
  */
 void DebugMon_Handler(void) {}
 
-/**
- * @brief This function handles Pendable request for system service.
- */
-void PendSV_Handler(void) {}
+// /**
+//  * @brief This function handles Pendable request for system service.
+//  */
+// void PendSV_Handler(void) {}
 
-/**
- * @brief This function handles System tick timer.
- */
-void SysTick_Handler(void) {}
+// /**
+//  * @brief This function handles System tick timer.
+//  */
+// void SysTick_Handler(void) { osSystickHandler(); }
 
 /**
  * @brief This function handles FMC IRQ.

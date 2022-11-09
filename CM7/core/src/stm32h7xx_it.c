@@ -16,11 +16,12 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
+#include <stm32h7xx_hal.h>
+
+#include <diag.hpp>
 #include <stm32h7xx_it.h>
 
 #include <cmsis_os.h>
-
-#include <main.hpp>
 
 void fmc_isr(void);
 void carbon_hw_us_systime_tim_isr(void);
@@ -33,6 +34,7 @@ void hsem_isr(void);
  * @brief This function handles Non maskable interrupt.
  */
 void NMI_Handler(void) {
+    RAW_DIAG("NMI_Handler");
     while (1) {
     }
 }
@@ -41,6 +43,7 @@ void NMI_Handler(void) {
  * @brief This function handles Hard fault interrupt.
  */
 void HardFault_Handler(void) {
+    RAW_DIAG("HardFault_Handler");
     while (1) {
     }
 }
@@ -49,6 +52,7 @@ void HardFault_Handler(void) {
  * @brief This function handles Memory management fault.
  */
 void MemManage_Handler(void) {
+    RAW_DIAG("MemManage_Handler");
     while (1) {
     }
 }
@@ -57,6 +61,7 @@ void MemManage_Handler(void) {
  * @brief This function handles Pre-fetch fault, memory access fault.
  */
 void BusFault_Handler(void) {
+    RAW_DIAG("BusFault_Handler");
     while (1) {
     }
 }
@@ -65,29 +70,20 @@ void BusFault_Handler(void) {
  * @brief This function handles Undefined instruction or illegal state.
  */
 void UsageFault_Handler(void) {
+    RAW_DIAG("UsageFault_Handler");
     while (1) {
     }
 }
-
-// /**
-//  * @brief This function handles System service call via SWI instruction.
-//  */
-// void SVC_Handler(void) {}
 
 /**
  * @brief This function handles Debug monitor.
  */
 void DebugMon_Handler(void) {}
 
-// /**
-//  * @brief This function handles Pendable request for system service.
-//  */
-// void PendSV_Handler(void) {}
-
-// /**
-//  * @brief This function handles System tick timer.
-//  */
-// void SysTick_Handler(void) { osSystickHandler(); }
+/**
+ * @brief This function handles System tick timer.
+ */
+void SysTick_Handler(void) { osSystickHandler(); }
 
 /**
  * @brief This function handles FMC IRQ.

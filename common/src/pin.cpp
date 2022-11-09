@@ -19,9 +19,7 @@
 #include <pin.hpp>
 #include <stm32h7xx_hal.h>
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 
 #define LED1_GPIO_PORT GPIOI
 #define LED1_PIN GPIO_PIN_12
@@ -158,7 +156,4 @@ int32_t BSP_LED_GetState(Led_TypeDef Led) {
     ret = (int32_t)HAL_GPIO_ReadPin(LED_PORT[Led], (uint16_t)LED_PIN[Led]);
     return ret;
 }
-
-#ifdef __cplusplus
 }
-#endif

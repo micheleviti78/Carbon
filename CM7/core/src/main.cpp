@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include <diag.hpp>
 #include <error.hpp>
-#include <main.hpp>
 #include <pin.hpp>
 #include <sdram.hpp>
 #include <systime.hpp>
@@ -34,16 +33,27 @@
 // static uint32_t sdram_buf __attribute__((aligned(4),
 // section(".sdram_bank2")));
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 
 static void SystemClock_Config(void);
+void Error_Handler(void);
+void start_os(void);
 
 #define GET_HAL_VERSION_MAIN ((HAL_GetHalVersion() >> 24) & 0xFFUL)
 #define GET_HAL_VERSION_SUB1 ((HAL_GetHalVersion() >> 16) & 0xFFUL)
 #define GET_HAL_VERSION_SUB2 ((HAL_GetHalVersion() >> 8) & 0xFFUL)
 #define GET_HAL_VERSION_RC (HAL_GetHalVersion() & 0xFFUL)
+
+#define OSC32_OUT_Pin GPIO_PIN_15
+#define OSC32_OUT_GPIO_Port GPIOC
+#define OSC32_IN_Pin GPIO_PIN_14
+#define OSC32_IN_GPIO_Port GPIOC
+#define CEC_CK_MCO1_Pin GPIO_PIN_8
+#define CEC_CK_MCO1_GPIO_Port GPIOA
+#define OSC_OUT_Pin GPIO_PIN_1
+#define OSC_OUT_GPIO_Port GPIOH
+#define OSC_IN_Pin GPIO_PIN_0
+#define OSC_IN_GPIO_Port GPIOH
 
 /**
  * @brief  The application entry point.
@@ -102,7 +112,7 @@ int main(void) {
 
     /*init hardware semaphore*/
     hsemInit();
-
+    RAW_DIAG(" ");
     RAW_DIAG("Initialization complete");
     RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,
              __NEWLIB_PATCHLEVEL__);
@@ -111,9 +121,9 @@ int main(void) {
 
     /* Infinite loop */
 
+    start_os();
+
     while (1) {
-        HAL_Delay(1000);
-        BSP_LED_Toggle(LED_GREEN);
     }
 }
 
@@ -226,7 +236,4 @@ static void SystemClock_Config(void) {
  */
 void assert_failed(uint8_t *file, uint32_t line) {}
 #endif /* USE_FULL_ASSERT */
-
-#ifdef __cplusplus
 }
-#endif

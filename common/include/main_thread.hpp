@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
- * @file         stm32h7xx_hal_msp.c
- * @brief        This file provides code for the MSP Initialization
- *               and de-Initialization codes.
+ * @file           main_thread.hpp
+ * @author         Michele Viti <micheleviti78@gmail.com>
+ * @date           Nov. 2022
+ * @brief          CM7 main thread header
  ******************************************************************************
  * @attention
- *
- * Copyright (c) 2022 STMicroelectronics.
+ * Copyright (c) 2022 Michele Viti.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -16,10 +16,14 @@
  ******************************************************************************
  */
 
-/* Includes ------------------------------------------------------------------*/
-#include <stm32h7xx_hal.h>
+#pragma once
 
-/**
- * Initializes the Global MSP.
- */
-void HAL_MspInit(void) { __HAL_RCC_SYSCFG_CLK_ENABLE(); }
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void mainThread(const void *argument);
+
+#ifdef __cplusplus
+}
+#endif

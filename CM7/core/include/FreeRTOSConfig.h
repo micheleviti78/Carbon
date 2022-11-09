@@ -26,6 +26,8 @@
  * 1 tab == 4 spaces!
  */
 
+// clang-format off
+
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
@@ -60,6 +62,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TICK_HOOK 0
 #define configMAX_PRIORITIES (7)
 #define configSUPPORT_STATIC_ALLOCATION 0
+#define configSUPPORT_DYNAMIC_ALLOCATION 1
 #define configCPU_CLOCK_HZ (SystemCoreClock)
 #define configTICK_RATE_HZ ((TickType_t)1000)
 #define configMINIMAL_STACK_SIZE ((uint16_t)128)
@@ -76,6 +79,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_APPLICATION_TASK_TAG 0
 #define configUSE_COUNTING_SEMAPHORES 1
 #define configGENERATE_RUN_TIME_STATS 0
+#define configUSE_TICKLESS_IDLE 1
 #define configUSE_POSIX_ERRNO 1
 
 /* Co-routine definitions. */
@@ -95,7 +99,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelete 1
 #define INCLUDE_vTaskCleanUpResources 0
 #define INCLUDE_vTaskSuspend 1
-#define INCLUDE_vTaskDelayUntil 0
+#define INCLUDE_vTaskDelayUntil 1
 #define INCLUDE_vTaskDelay 1
 #define INCLUDE_xTaskGetSchedulerState 1
 
@@ -135,7 +139,7 @@ used
 
 /* The lowest interrupt priority that can be used in a call to a "set priority"
 function. */
-#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY 0xf
+#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY 15
 
 /* The highest interrupt priority that can be used by any interrupt service
 routine that makes calls to interrupt safe FreeRTOS API functions.  DO NOT CALL
@@ -165,11 +169,5 @@ header file. */
    standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
-
-/* IMPORTANT: FreeRTOS is using the SysTick as internal time base, thus make
-   sure the system and peripherials are using a different time base (TIM based
-   for example).
- */
-#define xPortSysTickHandler SysTick_Handler
 
 #endif /* FREERTOS_CONFIG_H */

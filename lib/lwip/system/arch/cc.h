@@ -78,11 +78,15 @@ typedef int sys_prot_t;
 #define PACK_STRUCT_FIELD(x) x
 
 #endif
-
-#define LWIP_PLATFORM_ASSERT(x) do {printf("Assertion \"%s\" failed at line %d in %s\n", \
-                                     x, __LINE__, __FILE__); } while(0)
+void carbon_raw_diag_print(const char *format, ...);
+#define LWIP_PLATFORM_ASSERT(x)                                                \
+    do {                                                                       \
+        carbon_raw_diag_print("Assertion \"%s\" failed at line %d in %s\n", x, \
+                              __LINE__, __FILE__);                             \
+    } while (0);
 
 /* Define random number generator function */
-#define LWIP_RAND() ((u32_t)rand())
+uint32_t carbon_rand(void);
+#define LWIP_RAND() ((u32_t)carbon_rand())
 
 #endif /* __CC_H__ */

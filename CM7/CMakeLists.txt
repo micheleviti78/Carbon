@@ -43,7 +43,11 @@ elseif(TEST_HSEM)
 else()
     SET(SOURCE_MAIN 
     ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/core/src/main_thread.cpp)
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/main_thread.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/app_ethernet.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/ethernetif.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/lan8742.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/netif_conf.c)
 endif(TEST_FIFO)
 
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/lwip lwip)

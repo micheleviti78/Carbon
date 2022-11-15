@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           main_thread.cpp
+ * @file           ethernetif.h
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Nov. 2022
- * @brief          CM7 main thread source
+ * @brief          Ethernet driver
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -16,30 +16,17 @@
  ******************************************************************************
  */
 
-#include <diag.hpp>
-#include <main_thread.hpp>
-#include <pin.hpp>
+#ifndef __ETHERNETIF_H__
+#define __ETHERNETIF_H__
 
 #include <cmsis_os.h>
-#include <task.h>
+#include <lwip/err.h>
+#include <lwip/netif.h>
 
-extern "C" {
-
-void netif_config(void);
-
-/**
- * @brief  Initializes the lwIP stack
- * @param  None
- * @retval None
- */
-
-void mainThread(const void *argument) {
-    RAW_DIAG("FreeRTOS version %d.%d.%d", tskKERNEL_VERSION_MAJOR,
-             tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD);
-    netif_config();
-    while (1) {
-        BSP_LED_Toggle(LED_GREEN);
-        osDelay(1000);
-    }
-}
-}
+/* Exported types ------------------------------------------------------------*/
+/* Structure that include link thread parameters */
+/* Exported functions ------------------------------------------------------- */
+err_t ethernetif_init(struct netif *netif);
+void ethernetif_input(const void *argument);
+void ethernet_link_thread(void const *argument);
+#endif

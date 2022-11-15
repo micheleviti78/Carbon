@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           main_thread.cpp
+ * @file           oshooks.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Nov. 2022
- * @brief          CM7 main thread source
+ * @brief          os hooks for debugging
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -17,29 +17,20 @@
  */
 
 #include <diag.hpp>
-#include <main_thread.hpp>
-#include <pin.hpp>
 
-#include <cmsis_os.h>
+#include <FreeRTOS.h>
 #include <task.h>
 
 extern "C" {
 
-void netif_config(void);
+const uint8_t freeRTOSMemoryScheme __attribute__((unused)) = 4;
 
-/**
- * @brief  Initializes the lwIP stack
- * @param  None
- * @retval None
- */
+void vApplicationStackOverflowHook(TaskHandle_t /*xTask*/, char *taskName) {
+    RAW_DIAG("Stack overflow in task %s !", taskName);
+    for (;;)
+        ;
+}
 
-void mainThread(const void *argument) {
-    RAW_DIAG("FreeRTOS version %d.%d.%d", tskKERNEL_VERSION_MAJOR,
-             tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD);
-    netif_config();
-    while (1) {
-        BSP_LED_Toggle(LED_GREEN);
-        osDelay(1000);
-    }
-}
-}
+void vApplicationMallocFailedHook(void) { RAW_DIAG("Malloc failed !"); }
+
+} // extern "C"

@@ -24,7 +24,7 @@
 static osThreadId main_task_handle;
 
 void start_os(void) {
-    osThreadDef(main_thread, mainThread, osPriorityNormal, 0, 256);
+    osThreadDef(main_thread, mainThread, osPriorityNormal, 0, 384);
     main_task_handle = osThreadCreate(osThread(main_thread), NULL);
     RAW_DIAG("starting OS");
     osKernelStart();

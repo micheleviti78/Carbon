@@ -23,6 +23,8 @@
 
 #include <cmsis_os.h>
 
+extern ETH_HandleTypeDef heth;
+
 void fmc_isr(void);
 void carbon_hw_us_systime_tim_isr(void);
 void hsem_isr(void);
@@ -101,3 +103,9 @@ void TIM2_IRQHandler(void) { carbon_hw_us_systime_tim_isr(); }
  */
 
 void HSEM1_IRQHandler(void) { hsem_isr(); }
+
+/**
+ * @brief This function handles Ethernet.
+ */
+
+void ETH_IRQHandler(void) { HAL_ETH_IRQHandler(&heth); }

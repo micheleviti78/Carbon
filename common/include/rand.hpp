@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           main_thread.cpp
+ * @file           rand.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Nov. 2022
- * @brief          CM7 main thread source
+ * @brief          random generator
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -16,30 +16,18 @@
  ******************************************************************************
  */
 
-#include <diag.hpp>
-#include <main_thread.hpp>
-#include <pin.hpp>
+#pragma once
 
-#include <cmsis_os.h>
-#include <task.h>
+#include <stdint.h>
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
-void netif_config(void);
+void carbon_rand_init(void);
 
-/**
- * @brief  Initializes the lwIP stack
- * @param  None
- * @retval None
- */
+uint32_t carbon_rand(void);
 
-void mainThread(const void *argument) {
-    RAW_DIAG("FreeRTOS version %d.%d.%d", tskKERNEL_VERSION_MAJOR,
-             tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD);
-    netif_config();
-    while (1) {
-        BSP_LED_Toggle(LED_GREEN);
-        osDelay(1000);
-    }
+#ifdef __cplusplus
 }
-}
+#endif

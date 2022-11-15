@@ -26,9 +26,9 @@
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
 
-#ifdef __cplusplus
 extern "C" {
-#endif
+
+void mainThread(const void */*argument*/){}
 
 /**
  * @brief  The application entry point.
@@ -91,7 +91,4 @@ void assert_failed(uint8_t *file, uint32_t line) {
     /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-#ifdef __cplusplus
 }
-#endif

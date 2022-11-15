@@ -118,9 +118,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart) {
 }
 
 void _putchar(char ch) {
-    if (HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF) != HAL_OK) {
-        Error_Handler();
-    }
+    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
 }
 
 void carbon_raw_diag_print(const char *format, ...) {

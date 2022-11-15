@@ -25,6 +25,8 @@ SET(HAL_SOURCE
     Src/stm32h7xx_hal_qspi.c
     Src/stm32h7xx_hal_rcc.c
     Src/stm32h7xx_hal_rcc_ex.c
+    Src/stm32h7xx_hal_rng.c
+    Src/stm32h7xx_hal_rng_ex.c
     Src/stm32h7xx_hal_rtc.c
     Src/stm32h7xx_hal_rtc_ex.c
     Src/stm32h7xx_hal_sai.c

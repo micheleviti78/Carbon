@@ -129,6 +129,8 @@ used
 
 */
 
+#define USE_FreeRTOS_HEAP_4
+
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS
 /* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
@@ -159,8 +161,9 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
 #define configASSERT(x)                                                        \
-    if ((x) == 0) {                                                            \
-        taskDISABLE_INTERRUPTS();                                              \
+    if ((x) == 0) {																  \
+		carbon_raw_diag_print("%s, %s, %d, %s",__FILE__, __func__, __LINE__, #x); \
+        taskDISABLE_INTERRUPTS();                                              	  \
         for (;;)                                                               \
             ;                                                                  \
     }

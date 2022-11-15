@@ -10,11 +10,6 @@ lib/msgpack/.*
 lib/printf/.*
 lib/USB/.*
 
-app/CM4/conf/.*
-app/CM7/conf/.*
-app/sim/conf/.*
+modified:   CM4/STM32H747XIHx_FLASH_CM4.ld
+modified:   CM7/STM32H747XIHx_FLASH_CM7.ld
 
-app/CM7/include/mwi/hw/lan8742.h
-app/CM7/src/hw/lan8742.c
-app/common/src/hw/system.c
-app/sim/src/hw/lwip_sim_netif.c

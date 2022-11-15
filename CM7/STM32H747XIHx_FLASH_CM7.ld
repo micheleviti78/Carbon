@@ -16,7 +16,7 @@
 **
 **  Target      : STMicroelectronics STM32
 **
-**  Distribution: The file is distributed �as is,� without any warranty
+**  Distribution: The file is distributed as is, without any warranty
 **                of any kind.
 **
 *****************************************************************************
@@ -32,6 +32,8 @@
 ******************************************************************************
 */
 
+/* clang-format off*/
+
 /* Entry Point */
 ENTRY(Reset_Handler)
 
@@ -46,8 +48,10 @@ MEMORY
 {
 FLASH (rx)           : ORIGIN = 0x08000000, LENGTH = 1024K
 AXI_RAM (xrw)        : ORIGIN = 0x24000000, LENGTH = 512K
+RAM_D2               : ORIGIN = 0x30000000, LENGTH = 288K
+RAM_D3 (xrw)         : ORIGIN = 0x38000000, LENGTH = 64K
 ITCMRAM (xrw)        : ORIGIN = 0x00000000, LENGTH = 64K
-FMC_SDRAM_BANK2(xrw) : ORIGIN = 0xD0000000, LENGTH = 64M
+FMC_SDRAM_BANK2(xrw) : ORIGIN = 0xD0000000, LENGTH = 32M
 }
 
 /* Define output sections */
@@ -172,6 +176,17 @@ SECTIONS
     libm.a ( * )
     libgcc.a ( * )
   }
+  
+  .lwip_sec (NOLOAD) : {
+    . = ABSOLUTE(0x30040000);
+    *(.RxDecripSection) 
+    
+    . = ABSOLUTE(0x30040060);
+    *(.TxDecripSection)
+    
+    . = ABSOLUTE(0x30040200);
+    *(.RxArraySection) 
+  } >RAM_D2 AT> FLASH
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }

@@ -17,12 +17,19 @@
  */
 #include <app_ethernet.h>
 #include <ethernetif.h>
+
+#include <diag.hpp>
+
+#include <lwip/init.h>
 #include <lwip/netif.h>
 #include <lwip/tcpip.h>
 
 struct netif gnetif; /* network interface structure */
 
 void netif_config(void) {
+    RAW_DIAG("LwIP version %d.%d.%d", LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR,
+             LWIP_VERSION_REVISION);
+
     tcpip_init(NULL, NULL);
 
     ip_addr_t ipaddr;

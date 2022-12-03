@@ -40,13 +40,13 @@ public:
 
     PREVENT_COPY_AND_MOVE(Fifo)
 
-    inline bool push(const ObjectType &object) {
-        uint32_t current_tail{0};
+    inline bool push(const ObjectType &object, Lock &lock) {
+        uint32_t fifo_pos{0};
         bool isOverflow = false;
         {
-            LockGuard<Lock> lockGuard(lock_);
+            LockGuard<Lock> lockGuard(lock);
             if (!isFull()) {
-                current_tail = this->tail_reserved_;
+                fifo_pos = this->tail_reserved_;
                 this->tail_reserved_ = increment(this->tail_reserved_);
             } else {
                 isOverflow = true;
@@ -59,28 +59,28 @@ public:
             return false;
         }
 
-        buffer_.insert(object, current_tail);
+        buffer_.insert(object, fifo_pos);
 
         {
             LockGuard<Lock> lockGuard(lock_);
-            uint8_t bit_pos = static_cast<uint8_t>(1u << (current_tail % 8u));
-            tail_ready[(current_tail / 8u)] |= bit_pos;
+            uint8_t bit_pos = static_cast<uint8_t>(1u << (fifo_pos % 8u));
+            tail_ready[(fifo_pos / 8u)] |= bit_pos;
         }
 
         return true;
     }
 
-    inline bool push(const ObjectType *object, uint32_t nObjects) {
-        uint32_t current_start_tail{0};
-        uint32_t current_end_tail{0};
+    inline bool push(const ObjectType *object, uint32_t nObjects, Lock &lock) {
+        uint32_t fifo_pos_start{0};
+        uint32_t fifo_pos_end{0};
         bool isOverflow = false;
         {
-            LockGuard<Lock> lockGuard(lock_);
+            LockGuard<Lock> lockGuard(lock);
             if (!isFull(nObjects)) {
-                current_start_tail = this->tail_reserved_;
-                current_end_tail = current_start_tail;
-                increment(current_end_tail, nObjects - 1);
-                this->tail_reserved_ = increment(current_end_tail);
+                fifo_pos_start = this->tail_reserved_;
+                fifo_pos_end = fifo_pos_start;
+                increment(fifo_pos_end, nObjects - 1);
+                this->tail_reserved_ = increment(fifo_pos_end);
             } else {
                 isOverflow = true;
             }
@@ -92,7 +92,7 @@ public:
             return false;
         }
 
-        uint8_t index = current_start_tail;
+        uint8_t index = fifo_pos_start;
 
         for (unsigned i = 0; i < nObjects; i++) {
             buffer_.insert(*(object + i), index);
@@ -100,23 +100,23 @@ public:
         }
 
         {
-            LockGuard<Lock> lockGuard(lock_);
-            uint32_t index1 = current_start_tail / 8u;
-            uint32_t index2 = current_end_tail / 8u;
+            LockGuard<Lock> lockGuard(lock);
+            uint32_t index1 = fifo_pos_start / 8u;
+            uint32_t index2 = fifo_pos_end / 8u;
             if (index1 == index2) {
                 uint8_t bit_pos1 =
-                    static_cast<uint8_t>(0xFF << (current_start_tail % 8u));
+                    static_cast<uint8_t>(0xFF << (fifo_pos_start % 8u));
                 uint8_t bit_pos2 =
-                    static_cast<uint8_t>(0xFF >> (7 - (current_end_tail % 8u)));
+                    static_cast<uint8_t>(0xFF >> (7 - (fifo_pos_end % 8u)));
                 bit_pos1 = bit_pos1 & bit_pos2;
                 tail_ready[index1] |= bit_pos1;
             } else {
                 uint8_t bit_pos1 =
-                    static_cast<uint8_t>(0xFF << (current_start_tail % 8u));
+                    static_cast<uint8_t>(0xFF << (fifo_pos_start % 8u));
                 tail_ready[index1] |= bit_pos1;
 
                 uint8_t bit_pos2 =
-                    static_cast<uint8_t>(0xFF >> (7 - (current_end_tail % 8u)));
+                    static_cast<uint8_t>(0xFF >> (7 - (fifo_pos_end % 8u)));
                 tail_ready[index2] |= bit_pos2;
 
                 if (index2 > index1) {
@@ -141,13 +141,13 @@ public:
         return true;
     }
 
-    inline bool pop(ObjectType &object) {
+    inline bool pop(ObjectType &object, Lock &lock) {
         uint8_t tail_ready_bit_pos{0};
         uint32_t tail_ready_index{0};
         uint32_t current_head;
         bool isUnderflow = false;
         {
-            LockGuard<Lock> lockGuard(lock_);
+            LockGuard<Lock> lockGuard(lock);
             current_head = this->head_;
             tail_ready_bit_pos =
                 static_cast<uint8_t>(1u << (current_head % 8u));
@@ -166,7 +166,7 @@ public:
         buffer_.remove(object, current_head);
 
         {
-            LockGuard<Lock> lockGuard(lock_);
+            LockGuard<Lock> lockGuard(lock);
             this->head_ = increment(this->head_);
             tail_ready[tail_ready_index] &= ~tail_ready_bit_pos;
         }
@@ -197,7 +197,7 @@ public:
             else
                 return false;
         } else if (tail_reserved_ > head_) {
-            if (nIncrement >= ((NElements + 1) - tail_reserved_ + head_))
+            if (nIncrement >= (BUFFER_SIZE - tail_reserved_ + head_))
                 return true;
             else
                 return false;
@@ -229,11 +229,11 @@ private:
             RAW_DIAG("increment bigger than fifo size");
             return false;
         } else {
-            if ((index + nIncrement) < (NElements + 1)) {
+            if ((index + nIncrement) < BUFFER_SIZE) {
                 index += nIncrement;
                 return true;
             } else {
-                index = (index + nIncrement) - (NElements + 1);
+                index = (index + nIncrement) - BUFFER_SIZE;
                 return true;
             }
         }
@@ -246,7 +246,7 @@ private:
     Buffer<ObjectType, aligment> &buffer_;
     uint32_t tail_reserved_{0};
     uint32_t head_{0};
-    static constexpr auto bit_field_size = (NElements + 1) / 8u + 1u;
+    static constexpr auto BUFFER_SIZE = (NElements + 1u);
+    static constexpr auto bit_field_size = BUFFER_SIZE / 8u + 1u;
     uint8_t tail_ready[bit_field_size]{0};
-    Lock lock_;
 };

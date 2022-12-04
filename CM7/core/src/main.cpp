@@ -32,13 +32,12 @@
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
 
-// static uint32_t sdram_buf __attribute__((aligned(4),
-// section(".sdram_bank2")));
+static uint32_t sdram_buf __attribute__((aligned(4), section(".sdram_bank2")));
 
 extern "C" {
 
 static void SystemClock_Config(void);
-static void MPU_Config();
+void MPU_Config();
 void Error_Handler(void);
 void start_os(void);
 
@@ -73,9 +72,6 @@ int main(void) {
         Error_Handler();
     }
 
-    /*configure MPU*/
-    MPU_Config();
-
     /*activate cache*/
     SCB_EnableICache();
 
@@ -103,8 +99,11 @@ int main(void) {
     BSP_LED_Init(LED_GREEN);
     BSP_LED_Init(LED_ORANGE);
 
+    RAW_DIAG(" ");
+    RAW_DIAG("CM7 ready");
+
     /* When system initialization is finished, Cortex-M7 will release Cortex-M4
-by means of HSEM notification */
+     * by means of HSEM notification */
     /*HW semaphore Clock enable*/
     __HAL_RCC_HSEM_CLK_ENABLE();
     /*Take HSEM */
@@ -121,7 +120,9 @@ by means of HSEM notification */
 
     /*init hardware semaphore*/
     hsemInit();
-    RAW_DIAG(" ");
+
+    HAL_Delay(10);
+
     RAW_DIAG("Initialization complete");
     RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,
              __NEWLIB_PATCHLEVEL__);
@@ -129,6 +130,9 @@ by means of HSEM notification */
              GET_HAL_VERSION_SUB1, GET_HAL_VERSION_SUB2, GET_HAL_VERSION_RC);
 
     /* Infinite loop */
+
+    sdram_buf = 12;
+    RAW_DIAG("sdram test = %lu", sdram_buf);
 
     start_os();
 
@@ -178,6 +182,7 @@ static void SystemClock_Config(void) {
 
     // Enable D2 domain SRAM3 Clock (0x30040000 AXI)
     __HAL_RCC_D2SRAM3_CLK_ENABLE();
+    __HAL_RCC_D2SRAM2_CLK_ENABLE();
 
     // Enable HSE Oscillator and activate PLL with HSE as source
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
@@ -228,32 +233,9 @@ static void SystemClock_Config(void) {
     PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOWIDE;
     PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
 
-    //	// PLL3Q 48MHz for USB
-    //	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USB;
-    //	PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_PLL3;
-
     // PLL1Q 100MHZ for RNG
     PeriphClkInitStruct.PeriphClockSelection |= RCC_PERIPHCLK_RNG;
     PeriphClkInitStruct.RngClockSelection = RCC_RNGCLKSOURCE_PLL;
-
-    //	// PLL3R 120MHZ for ADC
-    //	PeriphClkInitStruct.PeriphClockSelection |= RCC_PERIPHCLK_ADC;
-    //	PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL3;
-
-    //	// PLL3R 120MHZ for SPI1/2/3
-    //	static_assert(ADS1248_SPI1_CLOCK_SRC == 120);
-    //	PeriphClkInitStruct.PeriphClockSelection |= RCC_PERIPHCLK_SPI123;
-    //	PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI3CLKSOURCE_PLL3;
-    //
-    //	// D2PCLK1 100MHZ for I2C1/2/3
-    //	static_assert(MAX31875_I2C1_CLOCK_SRC == 100);
-    //	PeriphClkInitStruct.PeriphClockSelection |= RCC_PERIPHCLK_I2C123;
-    //	PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
-    //
-    //	// PLL1Q 100MHZ for QSPI
-    //	static_assert(EXT_FLASH_QSPI_CLOCK_SRC == 100);
-    //	PeriphClkInitStruct.PeriphClockSelection |= RCC_PERIPHCLK_QSPI;
-    //	PeriphClkInitStruct.QspiClockSelection = RCC_QSPICLKSOURCE_PLL;
 
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         assert_param(0);
@@ -279,7 +261,7 @@ SYSCFG_CCCSR
     HAL_EnableCompensationCell();
 }
 
-static void MPU_Config(void) {
+void MPU_Config(void) {
     MPU_Region_InitTypeDef MPU_InitStruct;
 
     /* Disable the MPU */
@@ -299,22 +281,34 @@ static void MPU_Config(void) {
 
     HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
-#ifdef USE_LCD
-    /* Configure the MPU attributes as WT for SDRAM */
     MPU_InitStruct.Enable = MPU_REGION_ENABLE;
-    MPU_InitStruct.BaseAddress = SDRAM_DEVICE_ADDR;
-    MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
+    MPU_InitStruct.Number = MPU_REGION_NUMBER1;
+    MPU_InitStruct.BaseAddress = 0x30020000;
+    MPU_InitStruct.Size = MPU_REGION_SIZE_128KB;
+    MPU_InitStruct.SubRegionDisable = 0x0;
+    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
     MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+    MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+    MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
     MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
-    MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
-    MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
-    MPU_InitStruct.Number = MPU_REGION_NUMBER3;
-    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-    MPU_InitStruct.SubRegionDisable = 0x00;
-    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
 
     HAL_MPU_ConfigRegion(&MPU_InitStruct);
-#endif
+
+    /* Configure the MPU attributes as WT for SDRAM */
+    MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+    MPU_InitStruct.BaseAddress = SDRAM_BANK2_ADDR;
+    MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
+    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+    MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
+    MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+    MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+    MPU_InitStruct.Number = MPU_REGION_NUMBER2;
+    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
+    MPU_InitStruct.SubRegionDisable = 0x00;
+    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+
+    HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
     /* Enable the MPU */
     HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);

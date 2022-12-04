@@ -48,7 +48,9 @@ MEMORY
 {
 FLASH (rx)           : ORIGIN = 0x08000000, LENGTH = 1024K
 AXI_RAM (xrw)        : ORIGIN = 0x24000000, LENGTH = 512K
-RAM_D2               : ORIGIN = 0x30000000, LENGTH = 288K
+RAM_D2_SR1           : ORIGIN = 0x30000000, LENGTH = 128K
+RAM_D2_SR2           : ORIGIN = 0x30020000, LENGTH = 128K
+RAM_D2_SR3           : ORIGIN = 0x30040000, LENGTH = 32K
 RAM_D3 (xrw)         : ORIGIN = 0x38000000, LENGTH = 64K
 ITCMRAM (xrw)        : ORIGIN = 0x00000000, LENGTH = 64K
 FMC_SDRAM_BANK2(xrw) : ORIGIN = 0xD0000000, LENGTH = 32M
@@ -176,7 +178,16 @@ SECTIONS
     libm.a ( * )
     libgcc.a ( * )
   }
-  
+
+  .bss_shared(NOLOAD) : {
+  	. = ABSOLUTE(0x30020000);
+  	. = ALIGN(4);
+    _sbss_shared = .;         /* define a global symbol at bss_share start */
+  	KEEP(*(.uart_struct));
+  	. = ALIGN(4);
+  	_ebss_shared = .;         /* define a global symbol at bss_share end */
+  } >RAM_D2_SR2 
+ 
   .lwip_sec (NOLOAD) : {
     . = ABSOLUTE(0x30040000);
     *(.RxDecripSection) 
@@ -186,8 +197,8 @@ SECTIONS
     
     . = ABSOLUTE(0x30040200);
     *(.RxArraySection) 
-  } >RAM_D2 AT> FLASH
-
+  } >RAM_D2_SR3 AT> FLASH
+  
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
 

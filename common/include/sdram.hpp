@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 void init_sdram();
+#define SDRAM_BANK2_ADDR 0xD0000000
 
 #ifdef __cplusplus
 }

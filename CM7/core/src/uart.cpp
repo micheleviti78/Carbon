@@ -31,7 +31,7 @@ extern "C" {
 #define STLINK_RX_Pin GPIO_PIN_9
 #define STLINK_RX_GPIO_Port GPIOA
 
-UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart1 __attribute__((section(".uart_struct")));
 
 void init_uart() {
     huart1.Instance = USART1;

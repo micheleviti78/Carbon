@@ -65,7 +65,7 @@ int main(void) {
     BSP_LED_Init(LED_BLUE);
     BSP_LED_Init(LED_RED);
 
-    // init_diag();
+    RAW_DIAG("CM4 ready");
 
     /* Infinite loop */
     while (1) {

@@ -46,8 +46,10 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-FLASH (rx)      : ORIGIN = 0x08100000, LENGTH = 1024K
-RAM (xrw)      : ORIGIN = 0x10000000, LENGTH = 128K
+FLASH (rx)           : ORIGIN = 0x08100000, LENGTH = 1024K
+RAM (xrw)            : ORIGIN = 0x10000000, LENGTH = 128K
+RAM_D2_SR2           : ORIGIN = 0x30020000, LENGTH = 128K
+RAM_D3 (xrw)         : ORIGIN = 0x38000000, LENGTH = 64K
 }
 
 /* Define output sections */
@@ -156,9 +158,7 @@ SECTIONS
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
-  } >RAM
-
-  
+  } >RAM	
 
   /* Remove information from the standard libraries */
   /DISCARD/ :
@@ -167,7 +167,16 @@ SECTIONS
     libm.a ( * )
     libgcc.a ( * )
   }
-
+  
+  .bss_shared(NOLOAD) : {
+    . = ABSOLUTE(0x30020000);
+  	. = ALIGN(4);
+    _sbss_shared = .;         /* define a global symbol at bss_share start */
+  	KEEP(*(.uart_struct));
+  	. = ALIGN(4);
+  	_ebss_shared = .;         /* define a global symbol at bss_share end */
+  } >RAM_D2_SR2
+   
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
 

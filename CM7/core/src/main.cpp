@@ -23,6 +23,7 @@
 #include <rand.hpp>
 #include <sdram.hpp>
 #include <systime.hpp>
+#include <uart.hpp>
 
 #include <fifo.hpp>
 #include <hsem.hpp>
@@ -87,7 +88,7 @@ int main(void) {
     SystemClock_Config();
 
     /* init DIAG*/
-    init_diag();
+    init_uart();
 
     /*init SDRAM*/
     init_sdram();

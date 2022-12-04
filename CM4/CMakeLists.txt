@@ -29,6 +29,7 @@ SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_hal_msp.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_it.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/uart.cpp
 )
 
 SET(STARTUP_SOURCE

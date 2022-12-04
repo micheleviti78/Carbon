@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           diag.hpp
+ * @file           uart.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Feb. 2022
- * @brief          DISCO-STM32H747 Diagnostic Console, header file
+ * @date           Dec. 2022
+ * @brief          DISCO-STM32H747 UART driver
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -22,9 +22,7 @@
 extern "C" {
 #endif
 
-void carbon_raw_diag_print(const char *format, ...);
-
-#define RAW_DIAG(...) carbon_raw_diag_print(__VA_ARGS__)
+void init_uart();
 
 #ifdef __cplusplus
 }

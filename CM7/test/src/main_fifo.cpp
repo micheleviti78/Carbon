@@ -243,7 +243,7 @@ int main(void) {
             RAW_DIAG("read wrong data");
         }
     }
-    /*
+
         oneByteFifo.push(reinterpret_cast<const uint8_t *>(text1),
                          std::strlen(text1), dummyLock);
 
@@ -363,7 +363,7 @@ int main(void) {
         while (oneByteFifo.pop(ch, dummyLock)) {
             _putchar(ch);
         }
-    */
+
     FifoTest test;
     test.test();
 

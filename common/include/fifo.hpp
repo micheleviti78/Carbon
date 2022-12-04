@@ -30,15 +30,17 @@ public:
     Fifo(Buffer<ObjectType, aligment> &buffer) : buffer_(buffer) {
         buffer_.init();
         uint32_t n = buffer_.getNumberOfAlignedElements();
-        if (n < (NElements + 1)) {
-            RAW_DIAG("memomy buffer too small");
+        if (n < (BUFFER_SIZE)) {
+            RAW_DIAG("memory buffer too small");
         }
-        RAW_DIAG("memomy buffer with %lu element(s)", n);
+        RAW_DIAG("memory buffer with %lu element(s)", n);
     }
 
     ~Fifo() = default;
 
     PREVENT_COPY_AND_MOVE(Fifo)
+
+    friend class FifoTest;
 
     inline bool push(const ObjectType &object, Lock &lock) {
         uint32_t fifo_pos{0};
@@ -62,9 +64,9 @@ public:
         buffer_.insert(object, fifo_pos);
 
         {
-            LockGuard<Lock> lockGuard(lock_);
+            LockGuard<Lock> lockGuard(lock);
             uint8_t bit_pos = static_cast<uint8_t>(1u << (fifo_pos % 8u));
-            tail_ready[(fifo_pos / 8u)] |= bit_pos;
+            tail_ready_[(fifo_pos / 8u)] |= bit_pos;
         }
 
         return true;
@@ -109,30 +111,30 @@ public:
                 uint8_t bit_pos2 =
                     static_cast<uint8_t>(0xFF >> (7 - (fifo_pos_end % 8u)));
                 bit_pos1 = bit_pos1 & bit_pos2;
-                tail_ready[index1] |= bit_pos1;
+                tail_ready_[index1] |= bit_pos1;
             } else {
                 uint8_t bit_pos1 =
                     static_cast<uint8_t>(0xFF << (fifo_pos_start % 8u));
-                tail_ready[index1] |= bit_pos1;
+                tail_ready_[index1] |= bit_pos1;
 
                 uint8_t bit_pos2 =
                     static_cast<uint8_t>(0xFF >> (7 - (fifo_pos_end % 8u)));
-                tail_ready[index2] |= bit_pos2;
+                tail_ready_[index2] |= bit_pos2;
 
                 if (index2 > index1) {
                     for (uint32_t i = (index1 + 1); i < index2; i++) {
-                        tail_ready[i] = 0xFF;
+                        tail_ready_[i] = 0xFF;
                     }
                 } else if (index1 > index2) {
                     uint32_t last_index = (NElements) / 8u;
                     for (uint32_t i = (index1 + 1); i < (last_index); i++) {
-                        tail_ready[i] = 0xFF;
+                        tail_ready_[i] = 0xFF;
                     }
 
-                    tail_ready[last_index] = (0xFF >> (7 - (NElements % 8u)));
+                    tail_ready_[last_index] = (0xFF >> (7 - (NElements % 8u)));
 
                     for (uint32_t i = 0; i < index2; i++) {
-                        tail_ready[i] = 0xFF;
+                        tail_ready_[i] = 0xFF;
                     }
                 }
             }
@@ -152,7 +154,7 @@ public:
             tail_ready_bit_pos =
                 static_cast<uint8_t>(1u << (current_head % 8u));
             tail_ready_index = current_head / 8u;
-            if ((tail_ready[tail_ready_index] & tail_ready_bit_pos) == 0) {
+            if ((tail_ready_[tail_ready_index] & tail_ready_bit_pos) == 0) {
                 isUnderflow = true;
             }
         }
@@ -168,7 +170,7 @@ public:
         {
             LockGuard<Lock> lockGuard(lock);
             this->head_ = increment(this->head_);
-            tail_ready[tail_ready_index] &= ~tail_ready_bit_pos;
+            tail_ready_[tail_ready_index] &= ~tail_ready_bit_pos;
         }
 
         return true;
@@ -177,7 +179,7 @@ public:
     inline bool isEmpty() {
         uint32_t current_head = this->head_;
         uint8_t bit_pos = static_cast<uint8_t>(1u << (current_head % 8u));
-        bool res = (tail_ready[(current_head / 8u)] & bit_pos == 0);
+        bool res = (tail_ready_[(current_head / 8u)] & bit_pos == 0);
         return res;
     }
 
@@ -203,6 +205,15 @@ public:
                 return false;
         } else
             return false;
+    }
+
+    void reset(Lock &lock) {
+        LockGuard<Lock> lockGuard(lock);
+        tail_reserved_ = 0;
+        head_ = 0;
+        for (unsigned i = 0; i < bit_field_size_; i++) {
+            tail_ready_[i] = 0u;
+        }
     }
 
     typedef void (*CallbackOverflow)(const ObjectType &object);
@@ -247,6 +258,6 @@ private:
     uint32_t tail_reserved_{0};
     uint32_t head_{0};
     static constexpr auto BUFFER_SIZE = (NElements + 1u);
-    static constexpr auto bit_field_size = BUFFER_SIZE / 8u + 1u;
-    uint8_t tail_ready[bit_field_size]{0};
+    static constexpr auto bit_field_size_ = BUFFER_SIZE / 8u + 1u;
+    uint8_t tail_ready_[bit_field_size_]{0};
 };

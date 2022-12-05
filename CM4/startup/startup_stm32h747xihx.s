@@ -93,8 +93,10 @@ LoopFillZerobss:
   cmp r2, r4
   bcc FillZerobss
 
+/*configure MPU*/
+  bl MPU_Config
 /* Call static constructors */
-    bl __libc_init_array
+  bl __libc_init_array
 /* Call the application's entry point.*/
   bl  main
   bx  lr

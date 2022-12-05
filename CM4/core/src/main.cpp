@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include <diag.hpp>
 #include <main.hpp>
+#include <mpu.hpp>
 #include <pin.hpp>
 #include <systime.hpp>
 

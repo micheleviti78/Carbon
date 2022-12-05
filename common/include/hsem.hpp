@@ -26,7 +26,7 @@
 
 void hsemInit();
 
-enum HSEM_ID : uint32_t { LockCM7, LockCM4, NotifyDiag };
+enum class HSEM_ID : uint32_t { LockCM7, LockCM4, NotifyDiag };
 
 template <HSEM_ID hsemID> class HSEMSpinLock {
 public:

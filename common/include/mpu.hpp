@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           diag.cpp
+ * @file           mpu.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Feb. 2022
- * @brief          DISCO-STM32H747 Diagnostic Console, source file
+ * @date           Jan. 2022
+ * @brief          MPU settings
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -15,32 +15,12 @@
  *
  ******************************************************************************
  */
-#include <hsem.hpp>
-#include <sync.hpp>
-#include <uart.hpp>
-
-#include <printf.h>
-#include <stm32h7xx_hal.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern UART_HandleTypeDef huart1;
-static HSEMSpinLock<HSEM_ID::NotifyDiag> hsemDiag;
-
-void _putchar(char ch) {
-    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
-}
-
-void carbon_raw_diag_print(const char *format, ...) {
-    // LockGuard<HSEMSpinLock<HSEM_ID::NotifyDiag>> Lock(hsemDIAG);
-    va_list vl;
-    va_start(vl, format);
-    vprintf(format, vl);
-    va_end(vl);
-    printf("\n\r");
-}
+void MPU_Config(void);
 
 #ifdef __cplusplus
 }

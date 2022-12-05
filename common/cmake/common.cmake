@@ -97,6 +97,7 @@ SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/error.cpp
     ${PROJECT_ROOT_DIR}/common/src/hsem.cpp
     ${PROJECT_ROOT_DIR}/common/src/irq.cpp
+    ${PROJECT_ROOT_DIR}/common/src/mpu.cpp
     ${PROJECT_ROOT_DIR}/common/src/systime.cpp
     ${PROJECT_ROOT_DIR}/common/src/sdram.cpp
     ${PROJECT_ROOT_DIR}/common/src/start_os.c

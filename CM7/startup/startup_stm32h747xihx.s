@@ -111,6 +111,8 @@ LoopFillZerobss_shared:
 
 /*configure MPU*/
   bl MPU_Config
+/*low level init*/
+  bl low_level_init
 /* Call static constructors */
   bl __libc_init_array
 /* Call the application's entry point.*/

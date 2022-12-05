@@ -18,7 +18,6 @@
 
 #include <diag.hpp>
 #include <error.hpp>
-#include <main.hpp>
 #include <sdram.hpp>
 
 #include <stm32h7xx_hal.h>

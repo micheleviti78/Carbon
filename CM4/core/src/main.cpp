@@ -18,14 +18,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <diag.hpp>
-#include <main.hpp>
-#include <mpu.hpp>
 #include <pin.hpp>
-#include <systime.hpp>
 
-#ifndef HSEM_ID_0
-#define HSEM_ID_0 (0U) /* HW semaphore 0*/
-#endif
+#include <stm32h7xx_hal.h>
 
 extern "C" {
 
@@ -36,36 +31,6 @@ void mainThread(const void */*argument*/){}
  * @retval int
  */
 int main(void) {
-    /*HW semaphore Clock enable*/
-    __HAL_RCC_HSEM_CLK_ENABLE();
-    /* Activate HSEM notification for Cortex-M4*/
-    HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
-    /*
-    Domain D2 goes to STOP mode (Cortex-M4 in deep-sleep) waiting for Cortex-M7
-    to perform system initialization (system clock config, external memory
-    configuration.. )
-    */
-    HAL_PWREx_ClearPendingEvent();
-    HAL_PWREx_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFE,
-                            PWR_D2_DOMAIN);
-    /* Clear HSEM flag */
-    __HAL_HSEM_CLEAR_FLAG(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
-
-    /* MCU
-     * Configuration--------------------------------------------------------*/
-
-    /* Reset of all peripherals, Initializes the Flash interface and the
-     * Systick.
-     */
-    HAL_Init();
-
-    /*init timer*/
-    low_level_system_time();
-
-    /* Initialize Pin needed by the Error function */
-    BSP_LED_Init(LED_BLUE);
-    BSP_LED_Init(LED_RED);
-
     RAW_DIAG("CM4 ready");
 
     /* Infinite loop */
@@ -92,4 +57,5 @@ void assert_failed(uint8_t *file, uint32_t line) {
     /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
 }

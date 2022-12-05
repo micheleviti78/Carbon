@@ -18,8 +18,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include <stm32h7xx_it.h>
 
-#include <main.hpp>
-
 void carbon_hw_us_systime_tim_isr(void);
 void hsem_isr(void);
 

@@ -20,14 +20,18 @@
 /* Includes ------------------------------------------------------------------*/
 #include <cmsis_os.h>
 #include <ethernetif.h>
+
+#include <stm32h7xx_hal.h>
+
 #include <lan8742.h>
+
 #include <lwip/ethip6.h>
 #include <lwip/opt.h>
 #include <lwip/tcpip.h>
 #include <lwip/timeouts.h>
-#include <main.hpp>
 #include <netif/etharp.h>
 #include <netif/ethernet.h>
+
 #include <string.h>
 
 /* Within 'USER CODE' section, code will be kept by default at each generation

@@ -33,8 +33,6 @@
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
 
-static uint32_t sdram_buf __attribute__((aligned(4), section(".sdram_bank2")));
-
 extern "C" {
 
 static void SystemClock_Config(void);

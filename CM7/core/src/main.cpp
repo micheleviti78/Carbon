@@ -87,9 +87,6 @@ int main(void) {
     BSP_LED_Init(LED_GREEN);
     BSP_LED_Init(LED_ORANGE);
 
-    RAW_DIAG(" ");
-    RAW_DIAG("CM7 ready");
-
     /* When system initialization is finished, Cortex-M7 will release Cortex-M4
      * by means of HSEM notification */
     /*HW semaphore Clock enable*/
@@ -106,10 +103,11 @@ int main(void) {
         Error_Handler();
     }
 
+    RAW_DIAG(" ");
+    RAW_DIAG("CM7 ready");
+
     /*init hardware semaphore*/
     hsemInit();
-
-    HAL_Delay(10);
 
     RAW_DIAG("Initialization complete");
     RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,

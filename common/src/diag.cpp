@@ -34,7 +34,7 @@ void _putchar(char ch) {
 }
 
 void carbon_raw_diag_print(const char *format, ...) {
-    // LockGuard<HSEMSpinLock<HSEM_ID::NotifyDiag>> Lock(hsemDIAG);
+    LockGuard<HSEMSpinLock<HSEM_ID::NotifyDiag>> Lock(hsemDiag);
     va_list vl;
     va_start(vl, format);
     vprintf(format, vl);

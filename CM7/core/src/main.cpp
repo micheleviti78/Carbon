@@ -58,12 +58,12 @@ int main(void) {
         Error_Handler();
     }
 
-    /*activate cache*/
+    /* activate cache */
     SCB_EnableICache();
 
     SCB_EnableDCache();
 
-    /*HAL low level init*/
+    /* HAL low level init */
     HAL_Init();
 
     /* Configure the system clock */
@@ -72,13 +72,13 @@ int main(void) {
     /* init DIAG*/
     init_uart();
 
-    /*init SDRAM*/
+    /* init SDRAM */
     init_sdram();
 
-    /*init timer*/
+    /* init timer */
     low_level_system_time();
 
-    /*true random generator init*/
+    /* true random generator init */
     carbon_rand_init();
 
     /* Initialize Pin needed by the Error function */
@@ -101,11 +101,11 @@ int main(void) {
         Error_Handler();
     }
 
-    RAW_DIAG(" ");
-    RAW_DIAG("CM7 ready");
-
     /*init hardware semaphore*/
     hsemInit();
+
+    RAW_DIAG(" ");
+    RAW_DIAG("CM7 ready");
 
     RAW_DIAG("Initialization complete");
     RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,

@@ -27,20 +27,24 @@ template <typename ObjectType, uint32_t aligment, typename Lock,
           uint32_t NElements>
 class Fifo {
 public:
-    Fifo(Buffer<ObjectType, aligment> &buffer) : buffer_(buffer) {
-        buffer_.init();
-        uint32_t n = buffer_.getNumberOfAlignedElements();
-        if (n < (BUFFER_SIZE)) {
-            RAW_DIAG("memory buffer too small");
-        }
-        RAW_DIAG("memory buffer with %lu element(s)", n);
-    }
+    Fifo() {}
 
     ~Fifo() = default;
 
     PREVENT_COPY_AND_MOVE(Fifo)
 
     friend class FifoTest;
+
+    bool init(uint32_t startAddress, uint32_t size) {
+        buffer_.init(startAddress, size);
+        uint32_t n = buffer_.getNumberOfAlignedElements();
+        if (n < (BUFFER_SIZE)) {
+            RAW_DIAG("memory buffer too small");
+            return false;
+        }
+        RAW_DIAG("memory buffer with %lu element(s)", n);
+        return true;
+    }
 
     inline bool push(const ObjectType &object, Lock &lock) {
         uint32_t fifo_pos{0};
@@ -254,7 +258,7 @@ private:
     CallbackOverflow callbackOverflow{nullptr};
     CallbackUnderflow callbackUnderflow{nullptr};
 
-    Buffer<ObjectType, aligment> &buffer_;
+    Buffer<ObjectType, aligment> buffer_;
     uint32_t tail_reserved_{0};
     uint32_t head_{0};
     static constexpr auto BUFFER_SIZE = (NElements + 1u);

@@ -46,16 +46,15 @@ private:
 
 template <size_t blockSize, uint32_t alignment> class MemoryAllocatorRaw {
 public:
-    MemoryAllocatorRaw(uint32_t startAddress, uint32_t size)
-        : memoryRegion_(startAddress, size) {}
+    MemoryAllocatorRaw() {}
 
     ~MemoryAllocatorRaw() = default;
 
     PREVENT_COPY_AND_MOVE(MemoryAllocatorRaw)
 
-    void init() {
-        sizeTotalBytes_ = memoryRegion_.getSize();
-        startAddress_ = memoryRegion_.getAddress();
+    void init(uint32_t startAddress, uint32_t size) {
+        sizeTotalBytes_ = size;
+        startAddress_ = reinterpret_cast<uint8_t *>(startAddress);
         alignedBlockSize_ = alignBlockSize(blockSize, alignment);
         firstAlignedAddress_ = alignAddress(startAddress_, alignment);
         alignedAddress_ = firstAlignedAddress_;
@@ -90,8 +89,6 @@ public:
     }
 
     void reset() { alignedAddress_ = firstAlignedAddress_; }
-
-    const MemoryRegion &getMemoryRegion() { return memoryRegion_; }
 
     uint32_t getTotalSize() const { return sizeTotalBytes_; }
 
@@ -135,7 +132,6 @@ public:
     }
 
 private:
-    MemoryRegion memoryRegion_;
     uint32_t sizeTotalBytes_{0};
     uint32_t alignedBlockSize_{0};
     uint8_t *startAddress_{nullptr};
@@ -278,14 +274,15 @@ protected:
 
 template <typename ObjectType, uint32_t aligment> class Buffer {
 public:
-    Buffer(uint32_t startAddress, uint32_t size)
-        : memoryAllocatorRaw_(startAddress, size) {}
+    Buffer() {}
 
     ~Buffer() = default;
 
     PREVENT_COPY_AND_MOVE(Buffer)
 
-    void init() { memoryAllocatorRaw_.init(); }
+    void init(uint32_t startAddress, uint32_t size) {
+        memoryAllocatorRaw_.init(startAddress, size);
+    }
 
     inline bool insert(const ObjectType &object, const uint32_t index) {
         uint8_t *data;

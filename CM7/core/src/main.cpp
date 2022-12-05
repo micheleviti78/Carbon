@@ -47,7 +47,8 @@ int main(void) {
     /* starting OS */
     start_os();
 
-    while (1);
+    while (1)
+        ;
 }
 
 #ifdef USE_FULL_ASSERT
@@ -60,5 +61,4 @@ int main(void) {
  */
 void assert_failed(uint8_t *file, uint32_t line) {}
 #endif /* USE_FULL_ASSERT */
-
 }

@@ -27,8 +27,8 @@ extern "C" {
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
 
-void low_level_init () {
-	/*HW semaphore Clock enable*/
+void low_level_init() {
+    /*HW semaphore Clock enable*/
     __HAL_RCC_HSEM_CLK_ENABLE();
 
     /* Activate HSEM notification for Cortex-M4*/
@@ -60,5 +60,4 @@ void low_level_init () {
     BSP_LED_Init(LED_BLUE);
     BSP_LED_Init(LED_RED);
 }
-
 }

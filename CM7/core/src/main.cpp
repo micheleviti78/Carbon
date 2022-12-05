@@ -117,9 +117,6 @@ int main(void) {
 
     /* Infinite loop */
 
-    sdram_buf = 12;
-    RAW_DIAG("sdram test = %lu", sdram_buf);
-
     start_os();
 
     while (1) {

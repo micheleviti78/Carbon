@@ -15,13 +15,13 @@
  *
  ******************************************************************************
  */
-#include <error.hpp>
-#include <hsem.hpp>
-#include <pin.hpp>
-#include <rand.hpp>
-#include <sdram.hpp>
-#include <systime.hpp>
-#include <uart.hpp>
+#include <carbon/error.hpp>
+#include <carbon/hsem.hpp>
+#include <carbon/pin.hpp>
+#include <carbon/rand.hpp>
+#include <carbon/sdram.hpp>
+#include <carbon/systime.hpp>
+#include <carbon/uart.hpp>
 
 #include <stm32h7xx_hal.h>
 

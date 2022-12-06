@@ -16,10 +16,9 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include <stm32h7xx_hal.h>
+#include <carbon/diag.hpp>
 
-#include <diag.hpp>
-#include <stm32h7xx_it.h>
+#include <stm32h7xx_hal.h>
 
 #include <cmsis_os.h>
 

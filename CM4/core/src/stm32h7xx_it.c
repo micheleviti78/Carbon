@@ -16,7 +16,7 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include <stm32h7xx_it.h>
+#include <carbon/stm32h7xx_it.h>
 
 void carbon_hw_us_systime_tim_isr(void);
 void hsem_isr(void);

@@ -30,7 +30,7 @@
 #include <sys/times.h>
 #include <time.h>
 
-#include <diag.hpp>
+#include <carbon/diag.hpp>
 
 /* Variables */
 extern int __io_putchar(int ch) __attribute__((weak));

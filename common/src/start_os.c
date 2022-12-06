@@ -16,8 +16,8 @@
  ******************************************************************************
  */
 
-#include <diag.hpp>
-#include <main_thread.hpp>
+#include <carbon/diag.hpp>
+#include <carbon/main_thread.hpp>
 
 #include <cmsis_os.h>
 

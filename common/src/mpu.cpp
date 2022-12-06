@@ -15,7 +15,7 @@
  *
  ******************************************************************************
  */
-#include <sdram.hpp>
+#include <carbon/sdram.hpp>
 
 #include <stm32h7xx_hal.h>
 

@@ -23,6 +23,8 @@ set(LDSCRIPT
     ${PROJECT_ROOT_DIR}/CM7/STM32H747XIHx_FLASH_CM7.ld
 )
 
+include_directories(${CMAKE_CURRENT_LIST_DIR}/conf)
+
 include(${PROJECT_ROOT_DIR}/common/cmake/common.cmake)
 
 if(TEST_FIFO)

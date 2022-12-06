@@ -15,11 +15,12 @@
  *
  ******************************************************************************
  */
-#include <hsem.hpp>
-#include <sync.hpp>
-#include <uart.hpp>
+#include <carbon/hsem.hpp>
+#include <carbon/sync.hpp>
+#include <carbon/uart.hpp>
 
 #include <printf.h>
+
 #include <stm32h7xx_hal.h>
 
 #ifdef __cplusplus

@@ -22,6 +22,8 @@ set(LDSCRIPT
     ${PROJECT_ROOT_DIR}/CM4/STM32H747XIHx_FLASH_CM4.ld
 )
 
+include_directories(${CMAKE_CURRENT_LIST_DIR}/conf)
+
 include(${PROJECT_ROOT_DIR}/common/cmake/common.cmake)
 
 SET(SOURCE

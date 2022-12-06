@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <irq.hpp>
+#include <carbon/irq.hpp>
 
 #include <stm32h7xx_hal.h>
 

@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <common.hpp>
-#include <diag.hpp>
-#include <pool.hpp>
+#include <carbon/common.hpp>
+#include <carbon/diag.hpp>
+#include <carbon/pool.hpp>
 
 template <typename ObjectType, uint32_t aligment, typename Lock,
           uint32_t NElements>

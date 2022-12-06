@@ -16,7 +16,7 @@
  ******************************************************************************
  */
 
-#include <diag.hpp>
+#include <carbon/diag.hpp>
 
 #include <FreeRTOS.h>
 

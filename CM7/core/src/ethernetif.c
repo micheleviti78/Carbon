@@ -18,12 +18,14 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include <cmsis_os.h>
-#include <ethernetif.h>
+
+#include <carbon/ethernetif.h>
+
+#include <lan8742.h>
 
 #include <stm32h7xx_hal.h>
 
-#include <lan8742.h>
+#include <cmsis_os.h>
 
 #include <lwip/ethip6.h>
 #include <lwip/opt.h>

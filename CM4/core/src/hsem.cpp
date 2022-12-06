@@ -16,7 +16,7 @@
  ******************************************************************************
  */
 
-#include <hsem.hpp>
+#include <carbon/hsem.hpp>
 
 void hsemNVIC(void) {
     HAL_NVIC_SetPriority(HSEM2_IRQn, 0x0F, 0);

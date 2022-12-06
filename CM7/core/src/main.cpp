@@ -17,7 +17,7 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include <diag.hpp>
+#include <carbon/diag.hpp>
 
 #include <stm32h7xx_hal.h>
 

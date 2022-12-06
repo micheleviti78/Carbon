@@ -16,7 +16,8 @@
  ******************************************************************************
  */
 
-#include <error.hpp>
+#include <carbon/error.hpp>
+
 #include <stm32h7xx_hal.h>
 
 #ifdef __cplusplus

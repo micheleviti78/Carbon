@@ -18,7 +18,7 @@
 
 #include <reent.h>
 
-#include <diag.hpp>
+#include <carbon/diag.hpp>
 
 // NOLINTNEXTLINE
 __extension__ typedef int __guard __attribute__((mode(__DI__)));

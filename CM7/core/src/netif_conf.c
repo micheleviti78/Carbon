@@ -15,10 +15,9 @@
  *
  ******************************************************************************
  */
-#include <app_ethernet.h>
-#include <ethernetif.h>
-
-#include <diag.hpp>
+#include <carbon/app_ethernet.h>
+#include <carbon/diag.hpp>
+#include <carbon/ethernetif.h>
 
 #include <lwip/init.h>
 #include <lwip/netif.h>

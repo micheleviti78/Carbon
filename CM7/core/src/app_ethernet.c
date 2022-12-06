@@ -21,11 +21,10 @@
 #if LWIP_DHCP
 #include <lwip/dhcp.h>
 #endif
-#include <app_ethernet.h>
-#include <ethernetif.h>
-
-#include <diag.hpp>
-#include <pin.hpp>
+#include <carbon/app_ethernet.h>
+#include <carbon/diag.hpp>
+#include <carbon/ethernetif.h>
+#include <carbon/pin.hpp>
 
 #include <stm32h7xx_hal.h>
 

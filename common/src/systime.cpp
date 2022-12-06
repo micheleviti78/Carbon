@@ -16,11 +16,11 @@
  ******************************************************************************
  */
 
-#include <diag.hpp>
-#include <error.hpp>
-#include <irq.hpp>
-#include <sync.hpp>
-#include <systime.hpp>
+#include <carbon/diag.hpp>
+#include <carbon/error.hpp>
+#include <carbon/irq.hpp>
+#include <carbon/sync.hpp>
+#include <carbon/systime.hpp>
 
 #include <stm32h7xx_hal.h>
 #include <stm32h7xx_ll_tim.h>

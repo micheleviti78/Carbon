@@ -16,11 +16,12 @@
  ******************************************************************************
  */
 
-#include <diag.hpp>
-#include <main_thread.hpp>
-#include <pin.hpp>
+#include <carbon/diag.hpp>
+#include <carbon/main_thread.hpp>
+#include <carbon/pin.hpp>
 
 #include <cmsis_os.h>
+
 #include <task.h>
 
 extern "C" {

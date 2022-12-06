@@ -16,8 +16,8 @@
  ******************************************************************************
  */
 
-#include <diag.hpp>
-#include <rand.hpp>
+#include <carbon/diag.hpp>
+#include <carbon/rand.hpp>
 
 #include <stm32h7xx_hal.h>
 #include <stm32h7xx_hal_rng.h>

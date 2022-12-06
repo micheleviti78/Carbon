@@ -16,8 +16,8 @@
  ******************************************************************************
  */
 
-#include <diag.hpp>
-#include <hsem.hpp>
+#include <carbon/diag.hpp>
+#include <carbon/hsem.hpp>
 
 __weak void hsem_notify_isr(uint32_t /*mask*/) {}
 

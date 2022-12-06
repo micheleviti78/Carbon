@@ -16,9 +16,9 @@
  ******************************************************************************
  */
 
-#include <diag.hpp>
-#include <error.hpp>
-#include <sdram.hpp>
+#include <carbon/diag.hpp>
+#include <carbon/error.hpp>
+#include <carbon/sdram.hpp>
 
 #include <stm32h7xx_hal.h>
 

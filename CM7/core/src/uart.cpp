@@ -16,9 +16,9 @@
  ******************************************************************************
  */
 
-#include <error.hpp>
-#include <pin.hpp>
-#include <uart.hpp>
+#include <carbon/error.hpp>
+#include <carbon/pin.hpp>
+#include <carbon/uart.hpp>
 
 #include <stm32h7xx_hal.h>
 

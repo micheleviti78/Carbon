@@ -16,7 +16,7 @@
  ******************************************************************************
  */
 
-#include <common.hpp>
+#include <carbon/common.hpp>
 
 template <typename Lock> class LockGuard {
 public:

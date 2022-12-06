@@ -17,9 +17,9 @@
  */
 #pragma once
 
-#include <common.hpp>
-#include <diag.hpp>
-#include <sync.hpp>
+#include <carbon/common.hpp>
+#include <carbon/diag.hpp>
+#include <carbon/sync.hpp>
 
 #include <cstring>
 #include <new>

@@ -112,10 +112,12 @@ public:
                                                   uint32_t bufferSize,
                                                   uint32_t objectSize,
                                                   uint32_t memAlignment) {
+#ifdef TEST_FIFO
         RAW_DIAG(
             "address %lu, bufferSize %lu, objectSize %lu, memAlignment %lu",
             reinterpret_cast<uint32_t>(address), bufferSize, objectSize,
             memAlignment);
+#endif
         uint8_t *startAddr = alignAddress(address, memAlignment);
         uint32_t objectSizeAligned =
             predictAlignedBlockSize(objectSize, memAlignment);
@@ -124,10 +126,12 @@ public:
                                : startAddr;
         uint32_t actualSize = reinterpret_cast<uint32_t>(endAddr) -
                               reinterpret_cast<uint32_t>(startAddr);
+#ifdef TEST_FIFO
         RAW_DIAG(
             "startAddr %lu, objectSizeAligned %lu, endAddr %lu, actualSize %lu",
             reinterpret_cast<uint32_t>(startAddr), objectSizeAligned,
             reinterpret_cast<uint32_t>(endAddr), actualSize);
+#endif
         return (actualSize / objectSizeAligned);
     }
 

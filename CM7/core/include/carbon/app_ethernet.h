@@ -16,8 +16,7 @@
  ******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __APP_ETHERNET_H
-#define __APP_ETHERNET_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,5 +63,3 @@ void DHCP_Thread(void const *argument);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* __APP_ETHERNET_H */

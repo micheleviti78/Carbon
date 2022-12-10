@@ -42,7 +42,9 @@ public:
             RAW_DIAG("memory buffer too small");
             return false;
         }
+#ifdef TEST_FIFO
         RAW_DIAG("memory buffer with %lu element(s)", n);
+#endif
         return true;
     }
 

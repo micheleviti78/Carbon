@@ -28,15 +28,12 @@ extern "C" {
 
 void netif_config(void);
 
-/**
- * @brief  Initializes the lwIP stack
- * @param  None
- * @retval None
- */
+void start_diag_thread(void);
 
 void mainThread(const void *argument) {
-    RAW_DIAG("FreeRTOS version %d.%d.%d", tskKERNEL_VERSION_MAJOR,
-             tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD);
+    start_diag_thread();
+    DIAG("FreeRTOS version %d.%d.%d", tskKERNEL_VERSION_MAJOR,
+         tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD);
     netif_config();
     while (1) {
         BSP_LED_Toggle(LED_GREEN);

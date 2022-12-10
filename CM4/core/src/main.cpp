@@ -31,7 +31,7 @@ void mainThread(const void */*argument*/){}
  * @retval int
  */
 int main(void) {
-    RAW_DIAG("CM4 ready");
+    DIAG("CM4 ready");
 
     /* Infinite loop */
     while (1) {

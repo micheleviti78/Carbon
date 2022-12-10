@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           start_os.c
+ * @file           shared_memory.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Nov. 2022
- * @brief          starting OS
+ * @date           Dec. 2022
+ * @brief          Shared memory for the IPC
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -16,18 +16,8 @@
  ******************************************************************************
  */
 
-#include <carbon/diag.hpp>
-#include <carbon/main_thread.hpp>
+#include <carbon/shared_memory.hpp>
 
-#include <cmsis_os.h>
-
-static osThreadId main_task_handle;
-
-void start_os(void) {
-    osThreadDef(main_thread, mainThread, osPriorityNormal, 0,
-                configMINIMAL_STACK_SIZE * 10);
-    main_task_handle = osThreadCreate(osThread(main_thread), NULL);
-    DIAG("starting OS");
-    osKernelStart();
-    RAW_DIAG("ERROR OS");
-}
+uint8_t diagBuffer[DIAG_BUFFER_SIZE];
+uint32_t diagBufferPtr = reinterpret_cast<uint32_t>(&diagBuffer[0]);
+DiagFifo diagFifo;

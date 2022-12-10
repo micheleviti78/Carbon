@@ -26,8 +26,8 @@
 struct netif gnetif; /* network interface structure */
 
 void netif_config(void) {
-    RAW_DIAG("LwIP version %d.%d.%d", LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR,
-             LWIP_VERSION_REVISION);
+    DIAG("LwIP version %d.%d.%d", LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR,
+         LWIP_VERSION_REVISION);
 
     tcpip_init(NULL, NULL);
 
@@ -59,14 +59,14 @@ void netif_config(void) {
     netif_set_link_callback(&gnetif, ethernet_link_status_updated);
 
     osThreadDef(EthLink, ethernet_link_thread, osPriorityNormal, 0,
-                configMINIMAL_STACK_SIZE * 2);
+                configMINIMAL_STACK_SIZE * 6);
     osThreadCreate(osThread(EthLink), &gnetif);
 #endif
 
 #if LWIP_DHCP
     /* Start DHCPClient */
     osThreadDef(DHCP, DHCP_Thread, osPriorityHigh, 0,
-                configMINIMAL_STACK_SIZE * 2);
+                configMINIMAL_STACK_SIZE * 6);
     osThreadCreate(osThread(DHCP), &gnetif);
 #endif
 }

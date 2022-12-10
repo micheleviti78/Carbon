@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           start_os.c
+ * @file           diag_thread.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Nov. 2022
- * @brief          starting OS
+ * @date           Dec. 2022
+ * @brief          starting diag thread
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -16,18 +16,14 @@
  ******************************************************************************
  */
 
-#include <carbon/diag.hpp>
-#include <carbon/main_thread.hpp>
+#pragma once
 
-#include <cmsis_os.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static osThreadId main_task_handle;
+void start_diag_thread(void);
 
-void start_os(void) {
-    osThreadDef(main_thread, mainThread, osPriorityNormal, 0,
-                configMINIMAL_STACK_SIZE * 10);
-    main_task_handle = osThreadCreate(osThread(main_thread), NULL);
-    DIAG("starting OS");
-    osKernelStart();
-    RAW_DIAG("ERROR OS");
+#ifdef __cplusplus
 }
+#endif

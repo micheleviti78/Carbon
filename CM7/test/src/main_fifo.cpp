@@ -91,7 +91,7 @@ static DummyLock dummyLock;
 #define GET_HAL_VERSION_SUB2 ((HAL_GetHalVersion() >> 8) & 0xFFUL)
 #define GET_HAL_VERSION_RC (HAL_GetHalVersion() & 0xFFUL)
 
-void _putchar(char ch);
+void putchar_(char ch);
 
 void mainThread(const void * /*argument*/) {}
 
@@ -103,7 +103,7 @@ int main(void) {
     RAW_DIAG("Initialization complete");
     RAW_DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,
              __NEWLIB_PATCHLEVEL__);
-    RAW_DIAG("HAL version %d.%d.%d.%d", GET_HAL_VERSION_MAIN,
+    RAW_DIAG("HAL version %lu.%lu.%lu.%lu", GET_HAL_VERSION_MAIN,
              GET_HAL_VERSION_SUB1, GET_HAL_VERSION_SUB2, GET_HAL_VERSION_RC);
 
     /* Infinite loop */
@@ -202,7 +202,7 @@ int main(void) {
 
         for (i = 0; i < std::strlen(text1); i++) {
             oneByteFifo.pop(ch, dummyLock);
-            _putchar(ch);
+            putchar_(ch);
         }
 
         oneByteFifo.push(reinterpret_cast<const uint8_t *>(text4),
@@ -212,7 +212,7 @@ int main(void) {
                          std::strlen(text1), dummyLock);
 
         while (oneByteFifo.pop(ch, dummyLock)) {
-            _putchar(ch);
+            putchar_(ch);
         }
 
         oneByteFifo.push(reinterpret_cast<const uint8_t *>(text1),
@@ -222,7 +222,7 @@ int main(void) {
                          std::strlen(text2), dummyLock);
 
         while (oneByteFifo.pop(ch, dummyLock)) {
-            _putchar(ch);
+            putchar_(ch);
         }
 
         oneByteFifo.push(reinterpret_cast<const uint8_t *>(text3),
@@ -232,7 +232,7 @@ int main(void) {
                          std::strlen(text4), dummyLock);
 
         while (oneByteFifo.pop(ch, dummyLock)) {
-            _putchar(ch);
+            putchar_(ch);
         }
 
         oneByteFifo.push(reinterpret_cast<const uint8_t *>(text1),
@@ -248,7 +248,7 @@ int main(void) {
                          std::strlen(text4), dummyLock);
 
         while (oneByteFifo.pop(ch, dummyLock)) {
-            _putchar(ch);
+            putchar_(ch);
         }
 
         oneByteFifo.push(reinterpret_cast<const uint8_t *>(text4),
@@ -259,7 +259,7 @@ int main(void) {
         while (i > 0) {
             oneByteFifo.pop(ch, dummyLock);
 
-            _putchar(ch);
+            putchar_(ch);
 
             oneByteFifo.push(reinterpret_cast<const uint8_t *>(text4),
                              std::strlen(text4), dummyLock);
@@ -271,7 +271,7 @@ int main(void) {
         while (i > 0) {
             oneByteFifo.pop(ch, dummyLock);
 
-            _putchar(ch);
+            putchar_(ch);
 
             oneByteFifo.push(reinterpret_cast<const uint8_t *>(text3),
                              std::strlen(text3), dummyLock);
@@ -283,7 +283,7 @@ int main(void) {
         while (i > 0) {
             oneByteFifo.pop(ch, dummyLock);
 
-            _putchar(ch);
+            putchar_(ch);
 
             oneByteFifo.push(reinterpret_cast<const uint8_t *>(text2),
                              std::strlen(text2), dummyLock);
@@ -295,7 +295,7 @@ int main(void) {
         while (i > 0) {
             oneByteFifo.pop(ch, dummyLock);
 
-            _putchar(ch);
+            putchar_(ch);
 
             oneByteFifo.push(reinterpret_cast<const uint8_t *>(text1),
                              std::strlen(text1), dummyLock);
@@ -303,7 +303,7 @@ int main(void) {
         }
 
         while (oneByteFifo.pop(ch, dummyLock)) {
-            _putchar(ch);
+            putchar_(ch);
         }
 
     FifoTest test;
@@ -322,13 +322,13 @@ void FifoTest::test() {
     oneByteFifo.reset(dummyLock);
     RAW_DIAG("starts test internal index");
 
-    RAW_DIAG("text_length 1 %d", std::strlen(text1));
-    RAW_DIAG("text_length 2 %d", std::strlen(text2));
-    RAW_DIAG("text_length 3 %d", std::strlen(text3));
-    RAW_DIAG("text_length 4 %d", std::strlen(text4));
-    RAW_DIAG("text_length text_to_fail_to_fill_buffer %d",
+    RAW_DIAG("text_length 1 %u", std::strlen(text1));
+    RAW_DIAG("text_length 2 %u", std::strlen(text2));
+    RAW_DIAG("text_length 3 %u", std::strlen(text3));
+    RAW_DIAG("text_length 4 %u", std::strlen(text4));
+    RAW_DIAG("text_length text_to_fail_to_fill_buffer %u",
              std::strlen(text_to_fail_to_fill_buffer));
-    RAW_DIAG("text_length text_to_success_to_fill_buffer %d",
+    RAW_DIAG("text_length text_to_success_to_fill_buffer %u",
              std::strlen(text_to_success_to_fill_buffer));
 
     if (oneByteFifo.bit_field_size_ != 26) {
@@ -346,7 +346,7 @@ void FifoTest::test() {
 
     for (unsigned i = 0; i < (expected_tail / 8u); i++) {
         if (oneByteFifo.tail_ready_[i] != 0xFF) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -354,14 +354,14 @@ void FifoTest::test() {
     bitField = bitFieldConverter(expected_tail % 8);
 
     if (oneByteFifo.tail_ready_[expected_tail / 8u] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u", expected_tail / 8u,
+        RAW_DIAG("error tail_ready_[%u] = %u, expected %u", expected_tail / 8u,
                  oneByteFifo.tail_ready_[expected_tail / 8u], bitField);
     }
 
     for (unsigned i = (expected_tail / 8u + 1); i < oneByteFifo.bit_field_size_;
          i++) {
         if (oneByteFifo.tail_ready_[i] != 0) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -377,7 +377,7 @@ void FifoTest::test() {
 
     for (unsigned i = 0; i < (expected_tail / 8u); i++) {
         if (oneByteFifo.tail_ready_[i] != 0xFF) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -385,14 +385,14 @@ void FifoTest::test() {
     bitField = bitFieldConverter(expected_tail % 8);
 
     if (oneByteFifo.tail_ready_[expected_tail / 8u] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u", expected_tail / 8u,
+        RAW_DIAG("error tail_ready_[%u] = %u, expected %u", expected_tail / 8u,
                  oneByteFifo.tail_ready_[expected_tail / 8u], bitField);
     }
 
     for (unsigned i = (expected_tail / 8u + 1); i < oneByteFifo.bit_field_size_;
          i++) {
         if (oneByteFifo.tail_ready_[i] != 0) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -413,7 +413,7 @@ void FifoTest::test() {
 
     for (unsigned i = 0; i < (expected_tail / 8u); i++) {
         if (oneByteFifo.tail_ready_[i] != 0xFF) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -421,14 +421,14 @@ void FifoTest::test() {
     bitField = bitFieldConverter(expected_tail % 8);
 
     if (oneByteFifo.tail_ready_[expected_tail / 8u] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u", expected_tail / 8u,
+        RAW_DIAG("error tail_ready_[%u] = %u, expected %u", expected_tail / 8u,
                  oneByteFifo.tail_ready_[expected_tail / 8u], bitField);
     }
 
     for (unsigned i = (expected_tail / 8u + 1); i < oneByteFifo.bit_field_size_;
          i++) {
         if (oneByteFifo.tail_ready_[i] != 0) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -477,12 +477,12 @@ void FifoTest::test() {
     expected_head = std::strlen(text1);
 
     if (oneByteFifo.head_ != expected_head)
-        RAW_DIAG("error head_: expected %lu, got %lu", expected_head,
+        RAW_DIAG("error head_: expected %u, got %lu", expected_head,
                  oneByteFifo.head_);
 
     for (unsigned i = 0; i < (expected_head / 8u); i++) {
         if (oneByteFifo.tail_ready_[i] != 0) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -490,7 +490,7 @@ void FifoTest::test() {
     bitField = ~bitFieldConverter(expected_head % 8u);
 
     if (oneByteFifo.tail_ready_[expected_head / 8u] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u", expected_head / 8u,
+        RAW_DIAG("error tail_ready_[%u] = %u, expected %u", expected_head / 8u,
                  oneByteFifo.tail_ready_[expected_head / 8u], bitField);
     }
 
@@ -509,12 +509,12 @@ void FifoTest::test() {
     expected_head = +std::strlen(text2) + expected_head;
 
     if (oneByteFifo.head_ != expected_head)
-        RAW_DIAG("error head_: expected %lu, got %lu", expected_head,
+        RAW_DIAG("error head_: expected %u, got %lu", expected_head,
                  oneByteFifo.head_);
 
     for (unsigned i = 0; i < (expected_head / 8u); i++) {
         if (oneByteFifo.tail_ready_[i] != 0) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -522,7 +522,7 @@ void FifoTest::test() {
     bitField = ~bitFieldConverter(expected_head % 8u);
 
     if (oneByteFifo.tail_ready_[expected_head / 8u] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u", expected_head / 8u,
+        RAW_DIAG("error tail_ready_[%u] = %u, expected %u", expected_head / 8u,
                  oneByteFifo.tail_ready_[expected_head / 8u], bitField);
     }
 
@@ -542,7 +542,7 @@ void FifoTest::test() {
 
     for (unsigned i = 0; i < (oneByteFifo.tail_reserved_ / 8u); i++) {
         if (oneByteFifo.tail_ready_[i] != 0xFF) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -550,14 +550,14 @@ void FifoTest::test() {
     bitField = bitFieldConverter(expected_tail % 8);
 
     if (oneByteFifo.tail_ready_[expected_tail / 8u] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u", expected_tail / 8u,
+        RAW_DIAG("error tail_ready_[%u] = %u, expected %u", expected_tail / 8u,
                  oneByteFifo.tail_ready_[expected_tail / 8u], bitField);
     }
 
     for (unsigned i = (expected_tail / 8u + 1); i < (oneByteFifo.head_ / 8u);
          i++) {
         if (oneByteFifo.tail_ready_[i] != 0) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -565,14 +565,14 @@ void FifoTest::test() {
     bitField = ~bitFieldConverter(oneByteFifo.head_ % 8u);
 
     if (oneByteFifo.tail_ready_[oneByteFifo.head_ / 8u] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u", expected_head / 8u,
+        RAW_DIAG("error tail_ready_[%u] = %u, expected %u", expected_head / 8u,
                  oneByteFifo.tail_ready_[expected_head / 8u], bitField);
     }
 
     for (unsigned i = (oneByteFifo.head_ / 8u + 1);
          i < (oneByteFifo.bit_field_size_ - 1); i++) {
         if (oneByteFifo.tail_ready_[i] != 0xFF) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -580,7 +580,7 @@ void FifoTest::test() {
     bitField = bitFieldConverter(oneByteFifo.BUFFER_SIZE % 8);
 
     if (oneByteFifo.tail_ready_[oneByteFifo.bit_field_size_ - 1] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u",
+        RAW_DIAG("error tail_ready_[%lu] = %lu, expected %lu",
                  oneByteFifo.bit_field_size_ - 1,
                  oneByteFifo.tail_ready_[oneByteFifo.bit_field_size_ - 1],
                  bitField);
@@ -617,7 +617,7 @@ void FifoTest::test() {
 
     for (unsigned i = 0; i < (oneByteFifo.tail_reserved_ / 8u); i++) {
         if (oneByteFifo.tail_ready_[i] != 0xFF) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -625,7 +625,7 @@ void FifoTest::test() {
     bitField = bitFieldConverter(oneByteFifo.tail_reserved_ % 8);
 
     if (oneByteFifo.tail_ready_[oneByteFifo.tail_reserved_ / 8u] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u",
+        RAW_DIAG("error tail_ready_[%lu] = %u, expected %u",
                  oneByteFifo.tail_reserved_ / 8u,
                  oneByteFifo.tail_ready_[oneByteFifo.tail_reserved_ / 8u],
                  bitField);
@@ -634,7 +634,7 @@ void FifoTest::test() {
     for (unsigned i = (oneByteFifo.tail_reserved_ / 8u + 1);
          i < (oneByteFifo.head_ / 8u); i++) {
         if (oneByteFifo.tail_ready_[i] != 0) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -642,7 +642,7 @@ void FifoTest::test() {
     bitField = ~bitFieldConverter(oneByteFifo.head_ % 8u);
 
     if (oneByteFifo.tail_ready_[oneByteFifo.head_ / 8u] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u",
+        RAW_DIAG("error tail_ready_[%lu] = %u, expected %u",
                  oneByteFifo.head_ / 8u,
                  oneByteFifo.tail_ready_[oneByteFifo.head_ / 8u], bitField);
     }
@@ -650,7 +650,7 @@ void FifoTest::test() {
     for (unsigned i = (oneByteFifo.head_ / 8u + 1);
          i < (oneByteFifo.bit_field_size_ - 1); i++) {
         if (oneByteFifo.tail_ready_[i] != 0xFF) {
-            RAW_DIAG("error tail_ready_[%d] = %u", i,
+            RAW_DIAG("error tail_ready_[%u] = %u", i,
                      oneByteFifo.tail_ready_[i]);
         }
     }
@@ -658,7 +658,7 @@ void FifoTest::test() {
     bitField = bitFieldConverter(oneByteFifo.BUFFER_SIZE % 8);
 
     if (oneByteFifo.tail_ready_[oneByteFifo.bit_field_size_ - 1] != bitField) {
-        RAW_DIAG("error tail_ready_[%d] = %u, expected %u",
+        RAW_DIAG("error tail_ready_[%lu] = %u, expected %u",
                  oneByteFifo.bit_field_size_ - 1,
                  oneByteFifo.tail_ready_[oneByteFifo.bit_field_size_ - 1],
                  bitField);

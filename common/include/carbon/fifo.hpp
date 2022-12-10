@@ -78,73 +78,105 @@ public:
         return true;
     }
 
-    inline bool push(const ObjectType *object, uint32_t nObjects, Lock &lock) {
-        uint32_t fifo_pos_start{0};
-        uint32_t fifo_pos_end{0};
-        bool isOverflow = false;
-        {
-            LockGuard<Lock> lockGuard(lock);
-            if (!isFull(nObjects)) {
-                fifo_pos_start = this->tail_reserved_;
-                fifo_pos_end = fifo_pos_start;
-                increment(fifo_pos_end, nObjects - 1);
-                this->tail_reserved_ = increment(fifo_pos_end);
+    class Context {
+    public:
+        Context(Fifo<ObjectType, aligment, Lock, NElements> &fifo,
+                uint32_t nObjects, Lock &lock)
+            : fifo_(fifo), nObjects_(nObjects), lock_(lock) {
+            LockGuard<Lock> lockGuard(lock_);
+            if (!fifo_.isFull(nObjects_)) {
+                fifo_pos_start_ = fifo_.tail_reserved_;
+                fifo_pos_end_ = fifo_pos_start_;
+                fifo_.increment(fifo_pos_end_, nObjects_ - 1);
+                fifo_.tail_reserved_ = fifo_.increment(fifo_pos_end_);
+                index_ = fifo_pos_start_;
             } else {
-                isOverflow = true;
+                isOverflow_ = true;
             }
         }
 
-        if (isOverflow) {
-            if (callbackOverflow)
-                callbackOverflow(*object);
-            return false;
-        }
-
-        uint8_t index = fifo_pos_start;
-
-        for (unsigned i = 0; i < nObjects; i++) {
-            buffer_.insert(*(object + i), index);
-            index = increment(index);
-        }
-
-        {
-            LockGuard<Lock> lockGuard(lock);
-            uint32_t index1 = fifo_pos_start / 8u;
-            uint32_t index2 = fifo_pos_end / 8u;
+        ~Context() {
+            LockGuard<Lock> lockGuard(lock_);
+            uint32_t index1 = fifo_pos_start_ / 8u;
+            uint32_t index2 = fifo_pos_end_ / 8u;
             if (index1 == index2) {
                 uint8_t bit_pos1 =
-                    static_cast<uint8_t>(0xFF << (fifo_pos_start % 8u));
+                    static_cast<uint8_t>(0xFF << (fifo_pos_start_ % 8u));
                 uint8_t bit_pos2 =
-                    static_cast<uint8_t>(0xFF >> (7 - (fifo_pos_end % 8u)));
+                    static_cast<uint8_t>(0xFF >> (7 - (fifo_pos_end_ % 8u)));
                 bit_pos1 = bit_pos1 & bit_pos2;
-                tail_ready_[index1] |= bit_pos1;
+                fifo_.tail_ready_[index1] |= bit_pos1;
             } else {
                 uint8_t bit_pos1 =
-                    static_cast<uint8_t>(0xFF << (fifo_pos_start % 8u));
-                tail_ready_[index1] |= bit_pos1;
+                    static_cast<uint8_t>(0xFF << (fifo_pos_start_ % 8u));
+                fifo_.tail_ready_[index1] |= bit_pos1;
 
                 uint8_t bit_pos2 =
-                    static_cast<uint8_t>(0xFF >> (7 - (fifo_pos_end % 8u)));
-                tail_ready_[index2] |= bit_pos2;
+                    static_cast<uint8_t>(0xFF >> (7 - (fifo_pos_end_ % 8u)));
+                fifo_.tail_ready_[index2] |= bit_pos2;
 
                 if (index2 > index1) {
                     for (uint32_t i = (index1 + 1); i < index2; i++) {
-                        tail_ready_[i] = 0xFF;
+                        fifo_.tail_ready_[i] = 0xFF;
                     }
                 } else if (index1 > index2) {
                     uint32_t last_index = (NElements) / 8u;
                     for (uint32_t i = (index1 + 1); i < (last_index); i++) {
-                        tail_ready_[i] = 0xFF;
+                        fifo_.tail_ready_[i] = 0xFF;
                     }
 
-                    tail_ready_[last_index] = (0xFF >> (7 - (NElements % 8u)));
+                    fifo_.tail_ready_[last_index] =
+                        (0xFF >> (7 - (NElements % 8u)));
 
                     for (uint32_t i = 0; i < index2; i++) {
-                        tail_ready_[i] = 0xFF;
+                        fifo_.tail_ready_[i] = 0xFF;
                     }
                 }
             }
         }
+
+        DEFAULT_COPY_AND_MOVE(Context)
+
+        inline void push(const ObjectType &object) {
+            if (index_ != fifo_.tail_reserved_) {
+                if (!(fifo_.buffer_.insert(object, index_))) {
+                    RAW_DIAG("error pushing in buffer");
+                }
+                index_ = fifo_.increment(index_);
+            } else {
+                RAW_DIAG("cannot push in the buffer");
+            }
+        }
+
+        inline void push_array(const ObjectType *object) {
+            uint32_t i = 0;
+            while (index_ != fifo_.tail_reserved_) {
+                fifo_.buffer_.insert(*(object + i), index_);
+                index_ = fifo_.increment(index_);
+                i++;
+            }
+        }
+
+        bool isOverflow() const { return isOverflow_; }
+
+    private:
+        Fifo<ObjectType, aligment, Lock, NElements> &fifo_;
+        uint32_t nObjects_;
+        Lock &lock_;
+        uint32_t index_{0};
+        uint32_t fifo_pos_start_{0};
+        uint32_t fifo_pos_end_{0};
+        bool isOverflow_ = false;
+    };
+
+    inline bool push(const ObjectType *object, uint32_t nObjects, Lock &lock) {
+        Context context(*this, nObjects, lock);
+
+        if (context.isOverflow()) {
+            return false;
+        }
+
+        context.push_array(object);
 
         return true;
     }

@@ -16,9 +16,13 @@
  ******************************************************************************
  */
 #pragma once
-
+#ifndef __cplusplus
+#include <stddef.h>
+#include <stdint.h>
+#else
 #include <cstddef>
 #include <cstdint>
+#endif
 
 #define PREVENT_COPY(class_name)                                               \
     class_name(const class_name &) = delete;                                   \

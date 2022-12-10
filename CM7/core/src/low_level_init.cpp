@@ -20,6 +20,7 @@
 #include <carbon/pin.hpp>
 #include <carbon/rand.hpp>
 #include <carbon/sdram.hpp>
+#include <carbon/shared_memory.hpp>
 #include <carbon/systime.hpp>
 #include <carbon/uart.hpp>
 
@@ -30,6 +31,8 @@ extern "C" {
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
+
+void putchar_(char ch);
 
 static void SystemClock_Config(void);
 
@@ -55,14 +58,20 @@ void low_level_init() {
     /* Configure the system clock */
     SystemClock_Config();
 
+    /* init timer */
+    low_level_system_time();
+
+    /*init hardware semaphore*/
+    hsemInit();
+
     /* init DIAG*/
     init_uart();
 
+    putchar_('\r');
+    putchar_('\n');
+
     /* init SDRAM */
     init_sdram();
-
-    /* init timer */
-    low_level_system_time();
 
     /* true random generator init */
     carbon_rand_init();
@@ -70,6 +79,9 @@ void low_level_init() {
     /* Initialize Pin needed by the Error function */
     BSP_LED_Init(LED_GREEN);
     BSP_LED_Init(LED_ORANGE);
+
+    /*init diag fifo*/
+    diagFifo.init(diagBufferPtr, DIAG_BUFFER_SIZE_BYTES);
 
     /* When system initialization is finished, Cortex-M7 will release Cortex-M4
      * by means of HSEM notification */
@@ -86,9 +98,6 @@ void low_level_init() {
     if (timeout < 0) {
         Error_Handler();
     }
-
-    /*init hardware semaphore*/
-    hsemInit();
 }
 
 /**

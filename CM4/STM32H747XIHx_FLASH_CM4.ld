@@ -174,6 +174,10 @@ SECTIONS
     _sbss_shared = .;         /* define a global symbol at bss_share start */
   	KEEP(*(.uart_struct));
   	. = ALIGN(4);
+  	KEEP(*(.diag_buffer));
+  	. = ALIGN(4);
+  	KEEP(*(.diag_fifo));
+  	. = ALIGN(4);
   	_ebss_shared = .;         /* define a global symbol at bss_share end */
   } >RAM_D2_SR2
    

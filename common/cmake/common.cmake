@@ -94,6 +94,7 @@ SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/sys/newlib.c
     ${PROJECT_ROOT_DIR}/common/src/sys/cpp.cpp
     ${PROJECT_ROOT_DIR}/common/src/sys/oshooks.cpp
+    ${PROJECT_ROOT_DIR}/common/src/diag_thread.c
     ${PROJECT_ROOT_DIR}/common/src/diag.cpp
     ${PROJECT_ROOT_DIR}/common/src/error.cpp
     ${PROJECT_ROOT_DIR}/common/src/hsem.cpp

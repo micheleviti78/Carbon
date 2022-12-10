@@ -25,9 +25,6 @@ void hsemNVIC(void);
 
 extern "C" void hsem_isr(void) {
     auto semMask = uint32_t{HSEM_COMMON->MISR};
-#ifdef TEST_HSEM
-    RAW_DIAG("in ISR MISR %lu, ISR %lu", HSEM_COMMON->MISR, HSEM_COMMON->ISR);
-#endif
     HSEM_COMMON->ICR = semMask;
     hsem_notify_isr(semMask);
 }

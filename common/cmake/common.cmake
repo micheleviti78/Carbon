@@ -80,6 +80,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${S_ARM_FLAGS} -specs=${LDSPECS} -T${LDSCRIPT}")
 
 include_directories(${PROJECT_ROOT_DIR}/common/include)
 include_directories(${MAIN_DIR}/core/include)
+include_directories(${PROJECT_ROOT_DIR}/common/conf)
 
 SET(TARGET_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/core/include)
 
@@ -100,6 +101,7 @@ SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/mpu.cpp
     ${PROJECT_ROOT_DIR}/common/src/systime.cpp
     ${PROJECT_ROOT_DIR}/common/src/sdram.cpp
+    ${PROJECT_ROOT_DIR}/common/src/shared_memory.cpp
     ${PROJECT_ROOT_DIR}/common/src/start_os.c
     ${PROJECT_ROOT_DIR}/common/src/pin.cpp
     ${PROJECT_ROOT_DIR}/common/src/rand.c

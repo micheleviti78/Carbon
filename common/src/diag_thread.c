@@ -26,7 +26,7 @@ static osThreadId diag_handle;
 static void diag_thread(const void *argument);
 
 void start_diag_thread(void) {
-    osThreadDef(Diag, diag_thread, osPriorityNormal, 0,
+    osThreadDef(Diag, diag_thread, osPriorityBelowNormal, 0,
                 configMINIMAL_STACK_SIZE * 10);
     diag_handle = osThreadCreate(osThread(Diag), NULL);
 }

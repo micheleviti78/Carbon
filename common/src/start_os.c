@@ -27,7 +27,7 @@ void start_os(void) {
     osThreadDef(main_thread, mainThread, osPriorityNormal, 0,
                 configMINIMAL_STACK_SIZE * 10);
     main_task_handle = osThreadCreate(osThread(main_thread), NULL);
-    DIAG("starting OS");
+    DIAG(SYSTEM_DIAG "starting OS");
     osKernelStart();
-    RAW_DIAG("ERROR OS");
+    RAW_DIAG(SYSTEM_DIAG "ERROR OS");
 }

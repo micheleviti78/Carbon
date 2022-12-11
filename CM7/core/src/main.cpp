@@ -35,12 +35,12 @@ void start_os(void);
  * @retval int
  */
 int main(void) {
-    DIAG("CM7 ready");
+    DIAG(SYSTEM_DIAG "CM7 ready");
 
-    DIAG("Initialization complete");
-    DIAG("Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,
+    DIAG(SYSTEM_DIAG "Initialization complete");
+    DIAG(SYSTEM_DIAG "Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,
          __NEWLIB_PATCHLEVEL__);
-    DIAG("HAL version %lu.%lu.%lu.%lu", GET_HAL_VERSION_MAIN,
+    DIAG(SYSTEM_DIAG "HAL version %lu.%lu.%lu.%lu", GET_HAL_VERSION_MAIN,
          GET_HAL_VERSION_SUB1, GET_HAL_VERSION_SUB2, GET_HAL_VERSION_RC);
 
     /* starting OS */

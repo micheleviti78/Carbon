@@ -78,13 +78,13 @@ void DHCP_Thread(void const *argument) {
             ip_addr_set_zero_ip4(&netif->netmask);
             ip_addr_set_zero_ip4(&netif->gw);
             DHCP_state = DHCP_WAIT_ADDRESS;
-            DIAG("State: Looking for DHCP server ...");
+            DIAG(LWIP_DIAG "State: Looking for DHCP server ...");
             dhcp_start(netif);
         } break;
         case DHCP_WAIT_ADDRESS: {
             if (dhcp_supplied_address(netif)) {
                 DHCP_state = DHCP_ADDRESS_ASSIGNED;
-                DIAG("address via DHCP %s",
+                DIAG(LWIP_DIAG "address via DHCP %s",
                      ip4addr_ntoa(netif_ip4_addr(netif)));
             } else {
                 dhcp = (struct dhcp *)netif_get_client_data(
@@ -101,14 +101,14 @@ void DHCP_Thread(void const *argument) {
                     IP_ADDR4(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
                     netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask),
                                    ip_2_ip4(&gw));
-                    DIAG("static address %s",
+                    DIAG(LWIP_DIAG "static address %s",
                          ip4addr_ntoa(netif_ip4_addr(netif)));
                 }
             }
         } break;
         case DHCP_LINK_DOWN: {
             DHCP_state = DHCP_OFF;
-            DIAG("The network cable is not connected");
+            DIAG(LWIP_DIAG "The network cable is not connected");
         } break;
         default:
             break;

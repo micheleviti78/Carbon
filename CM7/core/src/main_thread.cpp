@@ -32,7 +32,7 @@ void start_diag_thread(void);
 
 void mainThread(const void *argument) {
     start_diag_thread();
-    DIAG("FreeRTOS version %d.%d.%d", tskKERNEL_VERSION_MAJOR,
+    DIAG(SYSTEM_DIAG "FreeRTOS version %d.%d.%d", tskKERNEL_VERSION_MAJOR,
          tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD);
     netif_config();
     while (1) {

@@ -18,6 +18,10 @@
 
 #include <carbon/shared_memory.hpp>
 
+namespace CARBON {
+
 uint8_t diagBuffer[DIAG_BUFFER_SIZE];
 uint32_t diagBufferPtr = reinterpret_cast<uint32_t>(&diagBuffer[0]);
 DiagFifo diagFifo;
+
+} // namespace CARBON

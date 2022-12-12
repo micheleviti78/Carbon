@@ -22,6 +22,8 @@
 
 #include <stm32h7xx.h>
 
+namespace CARBON {
+
 class IRQ {
 public:
     PREVENT_COPY_AND_MOVE(IRQ)
@@ -68,3 +70,4 @@ public:
 
     inline void release() { IRQ::unLockRecursive(); }
 };
+} // namespace CARBON

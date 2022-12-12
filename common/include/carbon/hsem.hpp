@@ -24,7 +24,9 @@
 
 #include <cstdint>
 
-void hsemInit();
+extern "C" void hsemInit();
+
+namespace CARBON {
 
 enum class HSEM_ID : uint32_t { LockCM7, LockCM4, NotifyDiag };
 
@@ -69,3 +71,5 @@ public:
         HSEM_COMMON->ICR = (1U << semId);
     }
 };
+
+} // namespace CARBON

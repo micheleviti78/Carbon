@@ -29,6 +29,8 @@
 // constructors. Do not access any static global classes from these
 // functions!
 
+using namespace CARBON;
+
 #ifdef CORE_CM7
 #define SYSTIME_TIM TIM2
 #define SYSTIME_TIM_PERIOD 0xFFFFFFFF // NOTE: always set to full span

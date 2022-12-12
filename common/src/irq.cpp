@@ -18,5 +18,9 @@
 
 #include <carbon/irq.hpp>
 
+namespace CARBON {
+
 IRQ::LockStatus IRQ::irqLockStartStatus = IRQ::LockStatus::Unlocked;
 uint32_t IRQ::irqLockCounter = uint32_t{0};
+
+} // namespace CARBON

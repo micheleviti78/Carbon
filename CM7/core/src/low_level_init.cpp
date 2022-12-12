@@ -81,7 +81,8 @@ void low_level_init() {
     BSP_LED_Init(LED_ORANGE);
 
     /*init diag fifo*/
-    diagFifo.init(diagBufferPtr, DIAG_BUFFER_SIZE_BYTES);
+    CARBON::diagFifo.init(CARBON::diagBufferPtr,
+                          CARBON::DIAG_BUFFER_SIZE_BYTES);
 
     /* When system initialization is finished, Cortex-M7 will release Cortex-M4
      * by means of HSEM notification */

@@ -23,6 +23,8 @@
 #include <carbon/diag.hpp>
 #include <carbon/pool.hpp>
 
+namespace CARBON {
+
 template <typename ObjectType, uint32_t aligment, typename Lock,
           uint32_t NElements>
 class Fifo {
@@ -299,3 +301,4 @@ private:
     static constexpr auto bit_field_size_ = BUFFER_SIZE / 8u + 1u;
     uint8_t tail_ready_[bit_field_size_]{0};
 };
+} // namespace CARBON

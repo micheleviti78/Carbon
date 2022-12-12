@@ -47,4 +47,4 @@ void carbon_diag_pull();
 
 #define RAW_DIAG(...) carbon_raw_diag_print(DIAG_CPU " " __VA_ARGS__)
 
-#define DIAG(...) carbon_diag_push(DIAG_CPU __VA_ARGS__)
+#define DIAG(...) carbon_diag_push("\n\r" DIAG_CPU __VA_ARGS__)

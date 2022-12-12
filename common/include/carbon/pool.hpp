@@ -24,6 +24,8 @@
 #include <cstring>
 #include <new>
 
+namespace CARBON {
+
 class MemoryRegion {
 public:
     MemoryRegion(uint32_t startAddress, uint32_t size) : size_(size) {
@@ -319,3 +321,5 @@ public:
 private:
     MemoryAllocatorRaw<sizeof(ObjectType), aligment> memoryAllocatorRaw_;
 };
+
+} // namespace CARBON

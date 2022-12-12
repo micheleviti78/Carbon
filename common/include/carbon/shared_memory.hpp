@@ -21,6 +21,8 @@
 #include <carbon/fifo.hpp>
 #include <carbon/hsem.hpp>
 
+namespace CARBON {
+
 static constexpr auto DIAG_ALIGNMENT = uint32_t{1};
 static constexpr auto DIAG_FIFO_NELEMENTS = uint32_t{2048};
 static constexpr auto DIAG_BUFFER_SIZE = DIAG_FIFO_NELEMENTS + 1;
@@ -34,3 +36,5 @@ extern uint8_t diagBuffer[DIAG_BUFFER_SIZE]
     __attribute__((aligned(4), section(".diag_buffer")));
 extern uint32_t diagBufferPtr;
 extern DiagFifo diagFifo __attribute__((aligned(4), section(".diag_fifo")));
+
+} // namespace CARBON

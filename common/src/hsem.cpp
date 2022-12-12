@@ -19,17 +19,20 @@
 #include <carbon/diag.hpp>
 #include <carbon/hsem.hpp>
 
+extern "C" {
+
 __weak void hsem_notify_isr(uint32_t /*mask*/) {}
 
-void hsemNVIC(void);
-
-extern "C" void hsem_isr(void) {
+void hsem_isr(void) {
     auto semMask = uint32_t{HSEM_COMMON->MISR};
     HSEM_COMMON->ICR = semMask;
     hsem_notify_isr(semMask);
 }
 
+void hsemNVIC(void);
+
 void hsemInit() {
     __HAL_RCC_HSEM_CLK_ENABLE();
     hsemNVIC();
+}
 }

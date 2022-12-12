@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 
+using namespace CARBON;
+
 extern UART_HandleTypeDef huart1;
 static HSEMSpinLock<HSEM_ID::NotifyDiag> hsemDiag;
 
@@ -55,7 +57,7 @@ void carbon_diag_push(const char *format, ...) {
     /*getting stream length*/
     int len = vsnprintf_(nullptr, 0, format, vl);
     va_end(vl);
-    DiagFifo::Context context(diagFifo, len + 2, hsemDiag);
+    DiagFifo::Context context(diagFifo, len, hsemDiag);
     if (context.isOverflow()) {
         carbon_raw_diag_print("???????????");
         return;
@@ -63,7 +65,6 @@ void carbon_diag_push(const char *format, ...) {
     /*writing into buffer, use vfctprintf (function to be implemented)*/
     vfctprintf(fifo_output, &context, format, vl);
     va_end(vl);
-    fctprintf(fifo_output, &context, "\r\n");
     /*close fifo context*/
 }
 

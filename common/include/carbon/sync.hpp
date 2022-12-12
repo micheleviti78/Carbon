@@ -19,6 +19,8 @@
 
 #include <carbon/common.hpp>
 
+namespace CARBON {
+
 template <typename Lock> class LockGuard {
 public:
     PREVENT_COPY_AND_MOVE(LockGuard)
@@ -54,3 +56,4 @@ public:
 
     inline void release() override {}
 };
+} // namespace CARBON

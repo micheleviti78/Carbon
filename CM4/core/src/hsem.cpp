@@ -18,9 +18,12 @@
 
 #include <carbon/hsem.hpp>
 
+extern "C" {
+
 void hsemNVIC(void) {
     HAL_NVIC_SetPriority(HSEM2_IRQn, 0x0F, 0);
     HAL_NVIC_EnableIRQ(HSEM2_IRQn);
 }
 
 void hsem_notify_isr(uint32_t /*mask*/) {}
+}

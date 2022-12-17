@@ -62,7 +62,7 @@ void carbon_diag_push(const char *format, ...) {
         carbon_raw_diag_print("???????????");
         return;
     }
-    /*writing into buffer, use vfctprintf (function to be implemented)*/
+    /*writing into buffer, using vfctprintf*/
     vfctprintf(fifo_output, &context, format, vl);
     va_end(vl);
     /*close fifo context*/

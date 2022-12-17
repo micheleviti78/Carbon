@@ -26,11 +26,9 @@
 
 #include <stm32h7xx_hal.h>
 
-extern "C" {
+using namespace CARBON;
 
-#ifndef HSEM_ID_0
-#define HSEM_ID_0 (0U) /* HW semaphore 0*/
-#endif
+extern "C" {
 
 void putchar_(char ch);
 
@@ -58,11 +56,24 @@ void low_level_init() {
     /* Configure the system clock */
     SystemClock_Config();
 
-    /* init timer */
-    low_level_system_time();
-
+    /* When system initialization is finished, Cortex-M7 will release Cortex-M4
+     * by means of HSEM notification */
     /*init hardware semaphore*/
     hsemInit();
+    /*Take HSEM */
+    hSemInitSync.get();
+    /*Release HSEM in order to notify the CPU2(CM4)*/
+    hSemInitSync.release();
+    /* wait until CPU2 wakes up from stop mode */
+    timeout = 0xFFFF;
+    while ((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0))
+        ;
+    if (timeout < 0) {
+        Error_Handler();
+    }
+
+    /* init timer */
+    low_level_system_time();
 
     /* init DIAG*/
     init_uart();
@@ -81,24 +92,7 @@ void low_level_init() {
     BSP_LED_Init(LED_ORANGE);
 
     /*init diag fifo*/
-    CARBON::diagFifo.init(CARBON::diagBufferPtr,
-                          CARBON::DIAG_BUFFER_SIZE_BYTES);
-
-    /* When system initialization is finished, Cortex-M7 will release Cortex-M4
-     * by means of HSEM notification */
-    /*HW semaphore Clock enable*/
-    __HAL_RCC_HSEM_CLK_ENABLE();
-    /*Take HSEM */
-    HAL_HSEM_FastTake(HSEM_ID_0);
-    /*Release HSEM in order to notify the CPU2(CM4)*/
-    HAL_HSEM_Release(HSEM_ID_0, 0);
-    /* wait until CPU2 wakes up from stop mode */
-    timeout = 0xFFFF;
-    while ((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0))
-        ;
-    if (timeout < 0) {
-        Error_Handler();
-    }
+    diagFifo.init(diagBufferPtr, DIAG_BUFFER_SIZE_BYTES);
 }
 
 /**
@@ -142,8 +136,8 @@ static void SystemClock_Config(void) {
     }
 
     // Enable D2 domain SRAM3 Clock (0x30040000 AXI)
-    __HAL_RCC_D2SRAM3_CLK_ENABLE();
-    __HAL_RCC_D2SRAM2_CLK_ENABLE();
+    //    __HAL_RCC_D2SRAM3_CLK_ENABLE();
+    //    __HAL_RCC_D2SRAM2_CLK_ENABLE();
 
     // Enable HSE Oscillator and activate PLL with HSE as source
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;

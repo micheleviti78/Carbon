@@ -28,15 +28,11 @@ extern "C" void hsemInit();
 
 namespace CARBON {
 
-enum class HSEM_ID : uint32_t { LockCM7, LockCM4, NotifyDiag };
+enum class HSEM_ID : uint32_t { InitSync, NotifyDiag };
 
 template <HSEM_ID hsemID> class HSEMSpinLock {
 public:
-    HSEMSpinLock() {
-        uint32_t semId = static_cast<uint32_t>(hsemID);
-        HSEM_COMMON->ICR = 1U << semId;
-        HSEM_COMMON->IER |= 0U << semId;
-    };
+    HSEMSpinLock() = default;
 
     PREVENT_COPY_AND_MOVE(HSEMSpinLock);
 
@@ -71,5 +67,7 @@ public:
         HSEM_COMMON->ICR = (1U << semId);
     }
 };
+
+extern HSEMSpinLock<HSEM_ID::InitSync> hSemInitSync;
 
 } // namespace CARBON

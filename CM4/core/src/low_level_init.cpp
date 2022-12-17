@@ -15,11 +15,13 @@
  *
  ******************************************************************************
  */
-
+#include <carbon/hsem.hpp>
 #include <carbon/pin.hpp>
 #include <carbon/systime.hpp>
 
 #include <stm32h7xx_hal.h>
+
+using namespace CARBON;
 
 extern "C" {
 
@@ -29,10 +31,10 @@ extern "C" {
 
 void low_level_init() {
     /*HW semaphore Clock enable*/
-    __HAL_RCC_HSEM_CLK_ENABLE();
+    hsemInit();
 
     /* Activate HSEM notification for Cortex-M4*/
-    HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
+    hSemInitSync.enableNotification();
 
     /*
     Domain D2 goes to STOP mode (Cortex-M4 in deep-sleep) waiting for Cortex-M7
@@ -42,8 +44,6 @@ void low_level_init() {
     HAL_PWREx_ClearPendingEvent();
     HAL_PWREx_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFE,
                             PWR_D2_DOMAIN);
-    /* Clear HSEM flag */
-    __HAL_HSEM_CLEAR_FLAG(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
 
     /* MCU
      * Configuration--------------------------------------------------------*/
@@ -59,5 +59,7 @@ void low_level_init() {
     /* Initialize Pin needed by the Error function */
     BSP_LED_Init(LED_BLUE);
     BSP_LED_Init(LED_RED);
+
+    HAL_Delay(100);
 }
 }

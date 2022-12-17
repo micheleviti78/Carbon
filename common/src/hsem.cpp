@@ -19,6 +19,10 @@
 #include <carbon/diag.hpp>
 #include <carbon/hsem.hpp>
 
+using namespace CARBON;
+
+HSEMSpinLock<HSEM_ID::InitSync> hSemInitSync;
+
 extern "C" {
 
 __weak void hsem_notify_isr(uint32_t /*mask*/) {}

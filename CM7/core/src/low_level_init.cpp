@@ -135,10 +135,6 @@ static void SystemClock_Config(void) {
     while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {
     }
 
-    // Enable D2 domain SRAM3 Clock (0x30040000 AXI)
-    //    __HAL_RCC_D2SRAM3_CLK_ENABLE();
-    //    __HAL_RCC_D2SRAM2_CLK_ENABLE();
-
     // Enable HSE Oscillator and activate PLL with HSE as source
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
     RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;

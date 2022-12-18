@@ -25,10 +25,6 @@ using namespace CARBON;
 
 extern "C" {
 
-#ifndef HSEM_ID_0
-#define HSEM_ID_0 (0U) /* HW semaphore 0*/
-#endif
-
 void low_level_init() {
     /*HW semaphore Clock enable*/
     hsemInit();
@@ -41,6 +37,7 @@ void low_level_init() {
     to perform system initialization (system clock config, external memory
     configuration.. )
     */
+
     HAL_PWREx_ClearPendingEvent();
     HAL_PWREx_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFE,
                             PWR_D2_DOMAIN);

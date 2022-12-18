@@ -34,6 +34,32 @@ extern "C" {
 UART_HandleTypeDef huart1 __attribute__((section(".uart_struct")));
 
 void init_uart() {
+    GPIO_InitTypeDef GPIO_InitStruct = {};
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {};
+
+    /** Initializes the peripherals clock
+     */
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART1;
+    PeriphClkInitStruct.Usart16ClockSelection = RCC_USART16CLKSOURCE_D2PCLK2;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
+        Error_Handler();
+    }
+
+    /* Peripheral clock enable */
+    __HAL_RCC_USART1_CLK_ENABLE();
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**USART1 GPIO Configuration
+            PA10     ------> USART1_RX
+            PA9     ------> USART1_TX
+     */
+    GPIO_InitStruct.Pin = STLINK_TX_Pin | STLINK_RX_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
     huart1.Instance = USART1;
     huart1.Init.BaudRate = 115200;
     huart1.Init.WordLength = UART_WORDLENGTH_8B;
@@ -58,42 +84,6 @@ void init_uart() {
     }
     if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK) {
         Error_Handler();
-    }
-}
-
-/**
- * @brief UART MSP Initialization
- * This function configures the hardware resources used in this example
- * @param huart: UART handle pointer
- * @retval None
- */
-void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
-    GPIO_InitTypeDef GPIO_InitStruct = {};
-    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {};
-    if (huart->Instance == USART1) {
-        /** Initializes the peripherals clock
-         */
-        PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART1;
-        PeriphClkInitStruct.Usart16ClockSelection =
-            RCC_USART16CLKSOURCE_D2PCLK2;
-        if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
-            Error_Handler();
-        }
-
-        /* Peripheral clock enable */
-        __HAL_RCC_USART1_CLK_ENABLE();
-
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-        /**USART1 GPIO Configuration
-        PA10     ------> USART1_RX
-        PA9     ------> USART1_TX
-        */
-        GPIO_InitStruct.Pin = STLINK_TX_Pin | STLINK_RX_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-        GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
     }
 }
 

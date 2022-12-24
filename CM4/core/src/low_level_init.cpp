@@ -17,6 +17,7 @@
  */
 #include <carbon/hsem.hpp>
 #include <carbon/pin.hpp>
+#include <carbon/shared_memory.hpp>
 #include <carbon/systime.hpp>
 
 #include <stm32h7xx_hal.h>
@@ -31,6 +32,9 @@ void low_level_init() {
 
     /* Activate HSEM notification for Cortex-M4*/
     hSemInitSync.enableNotification();
+
+    /*reset sync flag to sync the initialization of the peripheries*/
+    resetSyncFlag();
 
     /*
     Domain D2 goes to STOP mode (Cortex-M4 in deep-sleep) waiting for Cortex-M7
@@ -57,6 +61,6 @@ void low_level_init() {
     BSP_LED_Init(LED_BLUE);
     BSP_LED_Init(LED_RED);
 
-    HAL_Delay(100);
+    waitForSyncFlag(SyncFlagBit::PeripherySync);
 }
 }

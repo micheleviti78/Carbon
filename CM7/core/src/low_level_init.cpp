@@ -93,6 +93,8 @@ void low_level_init() {
 
     /*init diag fifo*/
     diagFifo.init(diagBufferPtr, DIAG_BUFFER_SIZE_BYTES);
+
+    setSyncFlag(SyncFlagBit::PeripherySync);
 }
 
 /**

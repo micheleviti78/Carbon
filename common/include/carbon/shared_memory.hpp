@@ -23,6 +23,12 @@
 
 namespace CARBON {
 
+enum class SyncFlagBit : uint32_t { PeripherySync };
+
+void waitForSyncFlag(SyncFlagBit syncFlagBit);
+void setSyncFlag(SyncFlagBit syncFlagBit);
+void resetSyncFlag();
+
 static constexpr auto DIAG_ALIGNMENT = uint32_t{1};
 static constexpr auto DIAG_FIFO_NELEMENTS = uint32_t{2048};
 static constexpr auto DIAG_BUFFER_SIZE = DIAG_FIFO_NELEMENTS + 1;
@@ -36,5 +42,8 @@ extern uint8_t diagBuffer[DIAG_BUFFER_SIZE]
     __attribute__((aligned(4), section(".diag_buffer")));
 extern uint32_t diagBufferPtr;
 extern DiagFifo diagFifo __attribute__((aligned(4), section(".diag_fifo")));
+
+volatile extern uint32_t syncFlag
+    __attribute__((aligned(4), section(".sync_flag")));
 
 } // namespace CARBON

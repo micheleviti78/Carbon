@@ -15,13 +15,37 @@
  *
  ******************************************************************************
  */
-
+#include <carbon/diag.hpp>
+#include <carbon/error.hpp>
 #include <carbon/shared_memory.hpp>
 
+#include <stm32h7xx_hal.h>
+
 namespace CARBON {
+
+void waitForSyncFlag(SyncFlagBit syncFlagBit) {
+    uint32_t timeout = 0xFFFFFFFF;
+    uint32_t mask = 0x1 << static_cast<uint32_t>(syncFlagBit);
+    while ((syncFlag & mask) == 0 && --timeout > 0) {
+    }
+    if (timeout == 0)
+        Error_Handler();
+}
+
+void setSyncFlag(SyncFlagBit syncFlagBit) {
+    uint32_t mask = 0x1 << static_cast<uint32_t>(syncFlagBit);
+    syncFlag |= mask;
+    __DSB();
+}
+
+void resetSyncFlag() {
+    syncFlag = 0;
+    __DSB();
+}
+
+volatile uint32_t syncFlag;
 
 uint8_t diagBuffer[DIAG_BUFFER_SIZE];
 uint32_t diagBufferPtr = reinterpret_cast<uint32_t>(&diagBuffer[0]);
 DiagFifo diagFifo;
-
 } // namespace CARBON

@@ -19,8 +19,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include <carbon/diag.hpp>
 #include <carbon/pin.hpp>
+#include <carbon/shared_memory.hpp>
 
 #include <stm32h7xx_hal.h>
+
+using namespace CARBON;
 
 extern "C" {
 

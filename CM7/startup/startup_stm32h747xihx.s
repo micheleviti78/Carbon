@@ -43,10 +43,6 @@ defined in linker script */
 .word  _sbss
 /* end address for the .bss section. defined in linker script */
 .word  _ebss
-/* start address for the .bss_share section. defined in linker script */
-.word _sbss_shared
-/* end address for the .bss_share section. defined in linker script */
-.word _ebss_shared
 /* stack used for SystemInit_ExtMemCtl; always internal RAM used */
 
 /**
@@ -96,18 +92,6 @@ FillZerobss:
 LoopFillZerobss:
   cmp r2, r4
   bcc FillZerobss
-  ldr r2, =_sbss_shared
-  ldr r4, =_ebss_shared
-  movs r3, #0
-  b LoopFillZerobss_shared
-
-FillZerobss_shared:
-  str  r3, [r2]
-  adds r2, r2, #4
-
-LoopFillZerobss_shared:
-  cmp r2, r4
-  bcc FillZerobss_shared
 
 /*configure MPU*/
   bl MPU_Config

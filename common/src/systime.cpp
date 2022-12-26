@@ -194,6 +194,19 @@ void HAL_SuspendTick() {}
 
 void HAL_ResumeTick() {}
 
+/***** RTOS Runtime Stats *****/
+
+void carbon_conf_timer_runtime_stats() {}
+
+uint32_t carbon_time_counter_value() {
+    uint64_t us = systimeUs();
+    // Freertos run time stats counter must not wrap - good for first ~71
+    // minutes
+    if (us > 0xFFFFFFFFUL)
+        return 0xFFFFFFFFUL;
+    return static_cast<uint32_t>(us);
+}
+
 /**********/
 
 } // extern "C"

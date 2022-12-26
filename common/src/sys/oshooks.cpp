@@ -27,6 +27,7 @@ const uint8_t freeRTOSMemoryScheme __attribute__((unused)) = 4;
 
 void vApplicationStackOverflowHook(TaskHandle_t /*xTask*/, char *taskName) {
     RAW_DIAG("Stack overflow in task %s !", taskName);
+    taskDISABLE_INTERRUPTS();
     for (;;)
         ;
 }

@@ -55,33 +55,42 @@ extern uint32_t SystemCoreClock;
  * configMAX_PRIORITIES to 56
  *
  */
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION	1
 /* #define configMAX_PRIORITIES					( 56 ) */
 #define configUSE_PREEMPTION 1
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION	1
 #define configUSE_IDLE_HOOK 0
 #define configUSE_TICK_HOOK 0
 #define configMAX_PRIORITIES (7)
+
 #define configSUPPORT_STATIC_ALLOCATION 0
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
+
 #define configCPU_CLOCK_HZ (SystemCoreClock)
 #define configTICK_RATE_HZ ((TickType_t)1000)
+
 #define configMINIMAL_STACK_SIZE ((uint16_t)128)
 #define configTOTAL_HEAP_SIZE ((size_t)(64 * 1024))
-#define configMAX_TASK_NAME_LEN (16)
-#define configUSE_TRACE_FACILITY 1
-#define configUSE_STATS_FORMATTING_FUNCTIONS 1
-#define configUSE_16_BIT_TICKS 0
-#define configIDLE_SHOULD_YIELD 1
-#define configUSE_MUTEXES 1
-#define configQUEUE_REGISTRY_SIZE 8
-#define configCHECK_FOR_STACK_OVERFLOW 2
-#define configUSE_RECURSIVE_MUTEXES 1
-#define configUSE_MALLOC_FAILED_HOOK 1
-#define configUSE_APPLICATION_TASK_TAG 0
+#define configMAX_TASK_NAME_LEN (16)x
+
+#define configUSE_16_BIT_TICKS        0
+#define configIDLE_SHOULD_YIELD       1
+#define configUSE_MUTEXES             1
+#define configUSE_RECURSIVE_MUTEXES   1
 #define configUSE_COUNTING_SEMAPHORES 1
-#define configGENERATE_RUN_TIME_STATS 1
-#define configUSE_TICKLESS_IDLE 1
-#define configUSE_POSIX_ERRNO 1
+#define configQUEUE_REGISTRY_SIZE     8
+#define configUSE_TICKLESS_IDLE       1
+#define configUSE_POSIX_ERRNO         1
+
+
+#define configCHECK_FOR_STACK_OVERFLOW 2
+#define configUSE_MALLOC_FAILED_HOOK   1
+#define configUSE_APPLICATION_TASK_TAG 0
+
+#define configUSE_STATS_FORMATTING_FUNCTIONS 1
+#define configUSE_TRACE_FACILITY             1
+#define portREMOVE_STATIC_QUALIFIER          1
+#define configGENERATE_RUN_TIME_STATS        1
+
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 0

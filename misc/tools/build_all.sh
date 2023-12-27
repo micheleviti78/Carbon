@@ -40,10 +40,9 @@ fi
 ##
 #(mkdir -p "$BLD/CM4_ETH_MWI_V0_dev" \
 #    && cd "$BLD/CM4_ETH_MWI_V0_dev" \
-#    && cmake ../../app/CM4 -G "$MAKE_GEN" -DMWI_TARGET_BOARD=ETH_MWI_V0 \
+#    && cmake ../../CM4 -G "$MAKE_GEN" \
 #    -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-#    -DHAL_FULL_ASSERT=ON -DFREERTOS_USE_ASSERT=ON -DMWI_USE_ASSERT=ON \
-#    -DMWI_USE_TRACE=ON \
+#    -DHAL_FULL_ASSERT=ON -DFREERTOS_USE_ASSERT=ON \
 #    && $MAKE_CMD -j8 $TARGET) || exit 1
 ##
 (mkdir -p "$BLD/CM7_CARBON" \
@@ -53,8 +52,7 @@ fi
 
 #(mkdir -p "$BLD/CM7_ETH_MWI_V0_dev" \
 #    && cd "$BLD/CM7_ETH_MWI_V0_dev" \
-#    && cmake ../../app/CM7 -G "$MAKE_GEN" -DMWI_TARGET_BOARD=ETH_MWI_V0 \
+#    && cmake ../../CM7 -G "$MAKE_GEN" \
 #    -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 #    -DHAL_FULL_ASSERT=ON -DFREERTOS_USE_ASSERT=ON -DDEBUG_LWIP=ON \
-#    -DMWI_USE_ASSERT=ON -DMWI_USE_TRACE=ON \
 #    && $MAKE_CMD -j8 $TARGET) || exit 1

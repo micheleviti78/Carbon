@@ -58,11 +58,3 @@ fi
 #    -DHAL_FULL_ASSERT=ON -DFREERTOS_USE_ASSERT=ON -DDEBUG_LWIP=ON \
 #    -DMWI_USE_ASSERT=ON -DMWI_USE_TRACE=ON \
 #    && $MAKE_CMD -j8 $TARGET) || exit 1
-#
-#(mkdir -p "$BLD/sim" \
-#    && cd "$BLD/sim" \
-#    && cmake ../../app/sim -G "$MAKE_GEN" -DCMAKE_BUILD_TYPE=Debug \
-#    -DCMAKE_CXX_CLANG_TIDY=$TDY -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-#    -DDEBUG_LWIP=ON -DMWI_USE_ASSERT=ON -DMWI_USE_TRACE=ON \
-#    -DBUILD_UNIT_TESTS=ON \
-#    && $MAKE_CMD -j8 $TARGET) || exit 1

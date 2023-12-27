@@ -70,7 +70,7 @@ extern uint32_t SystemCoreClock;
 
 #define configMINIMAL_STACK_SIZE ((uint16_t)128)
 #define configTOTAL_HEAP_SIZE ((size_t)(64 * 1024))
-#define configMAX_TASK_NAME_LEN (16)x
+#define configMAX_TASK_NAME_LEN (16)
 
 #define configUSE_16_BIT_TICKS        0
 #define configIDLE_SHOULD_YIELD       1

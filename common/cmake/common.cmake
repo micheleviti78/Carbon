@@ -51,6 +51,11 @@ add_compile_options(${WARN_FLAGS})
 add_compile_options(${MISC_FLAGS})
 add_compile_options(${HAL_COMMON})
 
+if (FREERTOS_USE_TRACE)
+    add_compile_definitions(FREERTOS_USE_TRACE)
+    message("USING FREERTOS TRACING")
+endif()
+
 string(REPLACE ";" " " S_CPP_FLAGS "${CPP_FLAGS}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${S_CPP_FLAGS}")
@@ -83,6 +88,7 @@ SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/diag_thread.c
     ${PROJECT_ROOT_DIR}/common/src/diag.cpp
     ${PROJECT_ROOT_DIR}/common/src/error.cpp
+    ${PROJECT_ROOT_DIR}/common/src/freeRTOSTrace.cpp
     ${PROJECT_ROOT_DIR}/common/src/hsem.cpp
     ${PROJECT_ROOT_DIR}/common/src/irq.cpp
     ${PROJECT_ROOT_DIR}/common/src/mpu.cpp

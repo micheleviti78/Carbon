@@ -38,6 +38,7 @@ void carbon_diag_pull();
 
 #define LWIP_DIAG "[lwip] "
 #define SYSTEM_DIAG "[system] "
+#define TRACE_DIAG "[trace] "
 #define TEST_DIAG "[test] "
 
 #ifdef CORE_CM7

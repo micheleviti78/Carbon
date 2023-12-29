@@ -26,6 +26,24 @@
  * 1 tab == 4 spaces!
  */
 
+/**
+ ******************************************************************************
+ * @file           FreeRTOSConfig.h
+ * @author         Michele Viti <micheleviti78@gmail.com>
+ * @date           Dec. 2022
+ * @brief          FreeRTOS configuration file
+ ******************************************************************************
+ * @attention
+ * Copyright (c) 2023 Michele Viti.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
+
 // clang-format off
 
 #ifndef FREERTOS_CONFIG_H
@@ -185,5 +203,9 @@ header file. */
 
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS carbon_conf_timer_runtime_stats
 #define portGET_RUN_TIME_COUNTER_VALUE carbon_time_counter_value
+
+#ifdef FREERTOS_USE_TRACE
+#include <FreeRTOSTrace.h>
+#endif
 
 #endif /* FREERTOS_CONFIG_H */

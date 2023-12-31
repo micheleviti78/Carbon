@@ -178,6 +178,10 @@ SECTIONS
   	. = ALIGN(4);
   	KEEP(*(.diag_fifo));
   	. = ALIGN(4);
+  	KEEP(*(.trace_buffer));
+  	. = ALIGN(4);
+  	KEEP(*(.trace_fifo));
+  	. = ALIGN(4);
   	KEEP(*(.sync_flag));
   	. = ALIGN(4);
   	_ebss_shared = .;         /* define a global symbol at bss_share end */

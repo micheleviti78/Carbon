@@ -2,7 +2,7 @@
  ******************************************************************************
  * @file           freeRTOSTrace.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Dec. 2022
+ * @date           Dec. 2023
  * @brief          FreeRTOS Trace hooks implementation
  ******************************************************************************
  * @attention
@@ -17,6 +17,8 @@
  */
 
 #include <carbon/diag.hpp>
+#include <carbon/trace_format.hpp>
+
 #include <cstddef>
 #include <cstdint>
 

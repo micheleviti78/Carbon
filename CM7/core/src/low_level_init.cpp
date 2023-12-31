@@ -92,7 +92,7 @@ void low_level_init() {
     BSP_LED_Init(LED_ORANGE);
 
     /*init diag fifo*/
-    diagFifo.init(diagBufferPtr, DIAG_BUFFER_SIZE_BYTES);
+    FIFO_INIT(diag)
 
     setSyncFlag(SyncFlagBit::PeripherySync);
 }

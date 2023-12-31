@@ -20,6 +20,34 @@
 
 #include <carbon/fifo.hpp>
 #include <carbon/hsem.hpp>
+#include <carbon/trace_format.hpp>
+
+#define FIFO_DECLARATION(NAME, TYPE, NELEMENTS, HSEM_INDEX)                    \
+    using NAME##_ELEMENT_TYPE = TYPE;                                          \
+    static constexpr auto NAME##_ELEMENT_ALIGNMENT =                           \
+        sizeof(NAME##_ELEMENT_TYPE);                                           \
+    static constexpr auto NAME##_ELEMENT_SIZE = sizeof(NAME##_ELEMENT_TYPE);   \
+    static constexpr auto NAME##_FIFO_NELEMENTS = uint32_t{NELEMENTS};         \
+    static constexpr auto NAME##_BUFFER_SIZE = NAME##_FIFO_NELEMENTS + 1;      \
+    static constexpr auto NAME##_BUFFER_SIZE_BYTES =                           \
+        (NAME##_FIFO_NELEMENTS + 1) * NAME##_ELEMENT_SIZE;                     \
+    using NAME##_HSEM = HSEMSpinLock<HSEM_ID::HSEM_INDEX>;                     \
+    using NAME##FifoClass =                                                    \
+        Fifo<NAME##_ELEMENT_TYPE, NAME##_ELEMENT_ALIGNMENT, NAME##_HSEM,       \
+             NAME##_FIFO_NELEMENTS>;                                           \
+    extern NAME##_ELEMENT_TYPE NAME##Buffer[NAME##_BUFFER_SIZE]                \
+        __attribute__((aligned(4), section("." #NAME "_buffer")));             \
+    extern uint32_t NAME##BufferPtr;                                           \
+    extern NAME##FifoClass NAME##Fifo                                          \
+        __attribute__((aligned(4), section("." #NAME "_fifo")));
+
+#define FIFO_DEFINITION(NAME)                                                  \
+    NAME##_ELEMENT_TYPE NAME##Buffer[NAME##_BUFFER_SIZE];                      \
+    uint32_t NAME##BufferPtr = reinterpret_cast<uint32_t>(&NAME##Buffer[0]);   \
+    NAME##FifoClass NAME##Fifo;
+
+#define FIFO_INIT(NAME)                                                        \
+    NAME##Fifo.init(NAME##BufferPtr, NAME##_BUFFER_SIZE_BYTES);
 
 namespace CARBON {
 
@@ -29,19 +57,13 @@ void waitForSyncFlag(SyncFlagBit syncFlagBit);
 void setSyncFlag(SyncFlagBit syncFlagBit);
 void resetSyncFlag();
 
-static constexpr auto DIAG_ALIGNMENT = uint32_t{1};
-static constexpr auto DIAG_FIFO_NELEMENTS = uint32_t{2048};
-static constexpr auto DIAG_BUFFER_SIZE = DIAG_FIFO_NELEMENTS + 1;
-static constexpr auto DIAG_BUFFER_SIZE_BYTES =
-    (DIAG_FIFO_NELEMENTS + 1) * sizeof(uint8_t);
+/*DIAG FIFO*/
 
-using DIAG_HSEM = HSEMSpinLock<HSEM_ID::NotifyDiag>;
-using DiagFifo = Fifo<uint8_t, DIAG_ALIGNMENT, DIAG_HSEM, DIAG_FIFO_NELEMENTS>;
+FIFO_DECLARATION(diag, uint8_t, 2048, NotifyDiag)
 
-extern uint8_t diagBuffer[DIAG_BUFFER_SIZE]
-    __attribute__((aligned(4), section(".diag_buffer")));
-extern uint32_t diagBufferPtr;
-extern DiagFifo diagFifo __attribute__((aligned(4), section(".diag_fifo")));
+/*TRACE FIFO*/
+
+/*Sync Flag*/
 
 volatile extern uint32_t syncFlag
     __attribute__((aligned(4), section(".sync_flag")));

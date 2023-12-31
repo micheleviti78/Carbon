@@ -38,7 +38,8 @@ void putchar_(char ch) {
 }
 
 static void fifo_output(char character, void *arg) {
-    DiagFifo::Context *context = reinterpret_cast<DiagFifo::Context *>(arg);
+    diagFifoClass::Context *context =
+        reinterpret_cast<diagFifoClass::Context *>(arg);
     context->push(character);
 }
 
@@ -57,7 +58,7 @@ void carbon_diag_push(const char *format, ...) {
     /*getting stream length*/
     int len = vsnprintf_(nullptr, 0, format, vl);
     va_end(vl);
-    DiagFifo::Context context(diagFifo, len, hsemDiag);
+    diagFifoClass::Context context(diagFifo, len, hsemDiag);
     if (context.isOverflow()) {
         carbon_raw_diag_print("???????????");
         return;

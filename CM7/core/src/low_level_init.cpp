@@ -91,8 +91,15 @@ void low_level_init() {
     BSP_LED_Init(LED_GREEN);
     BSP_LED_Init(LED_ORANGE);
 
-    /*init diag fifo*/
+    /*init fifos*/
+
+    /*DIAG FIFO*/
     FIFO_INIT(diag)
+
+#ifdef FREERTOS_USE_TRACE
+    /*DIAG TRACE*/
+    FIFO_INIT(trace)
+#endif
 
     setSyncFlag(SyncFlagBit::PeripherySync);
 }

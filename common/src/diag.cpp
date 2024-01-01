@@ -31,7 +31,7 @@ extern "C" {
 using namespace CARBON;
 
 extern UART_HandleTypeDef huart1;
-static HSEMSpinLock<HSEM_ID::NotifyDiag> hsemDiag;
+static HSEMSpinLock<HSEM_ID::Diag> hsemDiag;
 
 void putchar_(char ch) {
     HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
@@ -44,7 +44,7 @@ static void fifo_output(char character, void *arg) {
 }
 
 void carbon_raw_diag_print(const char *format, ...) {
-    LockGuard<HSEMSpinLock<HSEM_ID::NotifyDiag>> Lock(hsemDiag);
+    LockGuard<HSEMSpinLock<HSEM_ID::Diag>> Lock(hsemDiag);
     va_list vl;
     va_start(vl, format);
     vprintf_(format, vl);

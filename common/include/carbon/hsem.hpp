@@ -28,7 +28,7 @@ extern "C" void hsemInit();
 
 namespace CARBON {
 
-enum class HSEM_ID : uint32_t { InitSync, NotifyDiag, Trace };
+enum class HSEM_ID : uint32_t { InitSync, Diag, Trace };
 
 template <HSEM_ID hsemID> class HSEMSpinLock {
 public:

@@ -22,10 +22,9 @@
 #include <carbon/hsem.hpp>
 #include <carbon/trace_format.hpp>
 
-#define FIFO_DECLARATION(NAME, TYPE, NELEMENTS, HSEM_INDEX)                    \
+#define FIFO_DECLARATION(NAME, TYPE, ALIGMENT, NELEMENTS, HSEM_INDEX)          \
     using NAME##_ELEMENT_TYPE = TYPE;                                          \
-    static constexpr auto NAME##_ELEMENT_ALIGNMENT =                           \
-        sizeof(NAME##_ELEMENT_TYPE);                                           \
+    static constexpr auto NAME##_ELEMENT_ALIGNMENT = sizeof(ALIGMENT);         \
     static constexpr auto NAME##_ELEMENT_SIZE = sizeof(NAME##_ELEMENT_TYPE);   \
     static constexpr auto NAME##_FIFO_NELEMENTS = uint32_t{NELEMENTS};         \
     static constexpr auto NAME##_BUFFER_SIZE = NAME##_FIFO_NELEMENTS + 1;      \
@@ -40,6 +39,9 @@
     extern uint32_t NAME##BufferPtr;                                           \
     extern NAME##FifoClass NAME##Fifo                                          \
         __attribute__((aligned(4), section("." #NAME "_fifo")));
+
+#define FIFO_DECLARATION_8BIT_ALIG(NAME, TYPE, NELEMENTS, HSEM_INDEX)          \
+    FIFO_DECLARATION(NAME, TYPE, uint8_t, NELEMENTS, HSEM_INDEX)
 
 #define FIFO_DEFINITION(NAME)                                                  \
     NAME##_ELEMENT_TYPE NAME##Buffer[NAME##_BUFFER_SIZE];                      \
@@ -59,9 +61,13 @@ void resetSyncFlag();
 
 /*DIAG FIFO*/
 
-FIFO_DECLARATION(diag, uint8_t, 2048, NotifyDiag)
+FIFO_DECLARATION_8BIT_ALIG(diag, uint8_t, 2048, Diag)
 
+#ifdef FREERTOS_USE_TRACE
 /*TRACE FIFO*/
+
+FIFO_DECLARATION_8BIT_ALIG(trace, TraceEvent, 32, Trace)
+#endif
 
 /*Sync Flag*/
 

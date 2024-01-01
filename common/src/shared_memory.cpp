@@ -45,5 +45,14 @@ void resetSyncFlag() {
 
 volatile uint32_t syncFlag;
 
+/*DIAG FIFO*/
+
 FIFO_DEFINITION(diag)
+
+#ifdef FREERTOS_USE_TRACE
+/*TRACE FIFO*/
+
+FIFO_DEFINITION(trace)
+#endif
+
 } // namespace CARBON

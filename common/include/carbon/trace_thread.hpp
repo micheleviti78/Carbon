@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
- * @file           diag_thread.hpp
+ * @file           trace_thread.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Dec. 2022
- * @brief          starting diag thread
+ * @date           Jan. 2024
+ * @brief          starting trace thread
  ******************************************************************************
  * @attention
- * Copyright (c) 2022 Michele Viti.
+ * Copyright (c) 2024 Michele Viti.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -18,14 +18,16 @@
 
 #pragma once
 
-#include <carbon/diag.hpp>
+#ifdef FREERTOS_USE_TRACE
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void start_diag_thread(void);
+void start_trace_thread(void);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

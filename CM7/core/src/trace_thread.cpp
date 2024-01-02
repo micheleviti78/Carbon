@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
- * @file           freeRTOSTrace.cpp
+ * @file           trace_thread.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Dec. 2023
- * @brief          FreeRTOS Trace hooks implementation
+ * @date           Jan. 2024
+ * @brief          starting trace thread
  ******************************************************************************
  * @attention
- * Copyright (c) 2023 Michele Viti.
+ * Copyright (c) 2024 Michele Viti.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -15,23 +15,33 @@
  *
  ******************************************************************************
  */
+
 #ifdef FREERTOS_USE_TRACE
 
 #include <carbon/diag.hpp>
-#include <carbon/trace_format.hpp>
+#include <carbon/trace.hpp>
 
-#include <cstddef>
-#include <cstdint>
+#include <cmsis_os.h>
 
 extern "C" {
 
-void carbon_freertos_trace_malloc(void *address, size_t size) {}
-void carbon_freertos_trace_free(void *address, size_t size) {}
-void carbon_freertos_trace_switched_in(uint32_t number) {
-    // DIAG(TRACE_DIAG "thread %lu switched in", number);
+void start_trace_thread_imp(void);
+
+void start_trace_thread(void) {
+    if (CARBON::Trace::instance().init()) {
+        start_trace_thread_imp();
+    } else {
+        DIAG(TRACE_DIAG "trace initialization error");
+    }
 }
-void carbon_freertos_trace_switched_out(uint32_t number) {
-    // DIAG(TRACE_DIAG "thread %lu switched out", number);
+
+void trace_thread(const void *argument) {
+    while (1) {
+        CARBON::Trace::instance().sendTrace();
+        DIAG(TRACE_DIAG "can de dio");
+        osDelay(1000);
+    }
 }
 }
+
 #endif

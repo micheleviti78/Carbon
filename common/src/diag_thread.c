@@ -17,7 +17,6 @@
  */
 
 #include <carbon/diag.hpp>
-#include <carbon/pin.hpp>
 
 #include <cmsis_os.h>
 

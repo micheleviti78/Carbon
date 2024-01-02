@@ -2,7 +2,7 @@
  ******************************************************************************
  * @file           function_ref.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Maez. 2023
+ * @date           Mar. 2023
  * @brief          Non-owning reference to a callable object
  ******************************************************************************
  * @attention

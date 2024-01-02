@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
- * @file           diag_thread.hpp
+ * @file           trace.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Dec. 2022
- * @brief          starting diag thread
+ * @date           Jan. 2024
+ * @brief          class to handle and send trace packets
  ******************************************************************************
  * @attention
- * Copyright (c) 2022 Michele Viti.
+ * Copyright (c) 2024 Michele Viti.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -18,14 +18,25 @@
 
 #pragma once
 
-#include <carbon/diag.hpp>
+#ifdef FREERTOS_USE_TRACE
+#include <carbon/common.hpp>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace CARBON {
 
-void start_diag_thread(void);
+class Trace {
+public:
+    Trace() = default;
 
-#ifdef __cplusplus
-}
+    PREVENT_COPY_AND_MOVE(Trace)
+
+    ~Trace();
+
+    bool init();
+
+    void sendTrace();
+
+    static Trace &instance();
+};
+
+} // namespace CARBON
 #endif

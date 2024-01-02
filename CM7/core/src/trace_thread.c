@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
- * @file           diag_thread.hpp
+ * @file           trace_thread.c
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Dec. 2022
- * @brief          starting diag thread
+ * @date           Jan. 2024
+ * @brief          starting trace thread, c code
  ******************************************************************************
  * @attention
- * Copyright (c) 2022 Michele Viti.
+ * Copyright (c) 2024 Michele Viti.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -16,16 +16,18 @@
  ******************************************************************************
  */
 
-#pragma once
+#include <cmsis_os.h>
 
-#include <carbon/diag.hpp>
+#ifdef FREERTOS_USE_TRACE
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+static osThreadId trace_handle;
 
-void start_diag_thread(void);
+void trace_thread(const void *argument);
 
-#ifdef __cplusplus
+void start_trace_thread_imp(void) {
+    osThreadDef(Trace, trace_thread, osPriorityNormal, 0,
+                configMINIMAL_STACK_SIZE * 5);
+    trace_handle = osThreadCreate(osThread(Trace), NULL);
 }
+
 #endif

@@ -52,6 +52,9 @@ SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/low_level_init.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_hal_msp.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/stm32h7xx_it.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/trace.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/trace_thread.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/trace_thread.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/uart.cpp
 )
 

@@ -17,6 +17,8 @@
  */
 
 #include <carbon/error.hpp>
+#include <carbon/pin.hpp>
+#include <carbon/systime.hpp>
 
 #include <stm32h7xx_hal.h>
 
@@ -32,8 +34,14 @@ void Error_Handler(void) {
     /* User can add his own implementation to report the HAL error return state
      */
     __disable_irq();
-    while (1)
-        ;
+    while (1) {
+        HAL_Delay(1000);
+#ifdef CORE_CM4
+        BSP_LED_Toggle(LED_RED);
+#else
+        BSP_LED_Toggle(LED_ORANGE);
+#endif
+    }
 }
 
 #ifdef __cplusplus

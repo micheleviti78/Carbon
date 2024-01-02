@@ -21,6 +21,8 @@
 #ifdef FREERTOS_USE_TRACE
 #include <carbon/common.hpp>
 
+#include <lwip/api.h>
+
 namespace CARBON {
 
 class Trace {
@@ -33,9 +35,13 @@ public:
 
     bool init();
 
-    void sendTrace();
+    void runConnection();
 
     static Trace &instance();
+
+private:
+    void sendTrace(struct netconn *conn);
+    struct netconn *conn_{nullptr};
 };
 
 } // namespace CARBON

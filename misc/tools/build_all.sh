@@ -47,3 +47,8 @@ fi
     && cd "$BLD/CM7_CARBON_TRACE" \
     && cmake ../../CM7 -DFREERTOS_USE_TRACE=ON \
     && $MAKE_CMD -j8 $TARGET) || exit 1
+    
+(mkdir -p "$BLD/CM4_CARBON_TRACE" \
+    && cd "$BLD/CM4_CARBON_TRACE" \
+    && cmake ../../CM4 -DFREERTOS_USE_TRACE=ON \
+    && $MAKE_CMD -j8 $TARGET) || exit 1

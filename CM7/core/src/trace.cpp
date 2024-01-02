@@ -16,18 +16,88 @@
  ******************************************************************************
  */
 
-#include <lwip/api.h>
-
+#include <carbon/diag.hpp>
 #include <carbon/trace.hpp>
+
+#include <cstring>
+
+#define CARBON_TRACE_TCP_PORT 18888
 
 namespace CARBON {
 
 #ifdef FREERTOS_USE_TRACE
 Trace::~Trace() {}
 
-bool Trace::init() { return true; }
+bool Trace::init() {
+    if (conn_) {
+        return true;
+    }
 
-void Trace::sendTrace() {}
+    auto *conn = netconn_new(NETCONN_TCP);
+    if (!conn) {
+        DIAG(TRACE_DIAG "Failed to create new netconn");
+        return false;
+    }
+
+    auto port = uint16_t{CARBON_TRACE_TCP_PORT};
+    auto err = netconn_bind(conn, nullptr, port);
+    if (err != ERR_OK) {
+        DIAG(TRACE_DIAG "Can't bind to port %" PRIu16 ": %d", port, err);
+        netconn_delete(conn);
+        return false;
+    }
+
+    err = netconn_listen_with_backlog(conn, 1);
+    if (err != ERR_OK) {
+        DIAG(TRACE_DIAG "Can't listen to port %" PRIu16 ": %d", port, err);
+        netconn_delete(conn);
+        return false;
+    }
+
+    DIAG(TRACE_DIAG "Accepting connections on port %" PRIu16, port);
+
+    conn_ = conn;
+
+    return true;
+}
+
+void Trace::runConnection() {
+    int acceptTry = 0;
+    while (true) {
+        struct netconn *newConn = nullptr;
+        auto err = netconn_accept(conn_, &newConn);
+        if (err != ERR_OK) {
+            DIAG(TRACE_DIAG "Accept failed: %d", err);
+            osDelay(1000);
+            if (++acceptTry == 5) {
+                DIAG(TRACE_DIAG "accept failed 5 times, returning");
+                netconn_close(newConn);
+                netconn_delete(newConn);
+                return;
+            }
+            continue;
+        }
+        acceptTry = 0;
+        DIAG(TRACE_DIAG "Client connected");
+        sendTrace(newConn);
+        DIAG(TRACE_DIAG "Client disconnected");
+        netconn_close(newConn);
+        netconn_delete(newConn);
+    }
+}
+
+void Trace::sendTrace(struct netconn *conn) {
+    const char *test = "test\n\r";
+    auto mysize = strlen(test);
+    while (1) {
+        auto err = netconn_write(conn, test, mysize, NETCONN_COPY);
+        if (err != ERR_OK) {
+            DIAG(TRACE_DIAG "Send error: %d", err);
+            return;
+        }
+    }
+    return;
+}
 
 static Trace traceSingleton;
 

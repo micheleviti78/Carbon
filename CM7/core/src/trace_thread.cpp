@@ -36,9 +36,9 @@ void start_trace_thread(void) {
 }
 
 void trace_thread(const void *argument) {
+    CARBON::Trace::instance().runConnection();
     while (1) {
-        CARBON::Trace::instance().sendTrace();
-        DIAG(TRACE_DIAG "can de dio");
+        DIAG(TRACE_DIAG "trace connection error");
         osDelay(1000);
     }
 }

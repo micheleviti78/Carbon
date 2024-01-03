@@ -20,6 +20,7 @@
 
 #ifdef FREERTOS_USE_TRACE
 #include <carbon/common.hpp>
+#include <carbon/trace_format.hpp>
 
 #include <lwip/api.h>
 
@@ -40,7 +41,8 @@ public:
     static Trace &instance();
 
 private:
-    void sendTrace(struct netconn *conn);
+    void pullEvent(struct netconn *conn);
+
     struct netconn *conn_{nullptr};
 };
 

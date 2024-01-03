@@ -70,4 +70,6 @@ public:
 
 extern HSEMSpinLock<HSEM_ID::InitSync> hSemInitSync;
 
+extern HSEMSpinLock<HSEM_ID::Trace> hsemTrace;
+
 } // namespace CARBON

@@ -66,6 +66,8 @@ struct TraceEventHeader {
 
 static_assert(sizeof(TraceEventHeader) == 12);
 
+enum class TraceStream : TracePacketHeader::CpuIdType { CM7 = 0, CM4 = 1 };
+
 // ---------------------------------------------------------------------------
 // Common structures
 // ---------------------------------------------------------------------------
@@ -92,6 +94,11 @@ enum class TraceEventID : TraceEventHeader::IdType {
 struct TraceTasksEvent {
     static constexpr TraceEventID ID = TraceEventID::Tasks;
 
+    TraceEventHeader header{
+        static_cast<TraceEventHeader::SizeType>(sizeof(TraceTasksEvent) << 3),
+        static_cast<TraceEventHeader::IdType>(ID),
+        static_cast<TraceEventHeader::TimestampType>(0)};
+
     uint32_t totalRunTime{0};
     uint8_t nTasks{0};
     TraceTaskInfo tasks[0];
@@ -100,31 +107,71 @@ struct TraceTasksEvent {
 struct TraceMallocEvent {
     static constexpr TraceEventID ID = TraceEventID::Malloc;
 
+    TraceEventHeader header{
+        static_cast<TraceEventHeader::SizeType>(sizeof(TraceMallocEvent) << 3),
+        static_cast<TraceEventHeader::IdType>(ID),
+        static_cast<TraceEventHeader::TimestampType>(0)};
+
     uint32_t address;
     uint32_t size;
 };
+
+static_assert(sizeof(TraceMallocEvent) == 20);
+static_assert(sizeof(TraceMallocEvent) <=
+              TraceEventHeader::MAX_EVENT_SIZE_BYTES);
 
 struct TraceFreeEvent {
     static constexpr TraceEventID ID = TraceEventID::Free;
 
+    TraceEventHeader header{
+        static_cast<TraceEventHeader::SizeType>(sizeof(TraceFreeEvent) << 3),
+        static_cast<TraceEventHeader::IdType>(ID),
+        static_cast<TraceEventHeader::TimestampType>(0)};
+
     uint32_t address;
     uint32_t size;
 };
 
+static_assert(sizeof(TraceFreeEvent) == 20);
+static_assert(sizeof(TraceFreeEvent) <= TraceEventHeader::MAX_EVENT_SIZE_BYTES);
+
 struct TraceTaskSwitchedInEvent {
     static constexpr TraceEventID ID = TraceEventID::TaskSwitchedIn;
 
+    TraceEventHeader header{static_cast<TraceEventHeader::SizeType>(
+                                sizeof(TraceTaskSwitchedInEvent) << 3),
+                            static_cast<TraceEventHeader::IdType>(ID),
+                            static_cast<TraceEventHeader::TimestampType>(0)};
+
     uint32_t number;
 };
+
+static_assert(sizeof(TraceTaskSwitchedInEvent) == 16);
+static_assert(sizeof(TraceTaskSwitchedInEvent) <=
+              TraceEventHeader::MAX_EVENT_SIZE_BYTES);
 
 struct TraceTaskSwitchedOutEvent {
     static constexpr TraceEventID ID = TraceEventID::TaskSwitchedOut;
 
+    TraceEventHeader header{static_cast<TraceEventHeader::SizeType>(
+                                sizeof(TraceTaskSwitchedOutEvent) << 3),
+                            static_cast<TraceEventHeader::IdType>(ID),
+                            static_cast<TraceEventHeader::TimestampType>(0)};
+
     uint32_t number;
 };
 
+static_assert(sizeof(TraceTaskSwitchedOutEvent) == 16);
+static_assert(sizeof(TraceTaskSwitchedOutEvent) <=
+              TraceEventHeader::MAX_EVENT_SIZE_BYTES);
+
 struct TracePerfCntEvent {
     static constexpr TraceEventID ID = TraceEventID::PerfCnt;
+
+    TraceEventHeader header{
+        static_cast<TraceEventHeader::SizeType>(sizeof(TracePerfCntEvent) << 3),
+        static_cast<TraceEventHeader::IdType>(ID),
+        static_cast<TraceEventHeader::TimestampType>(0)};
 
     uint32_t id{0};
     uint32_t minCycles{0};
@@ -132,10 +179,13 @@ struct TracePerfCntEvent {
     uint32_t avgCycles{0};
 };
 
+static_assert(sizeof(TracePerfCntEvent) == 28);
+static_assert(sizeof(TracePerfCntEvent) <=
+              TraceEventHeader::MAX_EVENT_SIZE_BYTES);
+
 #pragma pack(pop)
 
 using TraceEvent = std::variant<TraceTasksEvent, TraceMallocEvent,
                                 TraceFreeEvent, TraceTaskSwitchedInEvent,
                                 TraceTaskSwitchedOutEvent, TracePerfCntEvent>;
-
 } // namespace CARBON

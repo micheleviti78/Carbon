@@ -19,9 +19,15 @@
 #include <carbon/diag.hpp>
 #include <carbon/hsem.hpp>
 
-using namespace CARBON;
+namespace CARBON {
 
 HSEMSpinLock<HSEM_ID::InitSync> hSemInitSync;
+
+HSEMSpinLock<HSEM_ID::Trace> hsemTrace;
+
+} // namespace CARBON
+
+using namespace CARBON;
 
 extern "C" {
 

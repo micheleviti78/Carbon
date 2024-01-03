@@ -18,20 +18,33 @@
 #ifdef FREERTOS_USE_TRACE
 
 #include <carbon/diag.hpp>
+#include <carbon/hsem.hpp>
+#include <carbon/shared_memory.hpp>
+#include <carbon/systime.hpp>
 #include <carbon/trace_format.hpp>
 
 #include <cstddef>
 #include <cstdint>
+
+using namespace CARBON;
 
 extern "C" {
 
 void carbon_freertos_trace_malloc(void *address, size_t size) {}
 void carbon_freertos_trace_free(void *address, size_t size) {}
 void carbon_freertos_trace_switched_in(uint32_t number) {
-    // DIAG(TRACE_DIAG "thread %lu switched in", number);
+    TraceTaskSwitchedInEvent trc; // NOLINT
+    trc.header.timestamp = systimeUs();
+    trc.number = number;
+    traceFifo.push(TraceEvent(std::move(trc)), hsemTrace);
+    return;
 }
 void carbon_freertos_trace_switched_out(uint32_t number) {
-    // DIAG(TRACE_DIAG "thread %lu switched out", number);
+    TraceTaskSwitchedOutEvent trc; // NOLINT
+    trc.header.timestamp = systimeUs();
+    trc.number = number;
+    traceFifo.push(TraceEvent(std::move(trc)), hsemTrace);
+    return;
 }
 }
 #endif

@@ -150,7 +150,12 @@ public:
             }
         }
 
-        inline void push_array(const ObjectType *object) {
+        template <class ObjectT = ObjectType,
+                  std::enable_if_t<sizeof(ObjectT) !=
+                                       (((sizeof(ObjectT) + aligment - 1)) &
+                                        (~(aligment - 1))),
+                                   bool> = true>
+        inline void push_array(const ObjectT *object) {
             uint32_t i = 0;
             while (index_ != fifo_.tail_reserved_) {
                 fifo_.buffer_.insert(*(object + i), index_);
@@ -170,18 +175,6 @@ public:
         uint32_t fifo_pos_end_{0};
         bool isOverflow_ = false;
     };
-
-    inline bool push(const ObjectType *object, uint32_t nObjects, Lock &lock) {
-        Context context(*this, nObjects, lock);
-
-        if (context.isOverflow()) {
-            return false;
-        }
-
-        context.push_array(object);
-
-        return true;
-    }
 
     inline bool pop(ObjectType &object, Lock &lock) {
         uint8_t tail_ready_bit_pos{0};

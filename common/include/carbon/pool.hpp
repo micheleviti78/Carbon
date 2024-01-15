@@ -46,7 +46,9 @@ private:
     bool isInitialized{false};
 };
 
-template <size_t blockSize, uint32_t alignment> class MemoryAllocatorRaw {
+template <size_t blockSize, uint32_t alignment,
+          std::enable_if_t<(alignment & (alignment - 1)) == 0, bool> = true>
+class MemoryAllocatorRaw {
 public:
     MemoryAllocatorRaw() {}
 
@@ -60,9 +62,11 @@ public:
         alignedBlockSize_ = alignBlockSize(blockSize, alignment);
         firstAlignedAddress_ = alignAddress(startAddress_, alignment);
         alignedAddress_ = firstAlignedAddress_;
+        nAlignedElements_ = getNumberOfElements(startAddress_, sizeTotalBytes_,
+                                                blockSize, alignment);
     }
 
-    bool getBlock(uint8_t **block) {
+    bool inline interateBlock(uint8_t **block) {
         if (alignedAddress_ >= startAddress_ + sizeTotalBytes_) {
             *block = nullptr;
             return false;
@@ -72,20 +76,21 @@ public:
         return true;
     }
 
-    bool getBlock(uint8_t **block, uint32_t index) {
+    bool inline getBlock(uint8_t **block, uint32_t index) {
         *block = firstAlignedAddress_ + index * alignedBlockSize_;
-        if (*block > startAddress_ + sizeTotalBytes_) {
+        if (*block >= startAddress_ + sizeTotalBytes_) {
             *block = nullptr;
             return false;
         }
         return true;
     }
 
-    bool blockBelongs(const void *block) const {
+    bool inline blockBelongs(const void *block) const {
         const uint8_t *blockPtr = reinterpret_cast<const uint8_t *>(block);
         bool check = true;
         check = check && (blockPtr >= startAddress_);
-        check = check && (blockPtr < (firstAlignedAddress_ + sizeTotalBytes_));
+        check = check && (blockPtr < (firstAlignedAddress_ +
+                                      alignedBlockSize_ * nAlignedElements_));
         check = check && (blockPtr == alignAddress(blockPtr, alignment));
         return check;
     }
@@ -96,14 +101,23 @@ public:
 
     uint32_t getAlignedBlockSize() const { return alignedBlockSize_; }
 
-    uint32_t getStartAddress() const { return startAddress_; }
-
-    uint32_t getAlignedStartAddress() const { return firstAlignedAddress_; }
-
-    uint32_t getNumberOfAlignedElements() const {
-        return getNumberOfElements(startAddress_, sizeTotalBytes_, blockSize,
-                                   alignment);
+    uint32_t getStartAddress() const {
+        return reinterpret_cast<uint32_t>(startAddress_);
     }
+
+    uint32_t getAlignedStartAddress() const {
+        return reinterpret_cast<uint32_t>(firstAlignedAddress_);
+    }
+
+    uint32_t getNumberOfAlignedElements() const { return nAlignedElements_; }
+
+private:
+    uint32_t sizeTotalBytes_{0};
+    uint32_t alignedBlockSize_{0};
+    uint8_t *startAddress_{nullptr};
+    uint8_t *firstAlignedAddress_{nullptr};
+    uint8_t *alignedAddress_{nullptr};
+    uint32_t nAlignedElements_{0};
 
     static constexpr uint32_t predictAlignedBlockSize(uint32_t objectSize,
                                                       uint32_t memAlignment) {
@@ -137,17 +151,9 @@ public:
         return (actualSize / objectSizeAligned);
     }
 
-private:
-    uint32_t sizeTotalBytes_{0};
-    uint32_t alignedBlockSize_{0};
-    uint8_t *startAddress_{nullptr};
-    uint8_t *firstAlignedAddress_{nullptr};
-    uint8_t *alignedAddress_{nullptr};
-
     static constexpr uint32_t alignBlockSize(uint32_t value,
                                              uint32_t memAlignment) {
-        return (((value + static_cast<uint32_t>(memAlignment) - 1)) &
-                (~(static_cast<uint32_t>(memAlignment) - 1)));
+        return (((value + memAlignment - 1)) & (~(memAlignment - 1)));
     }
 
     static constexpr uint8_t *alignAddress(const uint8_t *address,
@@ -234,7 +240,7 @@ public:
             RAW_DIAG("already initialized");
         return true;
         uint8_t *block{nullptr};
-        while (memoryAllocator_.getBlock(&block)) {
+        while (memoryAllocator_.interateBlock(&block)) {
             if (!block)
                 RAW_DIAG("allocate null pointer");
             return false;
@@ -278,7 +284,7 @@ protected:
     Stack<uint8_t, NElements> pool_;
 };
 
-template <typename ObjectType, uint32_t aligment> class Buffer {
+template <class ObjectType, uint32_t aligment> class Buffer {
 public:
     Buffer() {}
 
@@ -290,33 +296,100 @@ public:
         memoryAllocatorRaw_.init(startAddress, size);
     }
 
-    inline bool insert(const ObjectType &object, const uint32_t index) {
+    template <class ObjectT = ObjectType,
+              std::enable_if_t<sizeof(ObjectT) !=
+                                   (((sizeof(ObjectT) + aligment - 1)) &
+                                    (~(aligment - 1))),
+                               bool> = true>
+    inline bool insert(const ObjectT &object, const uint32_t index) {
         uint8_t *data;
         if (!(memoryAllocatorRaw_.getBlock(&data, index))) {
             RAW_DIAG("no block to insert at index %lu", index);
             return false;
         }
         std::memcpy(reinterpret_cast<void *>(data),
-                    reinterpret_cast<const void *>(&object), sizeof(object));
+                    reinterpret_cast<const void *>(&object), sizeof(ObjectT));
         return true;
     }
 
-    inline bool remove(ObjectType &object, const uint32_t index) {
+    template <class ObjectT = ObjectType,
+              std::enable_if_t<sizeof(ObjectT) ==
+                                   (((sizeof(ObjectT) + aligment - 1)) &
+                                    (~(aligment - 1))),
+                               bool> = true>
+    inline bool insert(const ObjectT &object, const uint32_t index,
+                       const uint32_t length = 1) {
+        uint8_t *data;
+
+        if (!(memoryAllocatorRaw_.getBlock(&data, index))) {
+            RAW_DIAG("no block to insert at index %lu", index);
+            return false;
+        }
+
+        if ((reinterpret_cast<uint32_t>(data) + (sizeof(ObjectT) * length)) >
+            (memoryAllocatorRaw_.getStartAddress() +
+             memoryAllocatorRaw_.getTotalSize())) {
+            RAW_DIAG("not enough space to in the buffer, address %lu, size %lu",
+                     reinterpret_cast<uint32_t>(data),
+                     sizeof(ObjectT) * length);
+            return false;
+        }
+
+        std::memcpy(data, reinterpret_cast<const void *>(&object),
+                    sizeof(ObjectT) * length);
+
+        return true;
+    }
+
+    template <class ObjectT = ObjectType,
+              std::enable_if_t<sizeof(ObjectT) !=
+                                   (((sizeof(ObjectT) + aligment - 1)) &
+                                    (~(aligment - 1))),
+                               bool> = true>
+    inline bool remove(ObjectT &object, const uint32_t index) {
         uint8_t *data;
         if (!(memoryAllocatorRaw_.getBlock(&data, index))) {
             RAW_DIAG("no block to remove at index %lu", index);
             return false;
         }
         std::memcpy(reinterpret_cast<void *>(&object),
-                    reinterpret_cast<const void *>(data), sizeof(object));
+                    reinterpret_cast<const void *>(data), sizeof(ObjectT));
+        return true;
+    }
+
+    template <class ObjectT = ObjectType,
+              std::enable_if_t<sizeof(ObjectT) ==
+                                   (((sizeof(ObjectT) + aligment - 1)) &
+                                    (~(aligment - 1))),
+                               bool> = true>
+    inline bool remove(ObjectType &object, const uint32_t index,
+                       const uint32_t length = 1) {
+        uint8_t *data;
+
+        if (!(memoryAllocatorRaw_.getBlock(&data, index))) {
+            RAW_DIAG("no block to remove at index %lu", index);
+            return false;
+        }
+
+        if ((reinterpret_cast<uint32_t>(data) + (sizeof(ObjectT) * length)) >
+            (memoryAllocatorRaw_.getStartAddress() +
+             memoryAllocatorRaw_.getTotalSize())) {
+            RAW_DIAG(
+                "not enough space to read in the buffer, address %lu, size %lu",
+                reinterpret_cast<uint32_t>(data), sizeof(ObjectT) * length);
+            return false;
+        }
+
+        std::memcpy(reinterpret_cast<void *>(&object),
+                    reinterpret_cast<const void *>(data),
+                    sizeof(ObjectT) * length);
+
         return true;
     }
 
     uint32_t getNumberOfAlignedElements() const {
         return memoryAllocatorRaw_.getNumberOfAlignedElements();
     }
-
-    typedef ObjectType Type;
 
 private:
     MemoryAllocatorRaw<sizeof(ObjectType), aligment> memoryAllocatorRaw_;

@@ -38,6 +38,8 @@ public:
     friend class FifoTest;
 
     bool init(uint32_t startAddress, uint32_t size) {
+        startAddress_ = startAddress;
+        size_ = size;
         buffer_.init(startAddress, size);
         uint32_t n = buffer_.getNumberOfAlignedElements();
         if (n < (BUFFER_SIZE)) {
@@ -148,8 +150,6 @@ public:
 
         inline bool push(const ObjectType &object) {
             if (isOverflow_) {
-                // RAW_DIAG("Context could not reserve memory because of
-                // overflow");
                 return false;
             }
             if (index_ != fifo_.tail_reserved_) {
@@ -172,8 +172,6 @@ public:
                                    bool> = true>
         inline bool push_array(const ObjectT *object, uint32_t &length) {
             if (isOverflow_) {
-                // RAW_DIAG("Context could not reserve memory because of
-                // overflow");
                 return false;
             }
             uint32_t i = 0;
@@ -196,8 +194,6 @@ public:
                                    bool> = true>
         inline bool push_array(const ObjectT *object, uint32_t &length) {
             if (isOverflow_) {
-                // RAW_DIAG("Context could not reserve memory because of
-                // overflow");
                 return false;
             }
 
@@ -251,6 +247,64 @@ public:
         bool isOverflow_ = false;
     };
 
+    class ContextPull {
+    public:
+        ContextPull(Fifo<ObjectType, aligment, Lock, NElements> &fifo,
+                    Lock &lock)
+            : fifo_(fifo), lock_(lock) {
+            LockGuard<Lock> lockGuard(lock_);
+            currentHead_ = fifo_.head_;
+            fifo_.getElementReady(dataLength1_, dataLength2_);
+            dataLengthByte1_ = dataLength1_ * sizeof(ObjectType);
+            dataLengthByte2_ = dataLength2_ * sizeof(ObjectType);
+            dataPtr1_ = fifo_.startAddress_ + currentHead_;
+            dataPtr2_ = fifo_.startAddress_;
+        }
+
+        ~ContextPull() {
+            LockGuard<Lock> lockGuard(lock_);
+            uint8_t tail_ready_bit_pos{0};
+            uint32_t tail_ready_index{0};
+            for (unsigned i = 0; i < dataLength1_ + dataLength2_; i++) {
+                tail_ready_bit_pos =
+                    static_cast<uint8_t>(1u << (fifo_.head_ % 8u));
+                tail_ready_index = fifo_.head_ / 8u;
+                fifo_.tail_ready_[tail_ready_index] &= ~tail_ready_bit_pos;
+                fifo_.head_ = fifo_.increment(fifo_.head_);
+            }
+        }
+
+        DEFAULT_COPY_AND_MOVE(ContextPull)
+
+        inline void getDataLength(uint32_t &dataLength1,
+                                  uint32_t &dataLength2) {
+            dataLength1 = dataLength1_;
+            dataLength2 = dataLength2_;
+        }
+
+        inline void getDataLengthByte(uint32_t &dataLengthByte1,
+                                      uint32_t &dataLengthByte2) {
+            dataLengthByte1 = dataLengthByte1_;
+            dataLengthByte2 = dataLengthByte2_;
+        }
+
+        inline void getDataPtr(uint32_t &dataPtr1, uint32_t &dataPtr2) {
+            dataPtr1 = dataPtr1_;
+            dataPtr2 = dataPtr2_;
+        }
+
+    private:
+        Fifo<ObjectType, aligment, Lock, NElements> &fifo_;
+        Lock &lock_;
+        uint32_t currentHead_{0};
+        uint32_t dataLength1_{0};
+        uint32_t dataLengthByte1_{0};
+        uint32_t dataLength2_{0};
+        uint32_t dataLengthByte2_{0};
+        uint32_t dataPtr1_{0};
+        uint32_t dataPtr2_{0};
+    };
+
     inline bool pop(ObjectType &object, Lock &lock) {
         uint8_t tail_ready_bit_pos{0};
         uint32_t tail_ready_index{0};
@@ -287,7 +341,7 @@ public:
     inline bool isEmpty() {
         uint32_t current_head = this->head_;
         uint8_t bit_pos = static_cast<uint8_t>(1u << (current_head % 8u));
-        bool res = (tail_ready_[(current_head / 8u)] & bit_pos == 0);
+        bool res = ((tail_ready_[(current_head / 8u)] & bit_pos) == 0);
         return res;
     }
 
@@ -359,10 +413,53 @@ private:
         return true;
     }
 
+    inline void getElementReady(uint32_t &dataLength1, uint32_t &dataLength2) {
+        dataLength1 = 0;
+        dataLength2 = 0;
+        uint32_t current_head = this->head_;
+        bool empty;
+        do {
+            uint8_t bit_pos = static_cast<uint8_t>(1u << (current_head % 8u));
+            empty = ((tail_ready_[(current_head / 8u)] & bit_pos) == 0);
+            // RAW_DIAG("tail_ready_[(%lu / 8u)] %u ", current_head,
+            // tail_ready_[(current_head / 8u)]);
+            if (!empty)
+                dataLength1++;
+            current_head = increment(current_head);
+            if (current_head < this->head_)
+                break;
+            if (empty || (current_head == this->head_)) {
+                if (dataLength1 + dataLength2 > NElements) {
+                    RAW_DIAG("dataLength1 %lu + dataLength2 %lu > NElements",
+                             dataLength1, dataLength2);
+                }
+                return;
+            }
+        } while (1);
+        do {
+            uint8_t bit_pos = static_cast<uint8_t>(1u << (current_head % 8u));
+            empty = ((tail_ready_[(current_head / 8u)] & bit_pos) == 0);
+            if (!empty)
+                dataLength2++;
+            current_head = increment(current_head);
+            if ((current_head >= this->head_) || empty)
+                break;
+        } while (1);
+        if (dataLength1 + dataLength2 > NElements) {
+            RAW_DIAG("dataLength1 %lu + dataLength2 %lu > NElements",
+                     dataLength1, dataLength2);
+        }
+        if (dataLength1 == 0 && dataLength2 > 0) {
+            RAW_DIAG("dataLength1 == 0 && dataLength2 > 0");
+        }
+    }
+
     CallbackOverflow callbackOverflow{nullptr};
     CallbackUnderflow callbackUnderflow{nullptr};
 
     Buffer<ObjectType, aligment> buffer_;
+    uint32_t startAddress_{0};
+    uint32_t size_{0};
     uint32_t tail_reserved_{0};
     uint32_t head_{0};
     static constexpr auto BUFFER_SIZE = (NElements + 1u);

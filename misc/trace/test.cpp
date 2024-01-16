@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           trace.cpp
+ * @file           test.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Jan. 2024
- * @brief          class to handle and send trace packets
+ * @brief          TCP/IP client to test tracing
  ******************************************************************************
  * @attention
  * Copyright (c) 2024 Michele Viti.
@@ -103,9 +103,7 @@ int main(int argc, char *argv[]) {
 
     freeaddrinfo(servinfo); // all done with this structure
 
-    uint32_t cycles = 0;
-
-    while (cycles < 5) {
+    while (1) {
         int bytesLeft = sizeof(TracePacketHeader);
         int bufOffset = 0;
 
@@ -244,8 +242,6 @@ int main(int argc, char *argv[]) {
         }
 
         std::cout << std::endl;
-
-        cycles++;
     }
 
     close(sockfd);

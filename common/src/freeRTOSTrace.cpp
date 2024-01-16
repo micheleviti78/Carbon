@@ -40,7 +40,6 @@ void carbon_freertos_trace_switched_in(uint32_t number) {
         traceFifo, sizeof(TraceTaskSwitchedInEvent), hsemTrace);
     uint32_t len = sizeof(TraceTaskSwitchedInEvent);
     context.push_array(reinterpret_cast<uint8_t *>(&trc), len);
-    // traceFifo.push(TraceEvent(std::move(trc)), hsemTrace);
     return;
 }
 void carbon_freertos_trace_switched_out(uint32_t number) {
@@ -51,7 +50,6 @@ void carbon_freertos_trace_switched_out(uint32_t number) {
         traceFifo, sizeof(TraceTaskSwitchedOutEvent), hsemTrace);
     uint32_t len = sizeof(TraceTaskSwitchedOutEvent);
     context.push_array(reinterpret_cast<uint8_t *>(&trc), len);
-    // traceFifo.push(TraceEvent(std::move(trc)), hsemTrace);
     return;
 }
 }

@@ -301,14 +301,14 @@ public:
                                    (((sizeof(ObjectT) + aligment - 1)) &
                                     (~(aligment - 1))),
                                bool> = true>
-    inline bool insert(const ObjectT &object, const uint32_t index) {
+    inline bool insert(const ObjectT *object, const uint32_t index) {
         uint8_t *data;
         if (!(memoryAllocatorRaw_.getBlock(&data, index))) {
             RAW_DIAG("no block to insert at index %lu", index);
             return false;
         }
         std::memcpy(reinterpret_cast<void *>(data),
-                    reinterpret_cast<const void *>(&object), sizeof(ObjectT));
+                    reinterpret_cast<const void *>(object), sizeof(ObjectT));
         return true;
     }
 
@@ -317,7 +317,7 @@ public:
                                    (((sizeof(ObjectT) + aligment - 1)) &
                                     (~(aligment - 1))),
                                bool> = true>
-    inline bool insert(const ObjectT &object, const uint32_t index,
+    inline bool insert(const ObjectT *object, const uint32_t index,
                        const uint32_t length = 1) {
         uint8_t *data;
 
@@ -335,7 +335,7 @@ public:
             return false;
         }
 
-        std::memcpy(data, reinterpret_cast<const void *>(&object),
+        std::memcpy(data, reinterpret_cast<const void *>(object),
                     sizeof(ObjectT) * length);
 
         return true;
@@ -346,13 +346,13 @@ public:
                                    (((sizeof(ObjectT) + aligment - 1)) &
                                     (~(aligment - 1))),
                                bool> = true>
-    inline bool remove(ObjectT &object, const uint32_t index) {
+    inline bool remove(ObjectT object, const uint32_t index) {
         uint8_t *data;
         if (!(memoryAllocatorRaw_.getBlock(&data, index))) {
             RAW_DIAG("no block to remove at index %lu", index);
             return false;
         }
-        std::memcpy(reinterpret_cast<void *>(&object),
+        std::memcpy(reinterpret_cast<void *>(object),
                     reinterpret_cast<const void *>(data), sizeof(ObjectT));
         return true;
     }
@@ -362,7 +362,7 @@ public:
                                    (((sizeof(ObjectT) + aligment - 1)) &
                                     (~(aligment - 1))),
                                bool> = true>
-    inline bool remove(ObjectType &object, const uint32_t index,
+    inline bool remove(ObjectType *object, const uint32_t index,
                        const uint32_t length = 1) {
         uint8_t *data;
 
@@ -380,7 +380,7 @@ public:
             return false;
         }
 
-        std::memcpy(reinterpret_cast<void *>(&object),
+        std::memcpy(reinterpret_cast<void *>(object),
                     reinterpret_cast<const void *>(data),
                     sizeof(ObjectT) * length);
 

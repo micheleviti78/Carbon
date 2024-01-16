@@ -66,7 +66,7 @@ FIFO_DECLARATION_8BIT_ALIG(diag, uint8_t, 2048, Diag)
 #ifdef FREERTOS_USE_TRACE
 /*TRACE FIFO*/
 
-FIFO_DECLARATION_8BIT_ALIG(trace, TraceEvent, 32, Trace)
+FIFO_DECLARATION_8BIT_ALIG(trace, uint8_t, 2048, Trace)
 #endif
 
 /*Sync Flag*/

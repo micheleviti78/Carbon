@@ -69,7 +69,7 @@ public:
             return false;
         }
 
-        buffer_.insert(object, fifo_pos);
+        buffer_.insert(&object, fifo_pos);
 
         {
             LockGuard<Lock> lockGuard(lock);
@@ -80,10 +80,10 @@ public:
         return true;
     }
 
-    class Context {
+    class ContextPush {
     public:
-        Context(Fifo<ObjectType, aligment, Lock, NElements> &fifo,
-                uint32_t nObjects, Lock &lock)
+        ContextPush(Fifo<ObjectType, aligment, Lock, NElements> &fifo,
+                    uint32_t nObjects, Lock &lock)
             : fifo_(fifo), nObjects_(nObjects), lock_(lock) {
             LockGuard<Lock> lockGuard(lock_);
             if (!fifo_.isFull(nObjects_)) {
@@ -92,12 +92,19 @@ public:
                 fifo_.increment(fifo_pos_end_, nObjects_ - 1);
                 fifo_.tail_reserved_ = fifo_.increment(fifo_pos_end_);
                 index_ = fifo_pos_start_;
+                if (fifo_pos_start_ + nObjects_ <= BUFFER_SIZE) {
+                    data_length1_ = nObjects_;
+                    data_length2_ = 0;
+                } else {
+                    data_length1_ = BUFFER_SIZE - fifo_pos_start_;
+                    data_length2_ = nObjects_ - data_length1_;
+                }
             } else {
                 isOverflow_ = true;
             }
         }
 
-        ~Context() {
+        ~ContextPush() {
             LockGuard<Lock> lockGuard(lock_);
             uint32_t index1 = fifo_pos_start_ / 8u;
             uint32_t index2 = fifo_pos_end_ / 8u;
@@ -137,17 +144,25 @@ public:
             }
         }
 
-        DEFAULT_COPY_AND_MOVE(Context)
+        DEFAULT_COPY_AND_MOVE(ContextPush)
 
-        inline void push(const ObjectType &object) {
+        inline bool push(const ObjectType &object) {
+            if (isOverflow_) {
+                // RAW_DIAG("Context could not reserve memory because of
+                // overflow");
+                return false;
+            }
             if (index_ != fifo_.tail_reserved_) {
-                if (!(fifo_.buffer_.insert(object, index_))) {
+                if (!(fifo_.buffer_.insert(&object, index_))) {
                     RAW_DIAG("error pushing in buffer");
+                    return false;
                 }
                 index_ = fifo_.increment(index_);
             } else {
                 RAW_DIAG("cannot push in the buffer");
+                return false;
             }
+            return true;
         }
 
         template <class ObjectT = ObjectType,
@@ -155,13 +170,71 @@ public:
                                        (((sizeof(ObjectT) + aligment - 1)) &
                                         (~(aligment - 1))),
                                    bool> = true>
-        inline void push_array(const ObjectT *object) {
+        inline bool push_array(const ObjectT *object, uint32_t &length) {
+            if (isOverflow_) {
+                // RAW_DIAG("Context could not reserve memory because of
+                // overflow");
+                return false;
+            }
             uint32_t i = 0;
-            while (index_ != fifo_.tail_reserved_) {
-                fifo_.buffer_.insert(*(object + i), index_);
+            while (index_ != fifo_.tail_reserved_ || i < length) {
+                if (!(fifo_.buffer_.insert(*(&object + i), index_))) {
+                    RAW_DIAG("error pushing in buffer");
+                    return false;
+                }
                 index_ = fifo_.increment(index_);
                 i++;
             }
+            length = i;
+            return true;
+        }
+
+        template <class ObjectT = ObjectType,
+                  std::enable_if_t<sizeof(ObjectT) ==
+                                       (((sizeof(ObjectT) + aligment - 1)) &
+                                        (~(aligment - 1))),
+                                   bool> = true>
+        inline bool push_array(const ObjectT *object, uint32_t &length) {
+            if (isOverflow_) {
+                // RAW_DIAG("Context could not reserve memory because of
+                // overflow");
+                return false;
+            }
+
+            if (length <= data_length1_) {
+                if (!(fifo_.buffer_.insert(object, index_, length))) {
+                    RAW_DIAG("error pushing in buffer length");
+                    return false;
+                }
+                if (!fifo_.increment(index_, data_length1_)) {
+                    RAW_DIAG(
+                        "error while incrementing, length <= data lenght 1");
+                    return false;
+                }
+                object += length;
+            } else {
+                if (!(fifo_.buffer_.insert(object, index_, data_length1_))) {
+                    RAW_DIAG("error pushing in buffer data_length1_");
+                    return false;
+                }
+                if (!fifo_.increment(index_, data_length1_)) {
+                    RAW_DIAG(
+                        "error while incrementing, length > data lenght 1");
+                    return false;
+                }
+                if (index_ != 0) {
+                    RAW_DIAG("wrong index %lu", index_);
+                    return false;
+                }
+                object += data_length1_;
+                if (!(fifo_.buffer_.insert(object, index_,
+                                           length - data_length1_))) {
+                    RAW_DIAG("error pushing in buffer length-data_length1_");
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         bool isOverflow() const { return isOverflow_; }
@@ -173,6 +246,8 @@ public:
         uint32_t index_{0};
         uint32_t fifo_pos_start_{0};
         uint32_t fifo_pos_end_{0};
+        uint32_t data_length1_{0};
+        uint32_t data_length2_{0};
         bool isOverflow_ = false;
     };
 
@@ -198,7 +273,7 @@ public:
             return false;
         }
 
-        buffer_.remove(object, current_head);
+        buffer_.remove(&object, current_head);
 
         {
             LockGuard<Lock> lockGuard(lock);

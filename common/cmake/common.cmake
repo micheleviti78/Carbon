@@ -39,11 +39,12 @@ set(HAL_COMMON
 )
 
 set(CPP_FLAGS
-    -std=c++17
+    -std=c++23
     -fno-rtti
     -fno-exceptions
     -fno-threadsafe-statics
     -Wold-style-cast
+    -Wno-volatile
 )
 
 add_compile_options(${ARM_FLAGS})
@@ -66,7 +67,14 @@ set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 
 string(REPLACE ";" " " S_ARM_FLAGS "${ARM_FLAGS}")
 
-set(CMAKE_EXE_LINKER_FLAGS "${S_ARM_FLAGS} -specs=${LDSPECS} -T${LDSCRIPT}")
+set(LINK_FLAGS "${S_ARM_FLAGS} -Wl,--gc-sections \
+	-Wl,--undefined=uxTopUsedPriority,--undefined=freeRTOSMemoryScheme \
+    -Wl,--wrap=malloc,--wrap=free,--wrap=_malloc_r,--wrap=_free_r \
+    -Wl,--wrap=_Znwj \
+    -Wl,--no-warn-rwx-segments \
+    -Wl,-Map=${PROJECT_NAME}.map,--cref")
+
+set(CMAKE_EXE_LINKER_FLAGS "${LINK_FLAGS} -specs=${LDSPECS} -T${LDSCRIPT}")
 
 include_directories(${PROJECT_ROOT_DIR}/common/include)
 include_directories(${MAIN_DIR}/core/include)

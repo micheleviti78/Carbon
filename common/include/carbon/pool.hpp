@@ -23,6 +23,7 @@
 
 #include <cstring>
 #include <new>
+#include <type_traits>
 
 namespace CARBON {
 

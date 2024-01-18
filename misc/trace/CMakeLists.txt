@@ -5,7 +5,8 @@ get_filename_component(PROJECT_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../../" ABSOL
 project(trace_test)
 
 set(CPP_FLAGS
-    -std=c++17
+    -std=c++23
+    -Wno-volatile
 )
 
 string(REPLACE ";" " " S_CPP_FLAGS "${CPP_FLAGS}")
@@ -14,7 +15,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${S_CPP_FLAGS}")
 
 include_directories(${PROJECT_ROOT_DIR}/common/include)
 
-SET (SOURCE 
+SET (SOURCE
 	test.cpp
 	)
 

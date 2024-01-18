@@ -1,4 +1,21 @@
-set(TOOLCHAIN_PATH /opt/gcc-arm-none-eabi-10.3-2021.10/)
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+
+#https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
+
+set(CMAKE_C_FLAGS_DEBUG "-Og -ggdb3")
+set(CMAKE_C_FLAGS_MINSIZEREL "-Os -DNDEBUG")
+set(CMAKE_C_FLAGS_RELEASE "-Os -DNDEBUG")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "-Os -ggdb3")
+
+set(CMAKE_CXX_FLAGS_DEBUG "-Og -ggdb3")
+set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-Os -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-Os -ggdb3")
+
+if (UNIX)
+
+set(TOOLCHAIN_PATH /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/)
 
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc)
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PATH}/bin/arm-none-eabi-g++)
@@ -6,5 +23,21 @@ set(ARM_SIZE_UTIL ${TOOLCHAIN_PATH}/bin/arm-none-eabi-size)
 set(ARM_OBJCOPY ${TOOLCHAIN_PATH}/bin/arm-none-eabi-objcopy)
 set(ARM_OBJDUMP ${TOOLCHAIN_PATH}/bin/arm-none-eabi-objdump)
 
-set(OPENOCD_PATH /opt/openocd/bin/)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
+set(OPENOCD_PATH /usr/local/bin/)
 set(OPENOCD ${OPENOCD_PATH}/openocd)
+
+set(STLINK_PATH /opt/stlink)
+set(STLINK_FLASH ${STLINK_PATH}/st-flash)
+
+else()
+
+message(FATAL_ERROR "Unsupported host OS")
+
+endif()

@@ -80,7 +80,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TICK_HOOK 0
 #define configMAX_PRIORITIES (7)
 
-#define configSUPPORT_STATIC_ALLOCATION 0
+#define configSUPPORT_STATIC_ALLOCATION 1
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
 
 #define configCPU_CLOCK_HZ (SystemCoreClock)

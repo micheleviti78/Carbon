@@ -455,8 +455,10 @@ void sys_mutex_unlock(sys_mutex_t *mutex)
 sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread , void *arg, int stacksize, int prio)
 {
 #if (osCMSIS < 0x20000U)
-  const osThreadDef_t os_thread_def = { (char *)name, (os_pthread)thread, (osPriority)prio, 0, stacksize};
-  return osThreadCreate(&os_thread_def, arg);
+    const osThreadDef_t os_thread_def = {
+        (char *)name, (os_pthread)thread, (osPriority)prio, 0, stacksize, NULL,
+        NULL};
+    return osThreadCreate(&os_thread_def, arg);
 #else
   const osThreadAttr_t attributes = {
                         .name = name,

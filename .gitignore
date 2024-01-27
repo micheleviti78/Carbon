@@ -8,3 +8,4 @@ CubeCode/
 builds/
 Carbon Default.launch
 misc/trace/build
+lib/micropython/micropython

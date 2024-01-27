@@ -83,6 +83,8 @@ extern uint32_t SystemCoreClock;
 #define configSUPPORT_STATIC_ALLOCATION 1
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
 
+#define configNUM_THREAD_LOCAL_STORAGE_POINTERS 1
+
 #define configCPU_CLOCK_HZ (SystemCoreClock)
 #define configTICK_RATE_HZ ((TickType_t)1000)
 
@@ -188,6 +190,8 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
+void carbon_raw_diag_print(const char *format, ...);
+
 #define configASSERT(x)                                                        \
     if ((x) == 0) {																  \
 		carbon_raw_diag_print("%s, %s, %d, %s",__FILE__, __func__, __LINE__, #x); \
@@ -200,6 +204,9 @@ header file. */
    standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
+
+uint32_t carbon_time_counter_value();
+void carbon_conf_timer_runtime_stats();
 
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS carbon_conf_timer_runtime_stats
 #define portGET_RUN_TIME_COUNTER_VALUE carbon_time_counter_value

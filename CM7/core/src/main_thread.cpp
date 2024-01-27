@@ -25,6 +25,8 @@
 
 #include <task.h>
 
+#include <carbon_mp_test.h>
+
 extern "C" {
 
 void netif_config(void);
@@ -39,6 +41,8 @@ void mainThread(const void *argument) {
 #ifdef FREERTOS_USE_TRACE
     start_trace_thread();
 #endif
+    carbon_mp_test();
+
     while (1) {
         BSP_LED_Toggle(LED_GREEN);
         osDelay(1000);

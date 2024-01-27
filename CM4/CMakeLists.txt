@@ -18,6 +18,8 @@ set(ARM_FLAGS
     -mfloat-abi=hard
 )
 
+set(CORE_CM4 ON)
+
 set(LDSCRIPT
     ${PROJECT_ROOT_DIR}/CM4/STM32H747XIHx_FLASH_CM4.ld
 )

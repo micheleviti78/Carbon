@@ -39,7 +39,6 @@ if (FREERTOS_USE_ASSERT)
 endif()
 
 target_include_directories(${FREERTOS_LIB}
-    SYSTEM
     PUBLIC
     include
     ${PORTINCLUDES}

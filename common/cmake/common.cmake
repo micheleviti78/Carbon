@@ -4,14 +4,14 @@ set(WARN_FLAGS
     -Wall
     -Wextra
     -Werror
-    -Werror=vla
-    -Wundef
+    #-Werror=vla
+    #-Wundef
     -Wformat=2
     -Wformat-truncation
     -Wformat-overflow=2
     -Wformat-signedness
     -Wno-format-nonliteral
-    -Wstack-usage=1024
+    #-Wstack-usage=1024
     -Wno-unused-parameter
     -Wlogical-op
     -Wdouble-promotion
@@ -60,6 +60,8 @@ endif()
 string(REPLACE ";" " " S_CPP_FLAGS "${CPP_FLAGS}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${S_CPP_FLAGS}")
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c2x")
 
 set(LDSPECS nano.specs)
 

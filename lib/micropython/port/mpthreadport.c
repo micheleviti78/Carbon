@@ -1,3 +1,20 @@
+/**
+ ******************************************************************************
+ * @file           mpthreadport.c
+ * @author         Michele Viti <micheleviti78@gmail.com>
+ * @date           Jan. 2024
+ * @brief          binding functions for multithreading
+ ******************************************************************************
+ * @attention
+ * Copyright (c) 2022 Michele Viti.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /*
  * This file is part of the MicroPython project, http://micropython.org/
  *
@@ -29,7 +46,10 @@
 #include "py/mphal.h"
 #include "py/mpthread.h"
 #include "py/runtime.h"
+
 #include <task.h>
+
+#include <stdint.h>
 
 #if MICROPY_PY_THREAD
 

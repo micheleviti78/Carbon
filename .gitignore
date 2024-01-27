@@ -9,3 +9,5 @@ builds/
 Carbon Default.launch
 misc/trace/build
 lib/micropython/micropython
+lib/micropython/build-embed/
+lib/micropython/micropython_embed/

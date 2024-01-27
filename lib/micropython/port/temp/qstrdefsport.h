@@ -1,26 +1,10 @@
-/**
- ******************************************************************************
- * @file           mpthreadport.h
- * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Jan. 2024
- * @brief          binding functions for multithreading
- ******************************************************************************
- * @attention
- * Copyright (c) 2022 Michele Viti.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
 /*
  * This file is part of the MicroPython project, http://micropython.org/
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Damien P. George on behalf of Pycom Ltd
+ * Copyright (c) 2013, 2014 Damien P. George
+ * Copyright (c) 2015 Daniel Campora
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,26 +25,10 @@
  * THE SOFTWARE.
  */
 
-#ifndef MICROPY_INCLUDED_MPTHREADPORT_H
-#define MICROPY_INCLUDED_MPTHREADPORT_H
+// *FORMAT-OFF*
 
-#include <FreeRTOS.h>
-#include <semphr.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef struct _mp_thread_mutex_t {
-    SemaphoreHandle_t handle;
-    StaticSemaphore_t buffer;
-} mp_thread_mutex_t;
-
-void mp_thread_init(void);
-void mp_thread_gc_others(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+// for machine module
+Q(/)
+// entries for sys.path
+Q(/ flash)
+Q(/ flash / lib)

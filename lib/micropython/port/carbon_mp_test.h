@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           mpthreadport.h
+ * @file           carbon_mp_test.h
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Jan. 2024
- * @brief          binding functions for multithreading
+ * @brief          micropython test
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -20,7 +20,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Damien P. George on behalf of Pycom Ltd
+ * Copyright (c) 2022-2023 Damien P. George
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,27 +40,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-#ifndef MICROPY_INCLUDED_MPTHREADPORT_H
-#define MICROPY_INCLUDED_MPTHREADPORT_H
-
-#include <FreeRTOS.h>
-#include <semphr.h>
+#ifndef MICROPY_INCLUDED_CARBON_MP_TEST_H
+#define MICROPY_INCLUDED_CARBON_MP_TEST_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct _mp_thread_mutex_t {
-    SemaphoreHandle_t handle;
-    StaticSemaphore_t buffer;
-} mp_thread_mutex_t;
-
-void mp_thread_init(void);
-void mp_thread_gc_others(void);
+void carbon_mp_test();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif // MICROPY_INCLUDED_CARBON_MP_TEST_H

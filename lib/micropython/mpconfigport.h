@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           mpthreadport.h
+ * @file           mpconfigport.h
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Jan. 2024
- * @brief          binding functions for multithreading
+ * @brief          micropython config file
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -20,7 +20,8 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Damien P. George on behalf of Pycom Ltd
+ * Copyright (c) 2013, 2014 Damien P. George
+ * Copyright (c) 2015 Daniel Campora
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,26 +42,36 @@
  * THE SOFTWARE.
  */
 
-#ifndef MICROPY_INCLUDED_MPTHREADPORT_H
-#define MICROPY_INCLUDED_MPTHREADPORT_H
+#include <stdint.h>
 
-#include <FreeRTOS.h>
-#include <semphr.h>
+//#include <FreeRTOS.h>
+//#include <semphr.h>
 
-#ifdef __cplusplus
-extern "C" {
+// options to control how MicroPython is built
+
+// Use the minimal starting configuration (disables all optional features).
+#define MICROPY_CONFIG_ROM_LEVEL (MICROPY_CONFIG_ROM_LEVEL_CORE_FEATURES)
+
+// MicroPython configuration.
+#define MICROPY_ENABLE_COMPILER (1)
+#define MICROPY_ENABLE_GC (1)
+#define MICROPY_PY_GC (1)
+#define MICROPY_PY_THREAD (1)
+#define MICROPY_PY_THREAD_GIL (1)
+#define MICROPY_PY_IO (0)
+#define MICROPY_ENABLE_EXTERNAL_IMPORT (0)
+
+#define MICROPY_BANNER_MACHINE "Carbon"
+
+typedef intptr_t mp_int_t;   // must be pointer size
+typedef uintptr_t mp_uint_t; // must be pointer size
+typedef long mp_off_t;
+
+// Need to provide a declaration/definition of alloca()
+#if defined(__FreeBSD__) || defined(__NetBSD__)
+#include <stdlib.h>
+#else
+#include <alloca.h>
 #endif
 
-typedef struct _mp_thread_mutex_t {
-    SemaphoreHandle_t handle;
-    StaticSemaphore_t buffer;
-} mp_thread_mutex_t;
-
-void mp_thread_init(void);
-void mp_thread_gc_others(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#define MICROPY_MPHALPORT_H "port/mphalport.h"

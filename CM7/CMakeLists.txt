@@ -4,6 +4,10 @@ get_filename_component(PROJECT_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
 set(MAIN_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+set(CURRENT_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
+
+message(${CURRENT_BUILD_DIR})
+
 set(CMAKE_TOOLCHAIN_FILE ${PROJECT_ROOT_DIR}/common/cmake/toolchain.cmake)
 
 project(CARBON_CM7)

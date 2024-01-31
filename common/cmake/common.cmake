@@ -4,14 +4,14 @@ set(WARN_FLAGS
     -Wall
     -Wextra
     -Werror
-    #-Werror=vla
-    #-Wundef
+    -Werror=vla
+    -Wundef
     -Wformat=2
     -Wformat-truncation
     -Wformat-overflow=2
     -Wformat-signedness
     -Wno-format-nonliteral
-    #-Wstack-usage=1024
+    -Wstack-usage=1024
     -Wno-unused-parameter
     -Wlogical-op
     -Wdouble-promotion

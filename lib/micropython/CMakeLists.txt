@@ -145,7 +145,7 @@ set(MICROPYTHON_LIB micropython_${PROJECT_NAME})
 
 add_library(${MICROPYTHON_LIB} ${SOURCES_PORT} ${SOURCE_SHARED} ${SOURCE_PY})
 
-target_compile_options(${MICROPYTHON_LIB} PUBLIC -Wno-vla-extension)
+target_compile_options(${MICROPYTHON_LIB} PUBLIC -Wno-vla -Wno-undef -Wno-stack-usage)
 
 target_include_directories(${MICROPYTHON_LIB}
     PUBLIC

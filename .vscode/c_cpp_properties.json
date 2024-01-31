@@ -17,12 +17,13 @@
                 "CORE_CM4=1",
                 "HAL_TIM_MODULE_ENABLED=1",
                 "DUAL_CORE=1",
+                "FREERTOS_USE_TRACE=1",
                 "TIM2=1",
                 "USE_FULL_LL_DRIVER=1"
             ],
             "compilerPath": "/opt/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gcc",
-            "cStandard": "c11",
-            "cppStandard": "c++14",
+            "cStandard": "c23",
+            "cppStandard": "c++23",
             "intelliSenseMode": "gcc-arm",
             "configurationProvider": "ms-vscode.makefile-tools"
         },

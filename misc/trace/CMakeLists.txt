@@ -5,7 +5,7 @@ get_filename_component(PROJECT_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../../" ABSOL
 project(trace_test)
 
 set(CPP_FLAGS
-    -std=c++23
+    -std=c++17
     -Wno-volatile
 )
 

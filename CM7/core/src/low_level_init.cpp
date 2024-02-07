@@ -102,8 +102,11 @@ void low_level_init() {
     FIFO_INIT(trace)
 #endif
 
-    if (BSP_SD_Init(0) < 0) {
-        void Error_Handler(void);
+    int32_t err = BSP_SD_Init(0);
+    if (err < 0) {
+        RAW_DIAG("error SD init %ld", err);
+        for (;;) {
+        }
     }
 
     setSyncFlag(SyncFlagBit::PeripherySync);

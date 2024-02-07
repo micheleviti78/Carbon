@@ -27,24 +27,26 @@ extern ETH_HandleTypeDef heth;
 void fmc_isr(void);
 void carbon_hw_us_systime_tim_isr(void);
 void hsem_isr(void);
+void BSP_SD_IRQHandler(uint32_t Instance);
 
-//#include <backtrace.h>
+// #include <backtrace.h>
 
-//#define BACKTRACE_SIZE 25
+// #define BACKTRACE_SIZE 25
 //
-// static inline void __attribute__((always_inline)) do_backtrace(uint32_t pc) {
-//    static backtrace_t backtrace_buf[BACKTRACE_SIZE];
-//    int count = backtrace_unwind(backtrace_buf, BACKTRACE_SIZE);
-//    int i = 0;
-//    for (; i < count; ++i) {
-//        if ((uint32_t)backtrace_buf[i].address == pc)
-//            break;
-//    }
-//    for (; i < count; ++i) {
-//        RAW_DIAG("## %p %p", backtrace_buf[i].address,
-//                 backtrace_buf[i].function);
-//    }
-//}
+//  static inline void __attribute__((always_inline)) do_backtrace(uint32_t pc)
+//  {
+//     static backtrace_t backtrace_buf[BACKTRACE_SIZE];
+//     int count = backtrace_unwind(backtrace_buf, BACKTRACE_SIZE);
+//     int i = 0;
+//     for (; i < count; ++i) {
+//         if ((uint32_t)backtrace_buf[i].address == pc)
+//             break;
+//     }
+//     for (; i < count; ++i) {
+//         RAW_DIAG("## %p %p", backtrace_buf[i].address,
+//                  backtrace_buf[i].function);
+//     }
+// }
 
 /**
  * stack_unfold_hard_fault:
@@ -242,3 +244,9 @@ void HSEM1_IRQHandler(void) { hsem_isr(); }
 #if !defined TEST_FIFO && !defined TEST_HSEM
 void ETH_IRQHandler(void) { HAL_ETH_IRQHandler(&heth); }
 #endif
+
+/**
+ * @brief This function handles SDMMC1
+ */
+
+void SDMMC1_IRQHandler(void) { BSP_SD_IRQHandler(0); }

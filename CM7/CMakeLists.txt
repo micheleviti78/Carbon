@@ -33,16 +33,27 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/conf)
 
 include(${PROJECT_ROOT_DIR}/common/cmake/common.cmake)
 
-if(TEST_FIFO)
+if(FIFO_TEST)
     SET(SOURCE_MAIN ${CMAKE_CURRENT_LIST_DIR}/test/src/main_fifo.cpp)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTEST_FIFO")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTEST_FIFO")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFIFO_TEST")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFIFO_TEST")
     message("testing fifo interface")
-elseif(TEST_HSEM)
+elseif(HSEM_TEST)
     SET(SOURCE_MAIN ${CMAKE_CURRENT_LIST_DIR}/test/src/main_hsem.cpp)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTEST_HSEM")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTEST_HSEM")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHSEM_TEST")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHSEM_TEST")
     message("testing hsem interface")
+elseif(SD_TEST)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSD_TEST")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSD_TEST")
+    SET(SOURCE_MAIN 
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test/src/main_thread_sd.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/app_ethernet.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/ethernetif.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/lan8742.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/netif_conf.c)
+    message("testing sd interface")
 else()
     SET(SOURCE_MAIN 
     ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp
@@ -51,7 +62,7 @@ else()
     ${CMAKE_CURRENT_LIST_DIR}/core/src/ethernetif.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/lan8742.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/netif_conf.c)
-endif(TEST_FIFO)
+endif(FIFO_TEST)
 
 SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/hsem.cpp

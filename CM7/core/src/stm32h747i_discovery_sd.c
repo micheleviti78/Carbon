@@ -66,6 +66,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 
+#include <carbon/diag.hpp>
 #include <carbon/stm32h747i_discovery_sd.h>
 
 /** @addtogroup BSP
@@ -84,10 +85,10 @@
  * TypesDefinitions
  * @{
  */
-#if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
-/* Is Msp Callbacks registered */
-static uint32_t IsMspCallbacksValid[SD_INSTANCES_NBR] = {0};
-#endif
+// #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
+// /* Is Msp Callbacks registered */
+// static uint32_t IsMspCallbacksValid[SD_INSTANCES_NBR] = {0};
+// #endif
 typedef void (*BSP_EXTI_LineCallback)(void);
 /**
  * @}
@@ -269,7 +270,7 @@ __weak HAL_StatusTypeDef MX_SDMMC1_SD_Init(SD_HandleTypeDef *hsd) {
 #else
     hsd->Init.BusWide = SDMMC_BUS_WIDE_1B;
 #endif
-    hsd->Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
+    hsd->Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
 #if (USE_SD_TRANSCEIVER > 0)
     hsd->Init.TranceiverPresent = SDMMC_TRANSCEIVER_PRESENT;
 #endif /*USE_SD_TRANSCEIVER*/
@@ -494,8 +495,11 @@ int32_t BSP_SD_ReadBlocks_DMA(uint32_t Instance, uint32_t *pData,
     if (Instance >= SD_INSTANCES_NBR) {
         ret = BSP_ERROR_WRONG_PARAM;
     } else {
-        if (HAL_SD_ReadBlocks_DMA(&hsd_sdmmc[Instance], (uint8_t *)pData,
-                                  BlockIdx, BlocksNbr) != HAL_OK) {
+        HAL_StatusTypeDef status = HAL_SD_ReadBlocks_DMA(
+            &hsd_sdmmc[Instance], (uint8_t *)pData, BlockIdx, BlocksNbr);
+        if (status != HAL_OK) {
+            DIAG("error reading SD %lu, status %lu, block %lu",
+                 hsd_sdmmc[Instance].ErrorCode, status, BlockIdx);
             ret = BSP_ERROR_PERIPH_FAILURE;
         }
     }
@@ -520,8 +524,11 @@ int32_t BSP_SD_WriteBlocks_DMA(uint32_t Instance, uint32_t *pData,
     if (Instance >= SD_INSTANCES_NBR) {
         ret = BSP_ERROR_WRONG_PARAM;
     } else {
-        if (HAL_SD_WriteBlocks_DMA(&hsd_sdmmc[Instance], (uint8_t *)pData,
-                                   BlockIdx, BlocksNbr) != HAL_OK) {
+        HAL_StatusTypeDef status = HAL_SD_WriteBlocks_DMA(
+            &hsd_sdmmc[Instance], (uint8_t *)pData, BlockIdx, BlocksNbr);
+        if (status != HAL_OK) {
+            DIAG("error writing SD %lu, status %lu, block %lu",
+                 hsd_sdmmc[Instance].ErrorCode, status, BlockIdx);
             ret = BSP_ERROR_PERIPH_FAILURE;
         }
     }
@@ -640,6 +647,26 @@ int32_t BSP_SD_GetCardInfo(uint32_t Instance, BSP_SD_CardInfo *CardInfo) {
     return ret;
 }
 
+/**
+ * @brief  Get SD CID about specific SD card.
+ * @param  Instance  SD Instance
+ * @param  CardInfo  Pointer to HAL_SD_CardCIDTypeDef structure
+ * @retval BSP status
+ */
+int32_t BSP_SD_GetCardCID(uint32_t Instance, BSP_SD_CardCID *CardCID) {
+    int32_t ret = BSP_ERROR_NONE;
+
+    if (Instance >= SD_INSTANCES_NBR) {
+        ret = BSP_ERROR_WRONG_PARAM;
+    } else {
+        if (HAL_SD_GetCardCID(&hsd_sdmmc[Instance], CardCID) != HAL_OK) {
+            ret = BSP_ERROR_PERIPH_FAILURE;
+        }
+    }
+    /* Return BSP status */
+    return ret;
+}
+
 #if !defined(USE_HAL_SD_REGISTER_CALLBACKS) ||                                 \
     (USE_HAL_SD_REGISTER_CALLBACKS == 0)
 /**
@@ -657,6 +684,7 @@ void HAL_SD_AbortCallback(SD_HandleTypeDef *hsd) {
  * @retval None
  */
 void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd) {
+    DIAG("TX transfer complete");
     BSP_SD_WriteCpltCallback((hsd == &hsd_sdmmc[0]) ? 0UL : 1UL);
 }
 
@@ -666,6 +694,7 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd) {
  * @retval None
  */
 void HAL_SD_RxCpltCallback(SD_HandleTypeDef *hsd) {
+    DIAG("RX transfer complete");
     BSP_SD_ReadCpltCallback((hsd == &hsd_sdmmc[0]) ? 0UL : 1UL);
 }
 

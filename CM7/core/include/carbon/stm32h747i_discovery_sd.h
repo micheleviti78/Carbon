@@ -49,6 +49,7 @@ extern "C" {
  * @brief SD Card information structure
  */
 #define BSP_SD_CardInfo HAL_SD_CardInfoTypeDef
+#define BSP_SD_CardCID HAL_SD_CardCIDTypeDef
 
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
 typedef struct {
@@ -146,6 +147,7 @@ int32_t BSP_SD_WriteBlocks_IT(uint32_t Instance, uint32_t *pData,
 int32_t BSP_SD_Erase(uint32_t Instance, uint32_t BlockIdx, uint32_t BlocksNbr);
 int32_t BSP_SD_GetCardState(uint32_t Instance);
 int32_t BSP_SD_GetCardInfo(uint32_t Instance, BSP_SD_CardInfo *CardInfo);
+int32_t BSP_SD_GetCardCID(uint32_t Instance, BSP_SD_CardCID *CardCID);
 int32_t BSP_SD_IsDetected(uint32_t Instance);
 
 void BSP_SD_DETECT_IRQHandler(uint32_t Instance);

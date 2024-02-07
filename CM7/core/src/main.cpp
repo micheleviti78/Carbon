@@ -18,7 +18,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <carbon/diag.hpp>
-#include <carbon/stm32h747i_discovery_sd.h>
 
 #include <stm32h7xx_hal.h>
 
@@ -43,22 +42,6 @@ int main(void) {
          __NEWLIB_PATCHLEVEL__);
     DIAG(SYSTEM_DIAG "HAL version %lu.%lu.%lu.%lu", GET_HAL_VERSION_MAIN,
          GET_HAL_VERSION_SUB1, GET_HAL_VERSION_SUB2, GET_HAL_VERSION_RC);
-
-    BSP_SD_CardInfo cardInfo;
-    if (BSP_SD_GetCardInfo(0, &cardInfo) < 0) {
-        DIAG(SYSTEM_DIAG "Error reading SD card Info or no card");
-    } else {
-        DIAG(SYSTEM_DIAG "SD card type %lu", cardInfo.CardType);
-        DIAG(SYSTEM_DIAG "SD card version %lu", cardInfo.CardVersion);
-        DIAG(SYSTEM_DIAG "SD card class %lu", cardInfo.Class);
-        DIAG(SYSTEM_DIAG "SD card number of blocks %lu", cardInfo.BlockNbr);
-        DIAG(SYSTEM_DIAG "SD card block size %lu", cardInfo.BlockSize);
-        DIAG(SYSTEM_DIAG "SD card number of logical blocks %lu",
-             cardInfo.LogBlockNbr);
-        DIAG(SYSTEM_DIAG "SD card logical block size %lu",
-             cardInfo.LogBlockSize);
-        DIAG(SYSTEM_DIAG "SD card speed %lu", cardInfo.CardSpeed);
-    }
 
     /* starting OS */
     start_os();

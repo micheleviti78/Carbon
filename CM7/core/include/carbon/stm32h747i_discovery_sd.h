@@ -27,7 +27,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include <carbon/stm32h747i_discovery_errno.h>
-#include <stm32h747i_discovery_conf.h>
+#include <stm32h7xx_hal_conf.h>
 
 /** @addtogroup BSP
  * @{

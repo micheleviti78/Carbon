@@ -65,7 +65,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-//#include <carbon/stm32h747i_discovery_bus.h>
+
 #include <carbon/stm32h747i_discovery_sd.h>
 
 /** @addtogroup BSP

@@ -102,7 +102,9 @@ void low_level_init() {
     FIFO_INIT(trace)
 #endif
 
-    BSP_SD_Init(0);
+    if (BSP_SD_Init(0) < 0) {
+        void Error_Handler(void);
+    }
 
     setSyncFlag(SyncFlagBit::PeripherySync);
 }

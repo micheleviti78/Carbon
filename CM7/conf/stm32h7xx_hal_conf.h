@@ -287,6 +287,14 @@ extern "C" {
 #define ETH_MAC_ADDR4 (0x00UL)
 #define ETH_MAC_ADDR5 (0x00UL)
 
+/* ########################### SD Card Configuration #########################
+ */
+
+#define USE_SD_BUS_WIDE_4B 1U
+#define BSP_SD_IT_PRIORITY 14U
+#define BSP_SD_RX_IT_PRIORITY 14U
+#define BSP_SD_TX_IT_PRIORITY 15U
+
 /* ########################## Assert Selection ############################## */
 /**
  * @brief Uncomment the line below to expanse the "assert_param" macro in the

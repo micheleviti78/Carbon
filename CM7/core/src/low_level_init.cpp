@@ -21,6 +21,7 @@
 #include <carbon/rand.hpp>
 #include <carbon/sdram.hpp>
 #include <carbon/shared_memory.hpp>
+#include <carbon/stm32h747i_discovery_sd.h>
 #include <carbon/systime.hpp>
 #include <carbon/uart.hpp>
 
@@ -101,6 +102,8 @@ void low_level_init() {
     FIFO_INIT(trace)
 #endif
 
+    BSP_SD_Init(0);
+
     setSyncFlag(SyncFlagBit::PeripherySync);
 }
 
@@ -110,18 +113,19 @@ void low_level_init() {
  *            System Clock source            = PLL (HSE)
  *            SYSCLK(Hz)                     = 400000000 (Cortex-M7 CPU Clock)
  *            HCLK(Hz)                       = 200000000 (Cortex-M4 CPU, Bus
- *                 matrix Clocks)
- *            AHB Prescaler                  = 2
- *            D1 APB3 Prescaler              = 2
- *                (APB3 Clock  100MHz)
- *            D2 APB1 Prescaler              = 2 (APB1 Clock  100MHz)
- *            D2 APB2 Prescaler              = 2 (APB2 Clock  100MHz)
- *            D3 APB4 Prescaler              = 2 (APB4 Clock  100MHz)
- *            HSE Frequency(Hz)              = 25000000 PLL_M = 5
- *            PLL_N                          = 160
+ * matrix Clocks) AHB Prescaler                  = 2 D1 APB3 Prescaler = 2 (APB3
+ * Clock  100MHz) D2 APB1 Prescaler              = 2 (APB1 Clock  100MHz) D2
+ * APB2 Prescaler              = 2 (APB2 Clock  100MHz) D3 APB4 Prescaler = 2
+ * (APB4 Clock  100MHz) HSE Frequency(Hz)              = 25000000 PLL_M = 4
+ *            PLL_N                          = 128
  *            PLL_P                          = 2
- *            PLL_Q                          = 4
+ *            PLL_Q                          = 8
  *            PLL_R                          = 2
+ *            PLL3_M                         = 5
+ *            PLL3_N                         = 48
+ *            PLL3_P                         = 2
+ *            PLL3_Q                         = 5
+ *            PLL3_R                         = 2
  *            VDD(V)                         = 3.3
  *            Flash Latency(WS)              = 4
  * @param  None
@@ -196,6 +200,10 @@ static void SystemClock_Config(void) {
     // PLL1Q 100MHZ for RNG
     PeriphClkInitStruct.PeriphClockSelection |= RCC_PERIPHCLK_RNG;
     PeriphClkInitStruct.RngClockSelection = RCC_RNGCLKSOURCE_PLL;
+
+    // PLL1Q 100MHZ for SD
+    PeriphClkInitStruct.PeriphClockSelection |= RCC_PERIPHCLK_SDMMC;
+    PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL;
 
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         assert_param(0);

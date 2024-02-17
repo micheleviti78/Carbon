@@ -69,6 +69,8 @@
 #include <carbon/diag.hpp>
 #include <carbon/stm32h747i_discovery_sd.h>
 
+#include <cmsis_os.h>
+
 /** @addtogroup BSP
  * @{
  */
@@ -107,6 +109,22 @@ EXTI_HandleTypeDef hsd_exti[SD_INSTANCES_NBR];
  * @{
  */
 static uint32_t PinDetect[SD_INSTANCES_NBR] = {SD_DETECT_PIN};
+/**
+ * @}
+ */
+
+/** @defgroup SD DMA Semaphore
+ * @{
+ */
+osSemaphoreDef(semDMATX);
+osSemaphoreId semDMATX[SD_INSTANCES_NBR];
+osSemaphoreDef(semDMARX);
+osSemaphoreId semDMARX[SD_INSTANCES_NBR];
+
+#define DMA_TIMEOUT 10000UL
+/**
+ * @}
+ */
 
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
 /* Is Msp Callbacks registered   */
@@ -221,6 +239,10 @@ int32_t BSP_SD_Init(uint32_t Instance) {
             }
         }
     }
+
+    semDMARX[Instance] = osSemaphoreCreate(osSemaphore(semDMARX), 1);
+    semDMATX[Instance] = osSemaphoreCreate(osSemaphore(semDMATX), 1);
+
     return ret;
 }
 
@@ -498,8 +520,13 @@ int32_t BSP_SD_ReadBlocks_DMA(uint32_t Instance, uint32_t *pData,
         HAL_StatusTypeDef status = HAL_SD_ReadBlocks_DMA(
             &hsd_sdmmc[Instance], (uint8_t *)pData, BlockIdx, BlocksNbr);
         if (status != HAL_OK) {
-            DIAG("error reading SD %lu, status %lu, block %lu",
+            DIAG(SD "error reading SD %lu, status %lu, block %lu",
                  hsd_sdmmc[Instance].ErrorCode, status, BlockIdx);
+            ret = BSP_ERROR_PERIPH_FAILURE;
+            return ret;
+        }
+        if (osSemaphoreWait(semDMARX[Instance], DMA_TIMEOUT) == osErrorOS) {
+            DIAG(SD "time out waiting RX DMA");
             ret = BSP_ERROR_PERIPH_FAILURE;
         }
     }
@@ -509,7 +536,8 @@ int32_t BSP_SD_ReadBlocks_DMA(uint32_t Instance, uint32_t *pData,
 }
 
 /**
- * @brief  Writes block(s) to a specified address in an SD card, in DMA mode.
+ * @brief  Writes block(s) to a specified address in an SD card, in DMA
+ * mode.
  * @param  Instance   SD Instance
  * @param  pData      Pointer to the buffer that will contain the data to
  * transmit
@@ -527,8 +555,13 @@ int32_t BSP_SD_WriteBlocks_DMA(uint32_t Instance, uint32_t *pData,
         HAL_StatusTypeDef status = HAL_SD_WriteBlocks_DMA(
             &hsd_sdmmc[Instance], (uint8_t *)pData, BlockIdx, BlocksNbr);
         if (status != HAL_OK) {
-            DIAG("error writing SD %lu, status %lu, block %lu",
+            DIAG(SD "error writing SD %lu, status %lu, block %lu",
                  hsd_sdmmc[Instance].ErrorCode, status, BlockIdx);
+            ret = BSP_ERROR_PERIPH_FAILURE;
+            return ret;
+        }
+        if (osSemaphoreWait(semDMATX[Instance], DMA_TIMEOUT) == osErrorOS) {
+            DIAG(SD "time out waiting TX DMA");
             ret = BSP_ERROR_PERIPH_FAILURE;
         }
     }
@@ -538,7 +571,8 @@ int32_t BSP_SD_WriteBlocks_DMA(uint32_t Instance, uint32_t *pData,
 }
 
 /**
- * @brief  Reads block(s) from a specified address in an SD card, in DMA mode.
+ * @brief  Reads block(s) from a specified address in an SD card, in DMA
+ * mode.
  * @param  Instance   SD Instance
  * @param  pData      Pointer to the buffer that will contain the data to
  * transmit
@@ -564,7 +598,8 @@ int32_t BSP_SD_ReadBlocks_IT(uint32_t Instance, uint32_t *pData,
 }
 
 /**
- * @brief  Writes block(s) to a specified address in an SD card, in DMA mode.
+ * @brief  Writes block(s) to a specified address in an SD card, in DMA
+ * mode.
  * @param  Instance   SD Instance
  * @param  pData      Pointer to the buffer that will contain the data to
  * transmit
@@ -684,7 +719,6 @@ void HAL_SD_AbortCallback(SD_HandleTypeDef *hsd) {
  * @retval None
  */
 void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd) {
-    DIAG("TX transfer complete");
     BSP_SD_WriteCpltCallback((hsd == &hsd_sdmmc[0]) ? 0UL : 1UL);
 }
 
@@ -694,7 +728,6 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd) {
  * @retval None
  */
 void HAL_SD_RxCpltCallback(SD_HandleTypeDef *hsd) {
-    DIAG("RX transfer complete");
     BSP_SD_ReadCpltCallback((hsd == &hsd_sdmmc[0]) ? 0UL : 1UL);
 }
 
@@ -749,8 +782,7 @@ __weak void BSP_SD_AbortCallback(uint32_t Instance) {
  * @retval None
  */
 __weak void BSP_SD_WriteCpltCallback(uint32_t Instance) {
-    /* Prevent unused argument(s) compilation warning */
-    UNUSED(Instance);
+    osSemaphoreRelease(semDMATX[Instance]);
 }
 
 /**
@@ -759,8 +791,7 @@ __weak void BSP_SD_WriteCpltCallback(uint32_t Instance) {
  * @retval None
  */
 __weak void BSP_SD_ReadCpltCallback(uint32_t Instance) {
-    /* Prevent unused argument(s) compilation warning */
-    UNUSED(Instance);
+    osSemaphoreRelease(semDMARX[Instance]);
 }
 
 /**
@@ -851,8 +882,8 @@ static void SD_MspInit(SD_HandleTypeDef *hsd) {
         gpio_init_structure.Alternate = GPIO_AF12_SDIO1;
 
 #if (USE_SD_BUS_WIDE_4B > 0)
-        /* SDMMC GPIO CLKIN PB8, D0 PC8, D1 PC9, D2 PC10, D3 PC11, CK PC12, CMD
-         * PD2 */
+        /* SDMMC GPIO CLKIN PB8, D0 PC8, D1 PC9, D2 PC10, D3 PC11, CK PC12,
+         * CMD PD2 */
         /* GPIOC configuration */
         gpio_init_structure.Pin =
             GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;

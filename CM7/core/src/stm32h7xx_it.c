@@ -241,7 +241,7 @@ void HSEM1_IRQHandler(void) { hsem_isr(); }
 /**
  * @brief This function handles Ethernet.
  */
-#if !defined TEST_FIFO && !defined TEST_HSEM
+#if !defined FIFO_TEST && !defined HSEM_TEST && !defined SDRAM_TEST
 void ETH_IRQHandler(void) { HAL_ETH_IRQHandler(&heth); }
 #endif
 

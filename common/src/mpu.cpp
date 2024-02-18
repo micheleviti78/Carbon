@@ -74,9 +74,15 @@ void MPU_Config(void) {
     MPU_InitStruct.BaseAddress = SDRAM_BANK2_ADDR;
     MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
     MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+#ifdef SDRAM_TEST
+    MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+    MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+    MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+#else
     MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
     MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
     MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+#endif
     MPU_InitStruct.Number = MPU_REGION_NUMBER2;
     MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
     MPU_InitStruct.SubRegionDisable = 0x00;

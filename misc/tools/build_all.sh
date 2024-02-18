@@ -57,3 +57,8 @@ fi
     && cd "$BLD/CM7_CARBON_SD_TEST" \
     && cmake ../../CM7 -DSD_TEST=ON \
     && $MAKE_CMD -j8 $TARGET) || exit 1
+    
+(mkdir -p "$BLD/CM7_CARBON_SDRAM_TEST" \
+    && cd "$BLD/CM7_CARBON_SDRAM_TEST" \
+    && cmake ../../CM7 -DSDRAM_TEST=ON \
+    && $MAKE_CMD -j8 $TARGET) || exit 1

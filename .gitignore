@@ -1,4 +1,5 @@
 common/cmake/toolchain.cmake
+apply-format
 CM4/build/
 CM7/build/
 CubeCode/

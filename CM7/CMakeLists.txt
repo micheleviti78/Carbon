@@ -54,6 +54,11 @@ elseif(SD_TEST)
     ${CMAKE_CURRENT_LIST_DIR}/core/src/lan8742.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/netif_conf.c)
     message("testing sd interface")
+elseif(SDRAM_TEST)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSDRAM_TEST")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDRAM_TEST") 
+    SET(SOURCE_MAIN ${CMAKE_CURRENT_LIST_DIR}/test/src/main_sdram.cpp)
+    message("testing sdram")
 else()
     SET(SOURCE_MAIN 
     ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp

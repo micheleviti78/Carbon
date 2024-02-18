@@ -57,10 +57,6 @@ void low_level_init() {
     /*init timer*/
     low_level_system_time();
 
-    /* Initialize Pin needed by the Error function */
-    BSP_LED_Init(LED_BLUE);
-    BSP_LED_Init(LED_RED);
-
     waitForSyncFlag(SyncFlagBit::PeripherySync);
 }
 }

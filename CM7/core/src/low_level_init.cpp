@@ -90,9 +90,13 @@ void low_level_init() {
     /* true random generator init */
     carbon_rand_init();
 
-    /* Initialize Pin needed by the Error function */
+    /* Initialize Pin needed by CM7 */
     BSP_LED_Init(LED_GREEN);
     BSP_LED_Init(LED_ORANGE);
+
+    /* Initialize Pin needed by CM4 */
+    BSP_LED_Init(LED_BLUE);
+    BSP_LED_Init(LED_RED);
 
     /*init fifos*/
 

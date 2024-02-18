@@ -31,8 +31,10 @@
 
 extern "C" {
 
-static uint8_t writeBuf[512] __attribute__((aligned(32)));
-static uint8_t readBuf[512] __attribute__((aligned(32)));
+static uint8_t writeBuf[512]
+    __attribute__((aligned(32), section(".sdram_bank2")));
+static uint8_t readBuf[512]
+    __attribute__((aligned(32), section(".sdram_bank2")));
 static BSP_SD_CardInfo cardInfo;
 static BSP_SD_CardCID cardCID;
 
@@ -97,7 +99,7 @@ void mainThread(const void *argument) {
         SCB_CleanDCache_by_Addr(reinterpret_cast<uint32_t *>(&writeBuf[0]),
                                 512);
 
-        for (unsigned i = 0; i < 10; i++) {
+        for (unsigned i = 0; i < 10000000; i++) {
             DIAG(SYSTEM_DIAG "block %u", i);
             sd_test(i);
         }
@@ -114,14 +116,16 @@ void sd_test(uint32_t block_id) {
         readBuf[i] = 11;
     }
 
+    SCB_CleanDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]), 512);
+
     int32_t err;
 
     while (BSP_SD_GetCardState(0)) {
         osDelay(3);
     }
 
-    err = BSP_SD_WriteBlocks_DMA(0, reinterpret_cast<uint32_t *>(&writeBuf[0]),
-                                 block_id, 1);
+    err = BSP_SD_WriteBlocks(0, reinterpret_cast<uint32_t *>(&writeBuf[0]),
+                             block_id, 1);
 
     if (err < 0) {
         DIAG(SYSTEM_DIAG "Error writing SD card %ld", err);
@@ -134,15 +138,19 @@ void sd_test(uint32_t block_id) {
         osDelay(3);
     }
 
-    SCB_CleanInvalidateDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]),
-                                      512);
+    // SCB_InvalidateDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]),
+    //                              512);
 
-    err = BSP_SD_ReadBlocks_DMA(0, reinterpret_cast<uint32_t *>(&readBuf[0]),
-                                block_id, 1);
+    err = BSP_SD_ReadBlocks(0, reinterpret_cast<uint32_t *>(&readBuf[0]),
+                            block_id, 1);
 
     while (BSP_SD_GetCardState(0)) {
         osDelay(3);
     }
+
+    SCB_CleanDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]), 512);
+    SCB_InvalidateDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]),
+                                 512);
 
     if (err < 0) {
         DIAG(SYSTEM_DIAG "Error reading SD card %ld", err);

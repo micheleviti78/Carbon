@@ -20,7 +20,7 @@
 #include <carbon/error.hpp>
 #include <carbon/main_thread.hpp>
 #include <carbon/pin.hpp>
-#include <carbon/stm32h747i_discovery_sd.h>
+#include <carbon/sd_card.h>
 #include <carbon/trace_thread.hpp>
 
 #include <cmsis_os.h>
@@ -96,10 +96,7 @@ void mainThread(const void *argument) {
             writeBuf[i] = 255;
         }
 
-        SCB_CleanDCache_by_Addr(reinterpret_cast<uint32_t *>(&writeBuf[0]),
-                                512);
-
-        for (unsigned i = 0; i < cardInfo.LogBlockNbr; i++) {
+        for (unsigned i = 0; i < 100000; i++) {
             DIAG(SYSTEM_DIAG "block %u", i);
             sd_test(i);
         }
@@ -120,37 +117,23 @@ void sd_test(uint32_t block_id) {
 
     int32_t err;
 
-    while (BSP_SD_GetCardState(0)) {
-        osDelay(3);
-    }
+    // err = BSP_SD_WriteBlocks_DMA(0, reinterpret_cast<uint32_t
+    // *>(&writeBuf[0]),
+    //                              block_id, 1);
 
-    err = BSP_SD_WriteBlocks(0, reinterpret_cast<uint32_t *>(&writeBuf[0]),
-                             block_id, 1);
+    // if (err < 0) {
+    //     DIAG(SYSTEM_DIAG "Error writing SD card %ld", err);
+    //     for (;;) {
+    //         osDelay(1000);
+    //     }
+    // }
 
-    if (err < 0) {
-        DIAG(SYSTEM_DIAG "Error writing SD card %ld", err);
-        for (;;) {
-            osDelay(1000);
-        }
-    }
+    err = BSP_SD_ReadBlocks_DMA(0, reinterpret_cast<uint32_t *>(&readBuf[0]),
+                                block_id, 1);
 
-    while (BSP_SD_GetCardState(0)) {
-        osDelay(3);
-    }
-
+    // SCB_CleanDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]), 512);
     // SCB_InvalidateDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]),
     //                              512);
-
-    err = BSP_SD_ReadBlocks(0, reinterpret_cast<uint32_t *>(&readBuf[0]),
-                            block_id, 1);
-
-    while (BSP_SD_GetCardState(0)) {
-        osDelay(3);
-    }
-
-    SCB_CleanDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]), 512);
-    SCB_InvalidateDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]),
-                                 512);
 
     if (err < 0) {
         DIAG(SYSTEM_DIAG "Error reading SD card %ld", err);

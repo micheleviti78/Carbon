@@ -1,4 +1,21 @@
 /**
+ ******************************************************************************
+ * @file           sd_card.c
+ * @author         Michele Viti <micheleviti78@gmail.com>
+ * @date           Feb. 2024
+ * @brief          SD Card Interface
+ ******************************************************************************
+ * @attention
+ * Copyright (c) 2024 Michele Viti.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
+/**
   ******************************************************************************
   * @file    stm32h747i_discovery_sd.c
   * @author  MCD Application Team
@@ -67,7 +84,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include <carbon/diag.hpp>
-#include <carbon/stm32h747i_discovery_sd.h>
+#include <carbon/sd_card.h>
 
 #include <cmsis_os.h>
 
@@ -82,6 +99,7 @@
 /** @defgroup STM32H747I_DISCO_SD SD
  * @{
  */
+#define BLOCK_SIZE 512U
 
 /** @defgroup STM32H747I_DISCO_SD_Private_TypesDefinitions Private
  * TypesDefinitions
@@ -463,9 +481,17 @@ int32_t BSP_SD_ReadBlocks(uint32_t Instance, uint32_t *pData, uint32_t BlockIdx,
     if (Instance >= SD_INSTANCES_NBR) {
         ret = BSP_ERROR_WRONG_PARAM;
     } else {
+        while (BSP_SD_GetCardState(0)) {
+            osDelay(3);
+        }
+
         if (HAL_SD_ReadBlocks(&hsd_sdmmc[Instance], (uint8_t *)pData, BlockIdx,
                               BlocksNbr, timeout) != HAL_OK) {
             ret = BSP_ERROR_PERIPH_FAILURE;
+        }
+
+        while (BSP_SD_GetCardState(0)) {
+            osDelay(3);
         }
     }
 
@@ -491,9 +517,17 @@ int32_t BSP_SD_WriteBlocks(uint32_t Instance, uint32_t *pData,
     if (Instance >= SD_INSTANCES_NBR) {
         ret = BSP_ERROR_WRONG_PARAM;
     } else {
+        while (BSP_SD_GetCardState(0)) {
+            osDelay(3);
+        }
+
         if (HAL_SD_WriteBlocks(&hsd_sdmmc[Instance], (uint8_t *)pData, BlockIdx,
                                BlocksNbr, timeout) != HAL_OK) {
             ret = BSP_ERROR_PERIPH_FAILURE;
+        }
+
+        while (BSP_SD_GetCardState(0)) {
+            osDelay(3);
         }
     }
 
@@ -517,17 +551,29 @@ int32_t BSP_SD_ReadBlocks_DMA(uint32_t Instance, uint32_t *pData,
     if (Instance >= SD_INSTANCES_NBR) {
         ret = BSP_ERROR_WRONG_PARAM;
     } else {
+        while (BSP_SD_GetCardState(0)) {
+            osDelay(3);
+        }
+
+        SCB_InvalidateDCache_by_Addr(pData, BLOCK_SIZE * BlocksNbr);
+
         HAL_StatusTypeDef status = HAL_SD_ReadBlocks_DMA(
             &hsd_sdmmc[Instance], (uint8_t *)pData, BlockIdx, BlocksNbr);
+
         if (status != HAL_OK) {
             DIAG(SD "error reading SD %lu, status %lu, block %lu",
                  hsd_sdmmc[Instance].ErrorCode, status, BlockIdx);
             ret = BSP_ERROR_PERIPH_FAILURE;
             return ret;
         }
+
         if (osSemaphoreWait(semDMARX[Instance], DMA_TIMEOUT) == osErrorOS) {
             DIAG(SD "time out waiting RX DMA");
             ret = BSP_ERROR_PERIPH_FAILURE;
+        }
+
+        while (BSP_SD_GetCardState(0)) {
+            osDelay(3);
         }
     }
 
@@ -552,8 +598,15 @@ int32_t BSP_SD_WriteBlocks_DMA(uint32_t Instance, uint32_t *pData,
     if (Instance >= SD_INSTANCES_NBR) {
         ret = BSP_ERROR_WRONG_PARAM;
     } else {
+        while (BSP_SD_GetCardState(0)) {
+            osDelay(3);
+        }
+
+        SCB_CleanDCache_by_Addr(pData, BLOCK_SIZE * BlocksNbr);
+
         HAL_StatusTypeDef status = HAL_SD_WriteBlocks_DMA(
             &hsd_sdmmc[Instance], (uint8_t *)pData, BlockIdx, BlocksNbr);
+
         if (status != HAL_OK) {
             DIAG(SD "error writing SD %lu, status %lu, block %lu",
                  hsd_sdmmc[Instance].ErrorCode, status, BlockIdx);
@@ -563,6 +616,10 @@ int32_t BSP_SD_WriteBlocks_DMA(uint32_t Instance, uint32_t *pData,
         if (osSemaphoreWait(semDMATX[Instance], DMA_TIMEOUT) == osErrorOS) {
             DIAG(SD "time out waiting TX DMA");
             ret = BSP_ERROR_PERIPH_FAILURE;
+        }
+
+        while (BSP_SD_GetCardState(0)) {
+            osDelay(3);
         }
     }
 

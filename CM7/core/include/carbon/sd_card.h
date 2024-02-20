@@ -1,5 +1,22 @@
 /**
  ******************************************************************************
+ * @file           sd_card.h
+ * @author         Michele Viti <micheleviti78@gmail.com>
+ * @date           Feb. 2024
+ * @brief          SD Card Interface
+ ******************************************************************************
+ * @attention
+ * Copyright (c) 2024 Michele Viti.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
+/**
+ ******************************************************************************
  * @file    stm32h747i_discovery_sd.h
  * @author  MCD Application Team
  * @brief   This file contains the common defines and functions prototypes for

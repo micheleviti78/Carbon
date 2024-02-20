@@ -19,9 +19,9 @@
 #include <carbon/hsem.hpp>
 #include <carbon/pin.hpp>
 #include <carbon/rand.hpp>
+#include <carbon/sd_card.h>
 #include <carbon/sdram.hpp>
 #include <carbon/shared_memory.hpp>
-#include <carbon/stm32h747i_discovery_sd.h>
 #include <carbon/systime.hpp>
 #include <carbon/uart.hpp>
 

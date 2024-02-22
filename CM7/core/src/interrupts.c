@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file    stm32h7xx_it.c
+ * @file    interrupts.c
  * @brief   Interrupt Service Routines.
  ******************************************************************************
  * @attention
@@ -250,5 +250,9 @@ void ETH_IRQHandler(void) { HAL_ETH_IRQHandler(&heth); }
  */
 
 void SDMMC1_IRQHandler(void) { BSP_SD_IRQHandler(0); }
+
+/**
+ * @brief This function handles EXTI9_5
+ */
 
 void EXTI9_5_IRQHandler(void) { HAL_EXTI_IRQHandler(&hsd_exti[0]); }

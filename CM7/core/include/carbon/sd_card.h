@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <carbon/stm32h747i_discovery_errno.h>
+#include <carbon/sd_errno.h>
 #include <stm32h7xx_hal_conf.h>
 
 /** @addtogroup BSP

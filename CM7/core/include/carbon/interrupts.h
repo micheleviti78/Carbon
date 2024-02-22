@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file    stm32h7xx_it.h
+ * @file    interrupts.h
  * @brief   This file contains the headers of the interrupt handlers.
  ******************************************************************************
  * @attention
@@ -16,8 +16,8 @@
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32H7xx_IT_H
-#define __STM32H7xx_IT_H
+#ifndef __INTERRUPTS_H
+#define __INTERRUPTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,4 +38,4 @@ void SysTick_Handler(void);
 }
 #endif
 
-#endif /* __STM32H7xx_IT_H */
+#endif /* __INTERRUPTS_H */

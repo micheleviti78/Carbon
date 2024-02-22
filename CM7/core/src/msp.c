@@ -1,8 +1,7 @@
 /**
  ******************************************************************************
- * @file         stm32h7xx_hal_msp.c
- * @brief        This file provides code for the MSP Initialization
- *               and de-Initialization codes.
+ * @file         msp.c
+ * @brief        MCU Support Package Init and Deinit
  ******************************************************************************
  * @attention
  *

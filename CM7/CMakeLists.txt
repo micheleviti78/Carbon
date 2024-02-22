@@ -44,20 +44,22 @@ elseif(HSEM_TEST)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHSEM_TEST")
     message("testing hsem interface")
 elseif(SD_TEST)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSD_TEST")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSD_TEST")
     SET(SOURCE_MAIN 
     ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test/src/main_thread_sd.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test/src/sd_thread.c
+    ${CMAKE_CURRENT_LIST_DIR}/test/src/sd_thread.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/app_ethernet.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/ethernetif.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/lan8742.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/netif_conf.c)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSD_TEST")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSD_TEST")
     message("testing sd interface")
 elseif(SDRAM_TEST)
+SET(SOURCE_MAIN ${CMAKE_CURRENT_LIST_DIR}/test/src/main_sdram.cpp)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSDRAM_TEST")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDRAM_TEST") 
-    SET(SOURCE_MAIN ${CMAKE_CURRENT_LIST_DIR}/test/src/main_sdram.cpp)
     message("testing sdram")
 else()
     SET(SOURCE_MAIN 

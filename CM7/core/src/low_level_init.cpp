@@ -107,14 +107,13 @@ void low_level_init() {
     /*DIAG TRACE*/
     FIFO_INIT(trace)
 #endif
-#ifdef SD_TEST
-    int32_t err = BSP_SD_Init(0);
-    if (err < 0) {
-        RAW_DIAG("error SD init %ld", err);
-        for (;;) {
-        }
+
+    if (BSP_SD_DetectITConfig(0) < 0) {
+        DIAG(SYSTEM_DIAG "SD detection not set");
+    } else {
+        DIAG(SYSTEM_DIAG "SD detection set");
     }
-#endif
+
     setSyncFlag(SyncFlagBit::PeripherySync);
 }
 

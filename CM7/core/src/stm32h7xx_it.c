@@ -17,6 +17,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <carbon/diag.hpp>
+#include <carbon/sd_card.h>
 
 #include <stm32h7xx_hal.h>
 
@@ -27,7 +28,6 @@ extern ETH_HandleTypeDef heth;
 void fmc_isr(void);
 void carbon_hw_us_systime_tim_isr(void);
 void hsem_isr(void);
-void BSP_SD_IRQHandler(uint32_t Instance);
 
 // #include <backtrace.h>
 
@@ -250,3 +250,5 @@ void ETH_IRQHandler(void) { HAL_ETH_IRQHandler(&heth); }
  */
 
 void SDMMC1_IRQHandler(void) { BSP_SD_IRQHandler(0); }
+
+void EXTI9_5_IRQHandler(void) { HAL_EXTI_IRQHandler(&hsd_exti[0]); }

@@ -166,6 +166,7 @@ int32_t BSP_SD_GetCardState(uint32_t Instance);
 int32_t BSP_SD_GetCardInfo(uint32_t Instance, BSP_SD_CardInfo *CardInfo);
 int32_t BSP_SD_GetCardCID(uint32_t Instance, BSP_SD_CardCID *CardCID);
 int32_t BSP_SD_IsDetected(uint32_t Instance);
+int32_t BSP_SD_Init_Detect_Notify(uint32_t Instance);
 
 void BSP_SD_DETECT_IRQHandler(uint32_t Instance);
 void BSP_SD_IRQHandler(uint32_t Instance);
@@ -175,7 +176,7 @@ void BSP_SD_IRQHandler(uint32_t Instance);
 void BSP_SD_AbortCallback(uint32_t Instance);
 void BSP_SD_WriteCpltCallback(uint32_t Instance);
 void BSP_SD_ReadCpltCallback(uint32_t Instance);
-void BSP_SD_DetectCallback(uint32_t Instance, uint32_t Status);
+void BSP_SD_DetectCallback(uint32_t Instance);
 void HAL_SD_DriveTransciver_1_8V_Callback(FlagStatus status);
 HAL_StatusTypeDef MX_SDMMC1_SD_Init(SD_HandleTypeDef *hsd);
 

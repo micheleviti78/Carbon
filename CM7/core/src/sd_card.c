@@ -131,13 +131,16 @@ static uint32_t PinDetect[SD_INSTANCES_NBR] = {SD_DETECT_PIN};
  * @}
  */
 
-/** @defgroup SD DMA Semaphore
+/** @defgroup SD Semaphore
  * @{
  */
 osSemaphoreDef(semDMATX);
 osSemaphoreId semDMATX[SD_INSTANCES_NBR];
 osSemaphoreDef(semDMARX);
 osSemaphoreId semDMARX[SD_INSTANCES_NBR];
+
+osSemaphoreDef(semDetect);
+osSemaphoreId semDetect[SD_INSTANCES_NBR];
 
 #define DMA_TIMEOUT 10000UL
 /**
@@ -181,6 +184,8 @@ static void SD_EXTI_Callback(void);
  * @retval BSP status
  */
 int32_t BSP_SD_Init(uint32_t Instance) {
+    osSemaphoreWait(semDetect[Instance], osWaitForever);
+
     int32_t ret = BSP_ERROR_NONE;
     GPIO_InitTypeDef gpio_init_structure;
 
@@ -261,6 +266,9 @@ int32_t BSP_SD_Init(uint32_t Instance) {
     semDMARX[Instance] = osSemaphoreCreate(osSemaphore(semDMARX), 1);
     semDMATX[Instance] = osSemaphoreCreate(osSemaphore(semDMATX), 1);
 
+    osSemaphoreWait(semDMARX[Instance], 0);
+    osSemaphoreWait(semDMATX[Instance], 0);
+
     return ret;
 }
 
@@ -271,7 +279,7 @@ int32_t BSP_SD_Init(uint32_t Instance) {
  */
 int32_t BSP_SD_DeInit(uint32_t Instance) {
     int32_t ret = BSP_ERROR_NONE;
-    GPIO_InitTypeDef gpio_init_structure;
+    // GPIO_InitTypeDef gpio_init_structure;
 
     if (Instance >= SD_INSTANCES_NBR) {
         ret = BSP_ERROR_WRONG_PARAM;
@@ -282,8 +290,8 @@ int32_t BSP_SD_DeInit(uint32_t Instance) {
             ret = BSP_ERROR_PERIPH_FAILURE;
         } else {
             /* SD detection pin configuration */
-            gpio_init_structure.Pin = SD_DETECT_PIN;
-            HAL_GPIO_DeInit(SD_DETECT_GPIO_PORT, gpio_init_structure.Pin);
+            // gpio_init_structure.Pin = SD_DETECT_PIN;
+            // HAL_GPIO_DeInit(SD_DETECT_GPIO_PORT, gpio_init_structure.Pin);
             /* Msp SD de-initialization */
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 0)
             SD_MspDeInit(&hsd_sdmmc[Instance]);
@@ -392,7 +400,7 @@ int32_t BSP_SD_RegisterMspCallbacks(uint32_t Instance, BSP_SD_Cb_t *CallBacks) {
  * @retval BSP status
  */
 int32_t BSP_SD_DetectITConfig(uint32_t Instance) {
-    int32_t ret;
+    int32_t ret = BSP_ERROR_NONE;
     GPIO_InitTypeDef gpio_init_structure;
     const uint32_t SD_EXTI_LINE[SD_INSTANCES_NBR] = {SD_DETECT_EXTI_LINE};
     static BSP_EXTI_LineCallback SdCallback[SD_INSTANCES_NBR] = {
@@ -406,6 +414,12 @@ int32_t BSP_SD_DetectITConfig(uint32_t Instance) {
         gpio_init_structure.Speed = GPIO_SPEED_FREQ_HIGH;
         gpio_init_structure.Mode = GPIO_MODE_IT_RISING_FALLING;
         HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpio_init_structure);
+
+        ret = BSP_SD_Init_Detect_Notify(Instance);
+
+        if (ret != BSP_ERROR_NONE) {
+            return ret;
+        }
 
         /* Enable and set SD detect EXTI Interrupt to the lowest priority */
         HAL_NVIC_SetPriority((IRQn_Type)(SD_DETECT_EXTI_IRQn), 0x0F, 0x00);
@@ -425,16 +439,32 @@ int32_t BSP_SD_DetectITConfig(uint32_t Instance) {
 }
 
 /**
- * @brief  BSP SD Callback.
+ * @brief  Init SD Detect Notification.
  * @param  Instance SD Instance
- * @param  Status   Pin status
  * @retval None.
  */
-__weak void BSP_SD_DetectCallback(uint32_t Instance, uint32_t Status) {
-    /* Prevent unused argument(s) compilation warning */
-    UNUSED(Instance);
-    UNUSED(Status);
+int32_t BSP_SD_Init_Detect_Notify(uint32_t Instance) {
+    semDetect[Instance] = osSemaphoreCreate(osSemaphore(semDetect), 1);
+    if (BSP_SD_IsDetected(Instance) == SD_NOT_PRESENT) {
+        osSemaphoreWait(semDetect[Instance], 0);
+    }
+    return BSP_ERROR_NONE;
+}
 
+/**
+ * @brief  BSP SD Callback.
+ * @param  Instance SD Instance
+ * @retval None.
+ */
+void BSP_SD_DetectCallback(uint32_t Instance) {
+    int32_t status = BSP_SD_IsDetected(Instance);
+
+    if (status == (int32_t)SD_PRESENT) {
+        DIAG(SD "SD Inserted");
+        osSemaphoreRelease(semDetect[Instance]);
+    } else if (status == (int32_t)SD_NOT_PRESENT) {
+        DIAG(SD "SD Removed");
+    }
     /* This function should be implemented by the user application.
        It is called into this driver when an event on JoyPin is triggered. */
 }
@@ -891,10 +921,7 @@ static void SD_RxCpltCallback(SD_HandleTypeDef *hsd) {
  * @brief  SD EXTI line detection callbacks.
  * @retval None
  */
-static void SD_EXTI_Callback(void) {
-    uint32_t sd_status = SD_PRESENT;
-    BSP_SD_DetectCallback(0, sd_status);
-}
+static void SD_EXTI_Callback(void) { BSP_SD_DetectCallback(0); }
 
 /**
  * @brief  Initializes the SD MSP.

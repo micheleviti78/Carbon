@@ -19,6 +19,7 @@
 #include <carbon/diag_thread.hpp>
 #include <carbon/main_thread.hpp>
 #include <carbon/pin.hpp>
+#include <carbon/sd_thread.hpp>
 #include <carbon/trace_thread.hpp>
 
 #include <cmsis_os.h>
@@ -41,7 +42,9 @@ void mainThread(const void *argument) {
 #ifdef FREERTOS_USE_TRACE
     start_trace_thread();
 #endif
-    carbon_mp_test();
+    // carbon_mp_test();
+
+    start_sd_thread();
 
     while (1) {
         BSP_LED_Toggle(LED_GREEN);

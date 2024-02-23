@@ -26,11 +26,13 @@
 
 #include <cmsis_os.h>
 
+static constexpr auto BUFFER_SIZE = uint32_t{1024};
+
 extern "C" {
 
-static uint8_t writeBuf[1024]
+static uint8_t writeBuf[BUFFER_SIZE]
     __attribute__((aligned(32), section(".sdram_bank2")));
-static uint8_t readBuf[1024]
+static uint8_t readBuf[BUFFER_SIZE]
     __attribute__((aligned(32), section(".sdram_bank2")));
 static BSP_SD_CardInfo cardInfo;
 static BSP_SD_CardCID cardCID;
@@ -95,11 +97,11 @@ void sd_test_thread(const void * /*argument*/) {
             for (unsigned i = 512; i < 768; i++) {
                 writeBuf[i] = 170;
             }
-            for (unsigned i = 768; i < 1024; i++) {
+            for (unsigned i = 768; i < BUFFER_SIZE; i++) {
                 writeBuf[i] = 255;
             }
 
-            for (unsigned i = 0; i < 10000000; i = i + 2) {
+            for (unsigned i = 0; i < cardInfo.LogBlockNbr; i = i + 2) {
                 DIAG(SYSTEM_DIAG "block %u", i);
                 sd_test(i);
             }
@@ -110,11 +112,12 @@ void sd_test_thread(const void * /*argument*/) {
 
 void sd_test(uint32_t block_id) {
 
-    for (unsigned i = 0; i < 1024; i++) {
+    for (unsigned i = 0; i < BUFFER_SIZE; i++) {
         readBuf[i] = 11;
     }
 
-    SCB_CleanDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]), 512);
+    SCB_CleanDCache_by_Addr(reinterpret_cast<uint32_t *>(&readBuf[0]),
+                            BUFFER_SIZE);
 
     int32_t err;
 
@@ -139,7 +142,7 @@ void sd_test(uint32_t block_id) {
     } else {
         for (unsigned i = 0; i < 256; i++) {
             if (readBuf[i] != 165) {
-                for (unsigned j = 0; j < 1024; j++) {
+                for (unsigned j = 0; j < BUFFER_SIZE; j++) {
                     DIAG(SYSTEM_DIAG "read back data %lu, byte %u, block %lu ",
                          static_cast<uint32_t>(readBuf[j]), j, block_id);
                     osDelay(5);
@@ -151,7 +154,7 @@ void sd_test(uint32_t block_id) {
         }
         for (unsigned i = 256; i < 512; i++) {
             if (readBuf[i] != 90) {
-                for (unsigned j = 0; j < 1024; j++) {
+                for (unsigned j = 0; j < BUFFER_SIZE; j++) {
                     DIAG(SYSTEM_DIAG "read back data %lu, byte %u, block %lu ",
                          static_cast<uint32_t>(readBuf[j]), j, block_id);
                     osDelay(5);
@@ -163,7 +166,7 @@ void sd_test(uint32_t block_id) {
         }
         for (unsigned i = 512; i < 768; i++) {
             if (readBuf[i] != 170) {
-                for (unsigned j = 0; j < 1024; j++) {
+                for (unsigned j = 0; j < BUFFER_SIZE; j++) {
                     DIAG(SYSTEM_DIAG "read back data %lu, byte %u, block %lu ",
                          static_cast<uint32_t>(readBuf[j]), j, block_id);
                     osDelay(5);
@@ -173,9 +176,9 @@ void sd_test(uint32_t block_id) {
                 }
             }
         }
-        for (unsigned i = 768; i < 1024; i++) {
+        for (unsigned i = 768; i < BUFFER_SIZE; i++) {
             if (readBuf[i] != 255) {
-                for (unsigned j = 0; j < 1024; j++) {
+                for (unsigned j = 0; j < BUFFER_SIZE; j++) {
                     DIAG(SYSTEM_DIAG "read back data %lu, byte %u, block %lu ",
                          static_cast<uint32_t>(readBuf[j]), j, block_id);
                     osDelay(5);

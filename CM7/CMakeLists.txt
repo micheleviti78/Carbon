@@ -87,6 +87,7 @@ SET(SOURCE
 
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/lwip lwip)
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/micropython micropython)
+add_subdirectory(${PROJECT_ROOT_DIR}/lib/fatfs fatfs)
 
 SET(STARTUP_SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/startup/startup_stm32h747xihx.s
@@ -99,7 +100,16 @@ target_include_directories(${PROJECT_NAME}
     ${TARGET_INCLUDE}
 )
 
-target_link_libraries(${PROJECT_NAME} cmsis_${PROJECT_NAME} hal_${PROJECT_NAME} printf_${PROJECT_NAME} freertos_${PROJECT_NAME} lwip_${PROJECT_NAME} backtrace_${PROJECT_NAME} micropython_${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} 
+    cmsis_${PROJECT_NAME} 
+    hal_${PROJECT_NAME} 
+    printf_${PROJECT_NAME} 
+    freertos_${PROJECT_NAME} 
+    lwip_${PROJECT_NAME} 
+    backtrace_${PROJECT_NAME} 
+    micropython_${PROJECT_NAME}
+    fatfs_${PROJECT_NAME}
+)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${ARM_SIZE_UTIL} ${PROJECT_NAME}.elf

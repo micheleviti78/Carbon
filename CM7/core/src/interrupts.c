@@ -29,24 +29,23 @@ void fmc_isr(void);
 void carbon_hw_us_systime_tim_isr(void);
 void hsem_isr(void);
 
-// #include <backtrace.h>
+#include <backtrace.h>
 
-// #define BACKTRACE_SIZE 25
-//
-//  static inline void __attribute__((always_inline)) do_backtrace(uint32_t pc)
-//  {
-//     static backtrace_t backtrace_buf[BACKTRACE_SIZE];
-//     int count = backtrace_unwind(backtrace_buf, BACKTRACE_SIZE);
-//     int i = 0;
-//     for (; i < count; ++i) {
-//         if ((uint32_t)backtrace_buf[i].address == pc)
-//             break;
-//     }
-//     for (; i < count; ++i) {
-//         RAW_DIAG("## %p %p", backtrace_buf[i].address,
-//                  backtrace_buf[i].function);
-//     }
-// }
+#define BACKTRACE_SIZE 128
+
+static inline void __attribute__((always_inline)) do_backtrace(uint32_t pc) {
+    static backtrace_t backtrace_buf[BACKTRACE_SIZE];
+    int count = backtrace_unwind(backtrace_buf, BACKTRACE_SIZE);
+    int i = 0;
+    for (; i < count; ++i) {
+        if ((uint32_t)backtrace_buf[i].address == pc)
+            break;
+    }
+    for (; i < count; ++i) {
+        RAW_DIAG("## %p %p", backtrace_buf[i].address,
+                 backtrace_buf[i].function);
+    }
+}
 
 /**
  * stack_unfold_hard_fault:
@@ -120,7 +119,7 @@ void stack_unfold_hard_fault(unsigned long *hardfault_args) {
     RAW_DIAG("hard fault _BFAR %lu", _BFAR);
     RAW_DIAG("hard fault _MMAR %lu", _MMAR);
 
-    // do_backtrace(stacked_pc);
+    do_backtrace(stacked_pc);
 
     while (1) {
     }

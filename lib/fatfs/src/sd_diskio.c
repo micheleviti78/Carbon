@@ -182,8 +182,7 @@ DSTATUS SD_status(BYTE lun) { return SD_CheckStatus(lun); }
  */
 DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count) {
     DRESULT res = RES_ERROR;
-
-    int32_t ret;
+    int32_t returnSD;
 
     /*
      * ensure the SDCard is ready for a new operation
@@ -208,17 +207,17 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count) {
         uint32_t i;
 
         for (i = 0; i < count; i++) {
-            ret =
+            returnSD =
                 BSP_SD_ReadBlocks_DMA(BSP_SD_INSTANCE, (uint32_t *)&readBuf[0],
                                       (uint32_t)sector++, 1);
-            if (ret == BSP_ERROR_NONE) {
+            if (returnSD == BSP_ERROR_NONE) {
                 memcpy(buff, &readBuf[0], BLOCKSIZE);
                 buff += BLOCKSIZE;
             } else {
                 break;
             }
         }
-        if ((i == count) && (ret == BSP_ERROR_NONE))
+        if ((i == count) && (returnSD == BSP_ERROR_NONE))
             res = RES_OK;
     }
     return res;
@@ -235,6 +234,7 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count) {
 #if _USE_WRITE == 1
 DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count) {
     DRESULT res = RES_ERROR;
+    int32_t returnSD;
 
     /*
      * ensure the SDCard is ready for a new operation
@@ -261,15 +261,15 @@ DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count) {
             memcpy((void *)&writeBuf[0], buff, BLOCKSIZE);
             buff += BLOCKSIZE;
 
-            res = BSP_SD_WriteBlocks_DMA(BSP_SD_INSTANCE,
-                                         (uint32_t *)&writeBuf[0],
-                                         (uint32_t)sector++, 1);
-            if (res != BSP_ERROR_NONE) {
+            returnSD = BSP_SD_WriteBlocks_DMA(BSP_SD_INSTANCE,
+                                              (uint32_t *)&writeBuf[0],
+                                              (uint32_t)sector++, 1);
+            if (returnSD != BSP_ERROR_NONE) {
                 break;
             }
         }
 
-        if ((i == count) && (res == BSP_ERROR_NONE))
+        if ((i == count) && (returnSD == BSP_ERROR_NONE))
             res = RES_OK;
     }
     return res;

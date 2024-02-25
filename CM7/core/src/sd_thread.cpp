@@ -18,22 +18,20 @@
 
 #include <carbon/diag.hpp>
 #include <carbon/error.hpp>
-#include <carbon/sd_card.h>
+
+#include <sd_diskio.h>
 
 #include <cmsis_os.h>
-
 #include <task.h>
-
-#include <cmsis_os.h>
-
-static constexpr auto BUFFER_SIZE = uint32_t{1024};
 
 extern "C" {
 
-static uint8_t writeBuf[BUFFER_SIZE]
+static char sdPath[4];
+static FATFS sdFATFS;
+
+static uint8_t workBuffer[_MAX_SS]
     __attribute__((aligned(32), section(".sdram_bank2")));
-static uint8_t readBuf[BUFFER_SIZE]
-    __attribute__((aligned(32), section(".sdram_bank2")));
+
 static BSP_SD_CardInfo cardInfo;
 static BSP_SD_CardCID cardCID;
 
@@ -56,35 +54,80 @@ void sd_thread(const void * /*argument*/) {
     DIAG("SD initialized");
 
     if (BSP_SD_GetCardInfo(0, &cardInfo) < 0) {
-        DIAG(SYSTEM_DIAG "Error reading SD card Info or no card");
+        DIAG(SD "Error reading SD card Info or no card");
     } else {
-        DIAG(SYSTEM_DIAG "SD card type %lu", cardInfo.CardType);
-        DIAG(SYSTEM_DIAG "SD card version %lu", cardInfo.CardVersion);
-        DIAG(SYSTEM_DIAG "SD card class %lu", cardInfo.Class);
-        DIAG(SYSTEM_DIAG "SD card number of blocks %lu", cardInfo.BlockNbr);
-        DIAG(SYSTEM_DIAG "SD card block size %lu", cardInfo.BlockSize);
-        DIAG(SYSTEM_DIAG "SD card number of logical blocks %lu",
-             cardInfo.LogBlockNbr);
-        DIAG(SYSTEM_DIAG "SD card logical block size %lu",
-             cardInfo.LogBlockSize);
-        DIAG(SYSTEM_DIAG "SD card speed %lu", cardInfo.CardSpeed);
+        DIAG(SD "SD card type %lu", cardInfo.CardType);
+        DIAG(SD "SD card version %lu", cardInfo.CardVersion);
+        DIAG(SD "SD card class %lu", cardInfo.Class);
+        DIAG(SD "SD card number of blocks %lu", cardInfo.BlockNbr);
+        DIAG(SD "SD card block size %lu", cardInfo.BlockSize);
+        DIAG(SD "SD card number of logical blocks %lu", cardInfo.LogBlockNbr);
+        DIAG(SD "SD card logical block size %lu", cardInfo.LogBlockSize);
+        DIAG(SD "SD card speed %lu", cardInfo.CardSpeed);
 
         if (BSP_SD_GetCardCID(0, &cardCID) < 0) {
-            DIAG(SYSTEM_DIAG "Error reading SD card CID or no card");
+            DIAG(SD "Error reading SD card CID or no card");
         } else {
-            DIAG(SYSTEM_DIAG "SD card Manufactorer ID %lu",
-                 cardCID.ManufacturerID);
-            DIAG(SYSTEM_DIAG "SD card Manufactorer OEMID %lu",
-                 cardCID.OEM_AppliID);
-            DIAG(SYSTEM_DIAG "SD card Manufacturing Date %lu",
-                 cardCID.ManufactDate);
+            DIAG(SD "SD card Manufactorer ID %lu", cardCID.ManufacturerID);
+            DIAG(SD "SD card Manufactorer OEMID %lu", cardCID.OEM_AppliID);
+            DIAG(SD "SD card Manufacturing Date %lu", cardCID.ManufactDate);
         }
-
-        DIAG(SYSTEM_DIAG "address of readBuf %lu",
-             reinterpret_cast<uint32_t>(&readBuf[0]));
-        DIAG(SYSTEM_DIAG "address of writeBuf %lu",
-             reinterpret_cast<uint32_t>(&writeBuf[0]));
     }
+
+    if (FATFS_LinkDriver(&SD_Driver, &sdPath[0]) != 0) {
+        DIAG(SD "cannot register diskio driver");
+        while (1) {
+            osDelay(10000);
+        }
+    } else {
+        DIAG(SD "Logical path for sd card volume %s", &sdPath[0]);
+    }
+
+    FRESULT fres = f_mount(&sdFATFS, &sdPath[0], 1);
+
+    if (fres == 0) {
+        DIAG(SD "Logical volume %s for sd card mounted", &sdPath[0]);
+    } else if (fres == 13) {
+        fres = f_mkfs(&sdPath[0], FM_ANY, 0, workBuffer, sizeof(workBuffer));
+        if (fres == 0) {
+            DIAG(SD "Logical volume %s formatted", &sdPath[0]);
+            fres = f_mount(&sdFATFS, &sdPath[0], 1);
+            if (fres == 0) {
+                DIAG(SD
+                     "Logical volume %s for sd card mounted after formatting",
+                     &sdPath[0]);
+            } else {
+                DIAG(SD "Error mounting logical volume %s: %d", &sdPath[0],
+                     fres);
+                while (1) {
+                    osDelay(10000);
+                }
+            }
+        } else {
+            DIAG(SD "Logical volume %s error %d while formatting", &sdPath[0],
+                 fres);
+            while (1) {
+                osDelay(10000);
+            }
+        }
+    } else {
+        DIAG(SD "Error mounting logical volume %s: %d", &sdPath[0], fres);
+        while (1) {
+            osDelay(10000);
+        }
+    }
+
+    // FIL fs_read;
+
+    // fres = f_open(&fs_read, "boot2.py", FA_WRITE | FA_CREATE_ALWAYS);
+
+    // if (fres != 0) {
+    //     DIAG(SD "error opening file %d", fres);
+    //     while (1) {
+    //         osDelay(10000);
+    //     }
+    // }
+
     while (1) {
         osDelay(10000);
     }

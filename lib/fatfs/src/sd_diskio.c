@@ -192,7 +192,7 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count) {
         return res;
     }
 
-    if (!((uint32_t)buff & 0x3)) {
+    if (!((uint32_t)buff & 0x1F)) {
         if (BSP_SD_ReadBlocks_DMA(BSP_SD_INSTANCE, (uint32_t *)buff,
                                   (uint32_t)(sector),
                                   count) != BSP_ERROR_NONE) {
@@ -244,7 +244,7 @@ DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count) {
         return res;
     }
 
-    if (!((uint32_t)buff & 0x3)) {
+    if (!((uint32_t)buff & 0x1F)) {
         if (BSP_SD_WriteBlocks_DMA(BSP_SD_INSTANCE, (uint32_t *)buff,
                                    (uint32_t)(sector),
                                    count) != BSP_ERROR_NONE) {

@@ -29,6 +29,15 @@ extern "C" {
 static char sdPath[4];
 static FATFS sdFATFS;
 
+static const char msg[] =
+    "Dopo quella diamantata pazzesca la contessina Serbelloni Mazzanti Vien "
+    "Dal mare gli fece conoscere alcuni amici e gli presentò "
+    "nell'ordine:\n\rla "
+    "signora Bolla, i coniugi Bertani, la contessa Ruffino, i fratelli Gancia, "
+    "Donna Folonari, il barone Ricasoli, il marchese Antinori, i Serristori "
+    "Branca e i Moretti, quelli della birra.\n\rA metà di quel giro di "
+    "presentazioni Fantozzi era già completamente ubriaco!";
+
 static uint8_t workBuffer[_MAX_SS]
     __attribute__((aligned(32), section(".sdram_bank2")));
 
@@ -93,8 +102,7 @@ void sd_thread(const void * /*argument*/) {
             DIAG(SD "Logical volume %s formatted", &sdPath[0]);
             fres = f_mount(&sdFATFS, &sdPath[0], 1);
             if (fres == 0) {
-                DIAG(SD
-                     "Logical volume %s for sd card mounted after formatting",
+                DIAG(SD "Logical volume %s mounted after formatting",
                      &sdPath[0]);
             } else {
                 DIAG(SD "Error mounting logical volume %s: %d", &sdPath[0],
@@ -117,16 +125,36 @@ void sd_thread(const void * /*argument*/) {
         }
     }
 
-    // FIL fs_read;
+    FIL fs_write;
+    UINT bw;
 
-    // fres = f_open(&fs_read, "boot2.py", FA_WRITE | FA_CREATE_ALWAYS);
+    fres = f_open(&fs_write, "boot.py", FA_WRITE | FA_CREATE_ALWAYS);
 
-    // if (fres != 0) {
-    //     DIAG(SD "error opening file %d", fres);
-    //     while (1) {
-    //         osDelay(10000);
-    //     }
-    // }
+    if (fres != 0) {
+        DIAG(SD "error opening file %d", fres);
+        while (1) {
+            osDelay(10000);
+        }
+    }
+
+    size_t msg_size = (sizeof(msg) / sizeof(msg[0])) - 1;
+
+    DIAG(SD "message size %u", msg_size);
+
+    fres = f_write(&fs_write, msg, msg_size, &bw);
+
+    if (fres != 0) {
+        DIAG(SD "error writing file %d", fres);
+        while (1) {
+            osDelay(10000);
+        }
+    }
+
+    DIAG(SD "bytes written %u", bw);
+
+    f_close(&fs_write);
+
+    DIAG(SD "FAT file system test complete");
 
     while (1) {
         osDelay(10000);

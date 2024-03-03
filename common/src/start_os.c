@@ -24,7 +24,6 @@
 #include <task.h>
 
 // This is the static memory (TCB and stack) for the idle task
-// todo move to a dedicated section
 static StaticTask_t xIdleTaskTCB; /*__attribute__((section(".rtos_heap")));*/
 static StackType_t uxIdleTaskStack[configMINIMAL_STACK_SIZE]
     __attribute__((aligned(8)));
@@ -35,9 +34,15 @@ void start_os(void) {
     osThreadDef(main_thread, mainThread, osPriorityNormal, 0,
                 configMINIMAL_STACK_SIZE * 10);
     main_task_handle = osThreadCreate(osThread(main_thread), NULL);
+
     DIAG(SYSTEM_DIAG "starting OS");
+
     osKernelStart();
+
     RAW_DIAG(SYSTEM_DIAG "ERROR OS");
+
+    while (1) {
+    }
 }
 
 // We need this when configSUPPORT_STATIC_ALLOCATION is enabled

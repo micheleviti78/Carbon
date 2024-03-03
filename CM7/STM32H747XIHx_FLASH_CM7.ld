@@ -42,6 +42,7 @@ _estack = 0x24080000;    /* end of RAM */
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
 _Min_Stack_Size = 0x400; /* required amount of stack */
+_SDRAM_Heap_size = 0X1400000; /*20 MB Heap for the SDRAM*/
 
 /* Specify the memory areas */
 MEMORY
@@ -169,6 +170,9 @@ SECTIONS
     . = ALIGN(4);
     KEEP(*(.sdram_bank2))
     . = ALIGN(4);
+    _sdram_heap_start = .;
+    KEEP(*(.sdram_bank2_heap))
+    _sdram_heap_end = .;
   } >FMC_SDRAM_BANK2
 
   /* Remove information from the standard libraries */

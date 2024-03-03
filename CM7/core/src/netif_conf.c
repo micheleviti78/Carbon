@@ -26,9 +26,6 @@
 struct netif gnetif; /* network interface structure */
 
 void netif_config(void) {
-    DIAG(SYSTEM_DIAG "LwIP version %d.%d.%d", LWIP_VERSION_MAJOR,
-         LWIP_VERSION_MINOR, LWIP_VERSION_REVISION);
-
     tcpip_init(NULL, NULL);
 
     ip_addr_t ipaddr;

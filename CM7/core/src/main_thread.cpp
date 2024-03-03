@@ -35,9 +35,6 @@ void netif_config(void);
 void mainThread(const void *argument) {
     start_diag_thread();
 
-    DIAG(SYSTEM_DIAG "FreeRTOS version %d.%d.%d", tskKERNEL_VERSION_MAJOR,
-         tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD);
-
     netif_config();
 #ifdef FREERTOS_USE_TRACE
     start_trace_thread();

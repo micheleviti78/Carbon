@@ -16,7 +16,6 @@
  ******************************************************************************
  */
 
-/* Includes ------------------------------------------------------------------*/
 #include <carbon/diag.hpp>
 
 #include <stm32h7xx_hal.h>
@@ -25,23 +24,12 @@ extern "C" {
 
 void start_os(void);
 
-#define GET_HAL_VERSION_MAIN ((HAL_GetHalVersion() >> 24) & 0xFFUL)
-#define GET_HAL_VERSION_SUB1 ((HAL_GetHalVersion() >> 16) & 0xFFUL)
-#define GET_HAL_VERSION_SUB2 ((HAL_GetHalVersion() >> 8) & 0xFFUL)
-#define GET_HAL_VERSION_RC (HAL_GetHalVersion() & 0xFFUL)
-
 /**
  * @brief  The application entry point.
  * @retval int
  */
 int main(void) {
     DIAG(SYSTEM_DIAG "CM7 ready");
-
-    DIAG(SYSTEM_DIAG "Initialization complete");
-    DIAG(SYSTEM_DIAG "Newlib version %d.%d.%d", __NEWLIB__, __NEWLIB_MINOR__,
-         __NEWLIB_PATCHLEVEL__);
-    DIAG(SYSTEM_DIAG "HAL version %lu.%lu.%lu.%lu", GET_HAL_VERSION_MAIN,
-         GET_HAL_VERSION_SUB1, GET_HAL_VERSION_SUB2, GET_HAL_VERSION_RC);
 
     /* starting OS */
     start_os();

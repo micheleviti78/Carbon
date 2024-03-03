@@ -89,7 +89,7 @@ extern uint32_t SystemCoreClock;
 #define configTICK_RATE_HZ ((TickType_t)1000)
 
 #define configMINIMAL_STACK_SIZE ((uint16_t)128)
-#define configTOTAL_HEAP_SIZE ((size_t)(64 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)(128 * 1024))
 #define configMAX_TASK_NAME_LEN (16)
 
 #define configUSE_16_BIT_TICKS        0
@@ -159,7 +159,7 @@ used
 
 */
 
-#define USE_FreeRTOS_HEAP_4
+#define USE_FreeRTOS_HEAP_5
 
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS

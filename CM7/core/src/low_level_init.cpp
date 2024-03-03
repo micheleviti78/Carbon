@@ -27,6 +27,23 @@
 
 #include <stm32h7xx_hal.h>
 
+#include <printf.h>
+
+#include <lwip/init.h>/*only to retrieve the version*/
+
+#include <ff.h>/*only to retrieve the version*/
+
+#include <FreeRTOS.h>
+#include <task.h>
+
+#define GET_HAL_VERSION_MAIN ((HAL_GetHalVersion() >> 24) & 0xFFUL)
+#define GET_HAL_VERSION_SUB1 ((HAL_GetHalVersion() >> 16) & 0xFFUL)
+#define GET_HAL_VERSION_SUB2 ((HAL_GetHalVersion() >> 8) & 0xFFUL)
+#define GET_HAL_VERSION_RC (HAL_GetHalVersion() & 0xFFUL)
+
+#define GET_CMSIS_VERSION_MAIN ((osCMSIS >> 16) & 0xFFUL)
+#define GET_CMSIS_VERSION_SUB (osCMSIS & 0xFFUL)
+
 using namespace CARBON;
 
 extern "C" {
@@ -34,6 +51,23 @@ extern "C" {
 void putchar_(char ch);
 
 static void SystemClock_Config(void);
+
+extern int __bss_end__;
+extern int _sdram_heap_start;
+extern int _sdram_heap_end;
+
+#define SDRAM_HEAP_REGION_SIZE 0x1400000UL /*"20 MB SDRAM Heap Region"*/
+
+/*Heap Regions*/
+uint8_t AXI_RAM_Heap_Region[configTOTAL_HEAP_SIZE] __attribute__((aligned(4)));
+size_t SD_RAM_Heap_Region_Size = SDRAM_HEAP_REGION_SIZE;
+uint8_t SD_RAM_Heap_Region[SDRAM_HEAP_REGION_SIZE]
+    __attribute__((aligned(32), section(".sdram_bank2_heap")));
+static const HeapRegion_t xHeapRegions[] = {
+    {(uint8_t *)&AXI_RAM_Heap_Region[0], configTOTAL_HEAP_SIZE},
+    {(uint8_t *)&SD_RAM_Heap_Region[0], SDRAM_HEAP_REGION_SIZE},
+    {NULL, 0} /* Terminates the array. */
+};
 
 void low_level_init() {
     int32_t timeout;
@@ -79,14 +113,47 @@ void low_level_init() {
     /* init DIAG*/
     init_uart();
 
-    putchar_('\r');
-    putchar_('\n');
+    printf_("\r\n\nBooting\r\n");
+
+    printf_("Newlib version %d.%d.%d\r\n", __NEWLIB__, __NEWLIB_MINOR__,
+            __NEWLIB_PATCHLEVEL__);
+    printf_("HAL version %lu.%lu.%lu.%lu\r\n", GET_HAL_VERSION_MAIN,
+            GET_HAL_VERSION_SUB1, GET_HAL_VERSION_SUB2, GET_HAL_VERSION_RC);
+    printf_("FreeRTOS version %d.%d.%d\r\n", tskKERNEL_VERSION_MAJOR,
+            tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD);
+    printf_("CMSIS Version %lu.%lu\r\n", GET_CMSIS_VERSION_MAIN,
+            GET_CMSIS_VERSION_SUB);
+    printf_("LwIP version %d.%d.%d\r\n", LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR,
+            LWIP_VERSION_REVISION);
+    printf_("FAT File System revision ID %d\r\n", _FATFS);
 
     /* init SDRAM */
     init_sdram();
 
+    RAW_DIAG(SYSTEM_DIAG "SD RAM initialized");
+
+    /*Init Heap*/
+    vPortDefineHeapRegions(xHeapRegions);
+
+    RAW_DIAG(SYSTEM_DIAG "AXI RAM Heap %p, size %u bytes",
+             &AXI_RAM_Heap_Region[0], configTOTAL_HEAP_SIZE);
+    RAW_DIAG(SYSTEM_DIAG "SDRAM Heap %p, size %u bytes", SD_RAM_Heap_Region,
+             (unsigned)&_sdram_heap_end - (unsigned)&_sdram_heap_start);
+
+    if (((unsigned)&_sdram_heap_end - (unsigned)&_sdram_heap_start) !=
+        SDRAM_HEAP_REGION_SIZE) {
+        RAW_DIAG(SYSTEM_DIAG "ERROR SDRAM Heap is %u Byte",
+                 (unsigned)&_sdram_heap_end - (unsigned)&_sdram_heap_start);
+        while (1) {
+        };
+    }
+
+    RAW_DIAG(SYSTEM_DIAG "Heap initialized");
+
     /* true random generator init */
     carbon_rand_init();
+
+    RAW_DIAG(SYSTEM_DIAG "Random generator initialized");
 
     /* Initialize Pin needed by CM7 */
     BSP_LED_Init(LED_GREEN);
@@ -96,21 +163,29 @@ void low_level_init() {
     BSP_LED_Init(LED_BLUE);
     BSP_LED_Init(LED_RED);
 
+    RAW_DIAG(SYSTEM_DIAG "LED pins initialized");
+
     /*init fifos*/
 
     /*DIAG FIFO*/
     FIFO_INIT(diag)
 
+    RAW_DIAG(SYSTEM_DIAG "Diag FIFO initialized");
+
 #ifdef FREERTOS_USE_TRACE
     /*DIAG TRACE*/
     FIFO_INIT(trace)
+
+    RAW_DIAG(SYSTEM_DIAG "Trace FIFO initialized");
 #endif
 
     if (BSP_SD_DetectITConfig(0) < 0) {
-        DIAG(SYSTEM_DIAG "SD detection not set");
+        RAW_DIAG(SYSTEM_DIAG "SD detection not set");
     } else {
-        DIAG(SYSTEM_DIAG "SD detection set");
+        RAW_DIAG(SYSTEM_DIAG "SD detection set");
     }
+
+    RAW_DIAG(SYSTEM_DIAG "Initialization complete, synchronizing with CM4");
 
     setSyncFlag(SyncFlagBit::PeripherySync);
 }

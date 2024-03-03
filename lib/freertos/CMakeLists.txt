@@ -13,7 +13,7 @@ set(FREERTOS_LIB freertos_${PROJECT_NAME})
 if (CORE_CM7)
     set(PORTSOURCES
         portable/GCC/ARM_CM7/r0p1/port.c
-        portable/MemMang/heap_4.c
+        portable/MemMang/heap_5.c
     )
     set(PORTINCLUDES
         portable/GCC/ARM_CM7/r0p1

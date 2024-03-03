@@ -8,6 +8,7 @@ execute_process(COMMAND make V=1 ROOT_PROJECT=${PROJECT_ROOT_DIR} -f ${CMAKE_CUR
 
 set(SOURCES_PORT
     ${CURRENT_BUILD_DIR}/micropython_embed/port/carbon_mp_test.c  
+    ${CURRENT_BUILD_DIR}/micropython_embed/port/carbon_mp.c  
     ${CURRENT_BUILD_DIR}/micropython_embed/port/gccollect.c  
     ${CURRENT_BUILD_DIR}/micropython_embed/port/mphalport.c  
     ${CURRENT_BUILD_DIR}/micropython_embed/port/mpthreadport.c

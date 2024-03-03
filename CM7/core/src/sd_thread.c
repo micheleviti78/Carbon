@@ -24,6 +24,6 @@ void sd_thread(const void *argument);
 
 void start_sd_thread_imp(void) {
     osThreadDef(SD_Thread, sd_thread, osPriorityNormal, 0,
-                configMINIMAL_STACK_SIZE * 5);
+                configMINIMAL_STACK_SIZE * 64);
     sd_handle = osThreadCreate(osThread(SD_Thread), NULL);
 }

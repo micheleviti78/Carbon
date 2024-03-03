@@ -58,6 +58,13 @@ extern int _sdram_heap_end;
 
 #define SDRAM_HEAP_REGION_SIZE 0x1400000UL /*"20 MB SDRAM Heap Region"*/
 
+#if SDRAM_TEST
+uint8_t AXI_RAM_Heap_Region[configTOTAL_HEAP_SIZE] __attribute__((aligned(4)));
+static const HeapRegion_t xHeapRegions[] = {
+    {(uint8_t *)&AXI_RAM_Heap_Region[0], configTOTAL_HEAP_SIZE},
+    {NULL, 0} /* Terminates the array. */
+};
+#else
 /*Heap Regions*/
 uint8_t AXI_RAM_Heap_Region[configTOTAL_HEAP_SIZE] __attribute__((aligned(4)));
 size_t SD_RAM_Heap_Region_Size = SDRAM_HEAP_REGION_SIZE;
@@ -68,6 +75,7 @@ static const HeapRegion_t xHeapRegions[] = {
     {(uint8_t *)&SD_RAM_Heap_Region[0], SDRAM_HEAP_REGION_SIZE},
     {NULL, 0} /* Terminates the array. */
 };
+#endif
 
 void low_level_init() {
     int32_t timeout;
@@ -131,7 +139,8 @@ void low_level_init() {
     init_sdram();
 
     RAW_DIAG(SYSTEM_DIAG "SD RAM initialized");
-
+#if SDRAM_TEST
+#else
     /*Init Heap*/
     vPortDefineHeapRegions(xHeapRegions);
 
@@ -149,7 +158,7 @@ void low_level_init() {
     }
 
     RAW_DIAG(SYSTEM_DIAG "Heap initialized");
-
+#endif
     /* true random generator init */
     carbon_rand_init();
 

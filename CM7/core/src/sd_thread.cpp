@@ -21,6 +21,9 @@
 
 #include <sd_diskio.h>
 
+#include <carbon_mp.h>
+#include <carbon_mp_test.h>
+
 #include <cmsis_os.h>
 #include <task.h>
 
@@ -39,6 +42,10 @@ static const char msg[] =
     "presentazioni Fantozzi era già completamente ubriaco!";
 
 static uint8_t workBuffer[_MAX_SS]
+    __attribute__((aligned(32), section(".sdram_bank2")));
+
+#define MICROPYTHON_HEAP_SIZE 2097152U /*2 MB size micropython heap*/
+static uint8_t micropython_heap[MICROPYTHON_HEAP_SIZE]
     __attribute__((aligned(32), section(".sdram_bank2")));
 
 static BSP_SD_CardInfo cardInfo;
@@ -155,6 +162,15 @@ void sd_thread(const void * /*argument*/) {
     f_close(&fs_write);
 
     DIAG(SD "FAT file system test complete");
+
+    osDelay(100);
+
+    mp_embed_init(&micropython_heap[0], MICROPYTHON_HEAP_SIZE);
+
+    DIAG(SYSTEM_DIAG "Micropython initialized, heap at %p, size %u",
+         &micropython_heap[0], MICROPYTHON_HEAP_SIZE);
+
+    carbon_mp_test();
 
     while (1) {
         osDelay(10000);

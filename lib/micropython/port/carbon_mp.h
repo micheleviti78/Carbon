@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           main_thread.cpp
+ * @file           carbon_mp.h
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Nov. 2022
- * @brief          CM7 main thread source
+ * @date           Mar. 2024
+ * @brief          carbon micropython API
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -16,33 +16,31 @@
  ******************************************************************************
  */
 
-#include <carbon/diag_thread.hpp>
-#include <carbon/main_thread.hpp>
-#include <carbon/pin.hpp>
-#include <carbon/sd_thread.hpp>
-#include <carbon/trace_thread.hpp>
+#ifndef MICROPY_INCLUDED_CARBON_MP_H
+#define MICROPY_INCLUDED_CARBON_MP_H
 
-#include <cmsis_os.h>
+#include <stddef.h>
+#include <stdint.h>
 
-#include <task.h>
+#include "mpconfigport.h"
 
+#ifdef __cplusplus
 extern "C" {
-
-void netif_config(void);
-
-void mainThread(const void *argument) {
-    start_diag_thread();
-
-    netif_config();
-#ifdef FREERTOS_USE_TRACE
-    start_trace_thread();
 #endif
 
-    start_sd_thread();
+void mp_embed_init(void *gc_heap, size_t gc_heap_size);
+void mp_embed_deinit();
 
-    while (1) {
-        BSP_LED_Toggle(LED_GREEN);
-        osDelay(1000);
-    }
+#if MICROPY_ENABLE_COMPILER
+void mp_embed_exec_str(const char *src);
+#endif
+
+#if MICROPY_PERSISTENT_CODE_LOAD
+void mp_embed_exec_mpy(const uint8_t *mpy, size_t len);
+#endif
+
+#ifdef __cplusplus
 }
-}
+#endif
+
+#endif // MICROPY_INCLUDED_CARBON_MP_H

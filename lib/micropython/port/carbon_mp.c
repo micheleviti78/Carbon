@@ -29,8 +29,11 @@
 #include <carbon/diag.hpp>
 
 // Initialise the runtime.
-void mp_embed_init(void *gc_heap, size_t gc_heap_size) {
-    mp_stack_ctrl_init();
+void mp_embed_init(void *gc_heap, size_t gc_heap_size, void *sp) {
+#if MICROPY_PY_THREAD
+    mp_thread_init();
+#endif
+    mp_stack_set_top(sp);
     gc_init(gc_heap, (uint8_t *)gc_heap + gc_heap_size);
     mp_init();
 }
@@ -75,15 +78,6 @@ void mp_embed_exec_mpy(const uint8_t *mpy, size_t len) {
         // Uncaught exception: print it out.
         mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
     }
-}
-#endif
-
-#if MICROPY_ENABLE_GC
-// Run a garbage collection cycle.
-void gc_collect(void) {
-    gc_collect_start();
-    gc_helper_collect_regs_and_stack();
-    gc_collect_end();
 }
 #endif
 

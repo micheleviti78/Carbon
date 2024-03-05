@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-void mp_embed_init(void *gc_heap, size_t gc_heap_size);
+void mp_embed_init(void *gc_heap, size_t gc_heap_size, void *sp);
 void mp_embed_deinit();
 
 #if MICROPY_ENABLE_COMPILER

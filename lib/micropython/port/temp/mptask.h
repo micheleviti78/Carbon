@@ -1,20 +1,3 @@
-/**
- ******************************************************************************
- * @file           mptask.h
- * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Jan. 2024
- * @brief          header file for the micropython task
- ******************************************************************************
- * @attention
- * Copyright (c) 2022 Michele Viti.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
 /*
  * This file is part of the MicroPython project, http://micropython.org/
  *
@@ -40,35 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef MICROPY_INCLUDED_MPTASK_H
-#define MICROPY_INCLUDED_MPTASK_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef MICROPY_INCLUDED_CC3200_MPTASK_H
+#define MICROPY_INCLUDED_CC3200_MPTASK_H
 
 /******************************************************************************
  DEFINE CONSTANTS
  ******************************************************************************/
-#define MICROPY_TASK_PRIORITY (1)
+#define MICROPY_TASK_PRIORITY (2)
 #define MICROPY_TASK_STACK_SIZE ((6 * 1024) + 512) // in bytes
 #define MICROPY_TASK_STACK_LEN (MICROPY_TASK_STACK_SIZE / sizeof(StackType_t))
 
 /******************************************************************************
  EXPORTED DATA
  ******************************************************************************/
-
-#include <FreeRTOS.h>
-
 extern StackType_t mpTaskStack[];
 
 /******************************************************************************
  DECLARE PUBLIC FUNCTIONS
  ******************************************************************************/
-void startMicropython(void *exec);
-
-#ifdef __cplusplus
-}
-#endif
+extern void TASK_MicroPython(void *pvParameters);
 
 #endif // MICROPY_INCLUDED_CC3200_MPTASK_H

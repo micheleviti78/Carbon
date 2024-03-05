@@ -21,8 +21,7 @@
 
 #include <sd_diskio.h>
 
-#include <carbon_mp.h>
-#include <carbon_mp_test.h>
+#include <mptask.h>
 
 #include <cmsis_os.h>
 #include <task.h>
@@ -52,11 +51,11 @@ extern "C" {
 
 [[maybe_unused]] static const char *example_3 =
     "def addition(number1, number2):\n"
-    "result = number1 + number2\n"
-    "print(' Addition result : ',result)\n"
+    "   result = number1 + number2\n"
+    "   print(' Addition result : ',result)\n"
     "def area(radius):\n"
-    "result = 3.14 * radius * radius\n"
-    "return result\n"
+    "   result = 3.1415 * radius * radius\n"
+    "   return result\n"
     "addition(5, 3)\n"
     "print(' Area of the circle is ',area(2))\n"
     // "import gc\n"
@@ -78,10 +77,6 @@ static const char msg[] =
     "presentazioni Fantozzi era già completamente ubriaco!";
 
 static uint8_t workBuffer[_MAX_SS]
-    __attribute__((aligned(32), section(".sdram_bank2")));
-
-#define MICROPYTHON_HEAP_SIZE 2097152U /*2 MB size micropython heap*/
-static uint8_t micropython_heap[MICROPYTHON_HEAP_SIZE]
     __attribute__((aligned(32), section(".sdram_bank2")));
 
 static BSP_SD_CardInfo cardInfo;
@@ -167,38 +162,6 @@ void sd_thread(const void * /*argument*/) {
             osDelay(10000);
         }
     }
-    /*
-    FIL fs_write;
-    UINT bw;
-
-    fres = f_open(&fs_write, "boot.py", FA_WRITE | FA_CREATE_ALWAYS);
-
-    if (fres != 0) {
-        DIAG(SD "error opening file %d", fres);
-        while (1) {
-            osDelay(10000);
-        }
-    }
-
-    size_t msg_size = (sizeof(msg) / sizeof(msg[0])) - 1;
-
-    DIAG(SD "message size %u", msg_size);
-
-    fres = f_write(&fs_write, msg, msg_size, &bw);
-
-    if (fres != 0) {
-        DIAG(SD "error writing file %d", fres);
-        while (1) {
-            osDelay(10000);
-        }
-    }
-
-    DIAG(SD "bytes written %u", bw);
-
-    f_close(&fs_write);
-
-    DIAG(SD "FAT file system test complete");
-    */
 
     FIL fs_read;
     UINT byte_read;
@@ -237,18 +200,7 @@ void sd_thread(const void * /*argument*/) {
 
         *(readBuffer + file_info.fsize) = 0;
 
-        mp_embed_init(&micropython_heap[0], MICROPYTHON_HEAP_SIZE);
-
-        DIAG("Micropython initialized, heap at %p, size %u",
-             &micropython_heap[0], MICROPYTHON_HEAP_SIZE);
-        DIAG("");
-
-        osDelay(100);
-
-        mp_embed_exec_str(example_3);
-        // carbon_mp_test();
-
-        vPortFree(readBuffer);
+        startMicropython((void *)example_2);
     }
 
     while (1) {

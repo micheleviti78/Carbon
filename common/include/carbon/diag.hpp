@@ -41,6 +41,7 @@ void carbon_diag_pull();
 #define TRACE_DIAG "[trace] "
 #define TEST_DIAG "[test] "
 #define SD "[sd] "
+#define MP "[mp] "
 
 #ifdef CORE_CM7
 #define DIAG_CPU "[CM7]"

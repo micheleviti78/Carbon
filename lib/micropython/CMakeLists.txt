@@ -156,4 +156,4 @@ target_include_directories(${MICROPYTHON_LIB}
     ${PROJECT_CONFIG_DIR}
 )
 
-target_link_libraries(${MICROPYTHON_LIB} freertos_${PROJECT_NAME})
+target_link_libraries(${MICROPYTHON_LIB} freertos_${PROJECT_NAME} printf_${PROJECT_NAME})

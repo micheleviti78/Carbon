@@ -131,7 +131,7 @@ void sd_thread(const void * /*argument*/) {
             osDelay(10000);
         }
     }
-
+    /*
     FIL fs_write;
     UINT bw;
 
@@ -162,15 +162,58 @@ void sd_thread(const void * /*argument*/) {
     f_close(&fs_write);
 
     DIAG(SD "FAT file system test complete");
+    */
 
-    osDelay(100);
+    FIL fs_read;
+    UINT byte_read;
 
-    mp_embed_init(&micropython_heap[0], MICROPYTHON_HEAP_SIZE);
+    fres = f_open(&fs_read, "boot.py", FA_READ);
 
-    DIAG(SYSTEM_DIAG "Micropython initialized, heap at %p, size %u",
-         &micropython_heap[0], MICROPYTHON_HEAP_SIZE);
+    if (fres != 0) {
+        DIAG(SD "error opening file %d", fres);
+    }
 
-    carbon_mp_test();
+    FILINFO file_info;
+
+    fres = f_stat("boot.py", &file_info);
+
+    if (fres != 0) {
+        DIAG(SD "error reading file stats %d", fres);
+    } else {
+        DIAG(SD "file size %lu", file_info.fsize);
+    }
+
+    uint8_t *readBuffer =
+        reinterpret_cast<uint8_t *>(pvPortMalloc(file_info.fsize + 1));
+
+    if (readBuffer) {
+        size_t byte_to_read = file_info.fsize;
+        uint8_t *head = readBuffer;
+        while (byte_to_read > 0) {
+            fres = f_read(&fs_read, head, byte_to_read, &byte_read);
+            if (fres != 0) {
+                DIAG(SD "error copying file %d", fres);
+                break;
+            }
+            byte_to_read -= byte_read;
+            head += byte_read;
+        }
+
+        *(readBuffer + file_info.fsize) = 0;
+
+        mp_embed_init(&micropython_heap[0], MICROPYTHON_HEAP_SIZE);
+
+        DIAG("Micropython initialized, heap at %p, size %u",
+             &micropython_heap[0], MICROPYTHON_HEAP_SIZE);
+        DIAG("");
+
+        osDelay(100);
+
+        // mp_embed_exec_str(reinterpret_cast<char *>(readBuffer));
+        // carbon_mp_test();
+
+        pvPortFree(readBuffer);
+    }
 
     while (1) {
         osDelay(10000);

@@ -29,6 +29,42 @@
 
 extern "C" {
 
+// This is example 1 script, which will be compiled and executed.
+[[maybe_unused]] static const char *example_1 =
+    "print('hello world!')\n"
+    "print(list(x + 1 for x in range(10)))\n"
+    "import gc\n"
+    "print('run GC collect')\n"
+    "gc.collect()\n"
+    "\n"
+    "print('finish')\n";
+
+// This is example 2 script, which will be compiled and executed.
+[[maybe_unused]] static const char *example_2 =
+    "for i in range(10):\n"
+    "    print('iter {:08}'.format(i))\n"
+    "\n"
+    "import gc\n"
+    "print('run GC collect')\n"
+    "gc.collect()\n"
+    "\n"
+    "print('finish')\n";
+
+[[maybe_unused]] static const char *example_3 =
+    "def addition(number1, number2):\n"
+    "result = number1 + number2\n"
+    "print(' Addition result : ',result)\n"
+    "def area(radius):\n"
+    "result = 3.14 * radius * radius\n"
+    "return result\n"
+    "addition(5, 3)\n"
+    "print(' Area of the circle is ',area(2))\n"
+    // "import gc\n"
+    // "print('run GC collect')\n"
+    // "gc.collect()\n"
+    // "\n"
+    "print('finish')\n";
+
 static char sdPath[4];
 static FATFS sdFATFS;
 
@@ -209,7 +245,7 @@ void sd_thread(const void * /*argument*/) {
 
         osDelay(100);
 
-        // mp_embed_exec_str(reinterpret_cast<char *>(readBuffer));
+        mp_embed_exec_str(example_3);
         // carbon_mp_test();
 
         vPortFree(readBuffer);

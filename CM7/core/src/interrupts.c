@@ -36,6 +36,7 @@ void hsem_isr(void);
 static inline void __attribute__((always_inline)) do_backtrace(uint32_t pc) {
     static backtrace_t backtrace_buf[BACKTRACE_SIZE];
     int count = backtrace_unwind(backtrace_buf, BACKTRACE_SIZE);
+    RAW_DIAG("backtrace unwind count %d", count);
     int i = 0;
     for (; i < count; ++i) {
         if ((uint32_t)backtrace_buf[i].address == pc)

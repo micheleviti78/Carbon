@@ -26,6 +26,8 @@
 #include "shared/runtime/gchelper.h"
 #include <string.h>
 
+#include <carbon/diag.hpp>
+
 // Initialise the runtime.
 void mp_embed_init(void *gc_heap, size_t gc_heap_size) {
     mp_stack_ctrl_init();
@@ -87,6 +89,7 @@ void gc_collect(void) {
 
 // Called if an exception is raised outside all C exception-catching handlers.
 void nlr_jump_fail(void *val) {
+    RAW_DIAG("exception at %p", val);
     for (;;) {
     }
 }
@@ -95,6 +98,8 @@ void nlr_jump_fail(void *val) {
 // Used when debugging is enabled.
 void __assert_func(const char *file, int line, const char *func,
                    const char *expr) {
+    RAW_DIAG("assert function file %s, line %d, func %s, expr %s", file, line,
+             func, expr);
     for (;;) {
     }
 }

@@ -212,7 +212,7 @@ void sd_thread(const void * /*argument*/) {
         // mp_embed_exec_str(reinterpret_cast<char *>(readBuffer));
         // carbon_mp_test();
 
-        pvPortFree(readBuffer);
+        vPortFree(readBuffer);
     }
 
     while (1) {

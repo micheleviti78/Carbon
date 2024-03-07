@@ -58,10 +58,10 @@ extern "C" {
     "   return result\n"
     "addition(5, 3)\n"
     "print(' Area of the circle is ',area(2))\n"
-    // "import gc\n"
-    // "print('run GC collect')\n"
-    // "gc.collect()\n"
-    // "\n"
+    "import gc\n"
+    "print('run GC collect')\n"
+    "gc.collect()\n"
+    "\n"
     "print('finish')\n";
 
 static char sdPath[4];
@@ -98,7 +98,7 @@ void sd_thread(const void * /*argument*/) {
         }
     }
 
-    DIAG("SD initialized");
+    DIAG(SD "SD initialized");
 
     if (BSP_SD_GetCardInfo(0, &cardInfo) < 0) {
         DIAG(SD "Error reading SD card Info or no card");
@@ -200,8 +200,16 @@ void sd_thread(const void * /*argument*/) {
 
         *(readBuffer + file_info.fsize) = 0;
 
-        startMicropython((void *)example_2);
+        startMicropython(readBuffer);
     }
+
+    /* Close open files */
+    f_close(&fs_read);
+    DIAG(SD "file closed");
+
+    /* Unmount volume */
+    f_mount(NULL, &sdPath[0], 0);
+    DIAG(SD "volume %s unmounted", &sdPath[0]);
 
     while (1) {
         osDelay(10000);

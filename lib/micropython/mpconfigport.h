@@ -42,15 +42,13 @@
  * THE SOFTWARE.
  */
 
+#include <alloca.h>
 #include <stdint.h>
-
-//#include <FreeRTOS.h>
-//#include <semphr.h>
 
 // options to control how MicroPython is built
 
 // Use the minimal starting configuration (disables all optional features).
-#define MICROPY_CONFIG_ROM_LEVEL (MICROPY_CONFIG_ROM_LEVEL_CORE_FEATURES)
+#define MICROPY_CONFIG_ROM_LEVEL (MICROPY_CONFIG_ROM_LEVEL_BASIC_FEATURES)
 
 // MicroPython configuration.
 #define MICROPY_ENABLE_COMPILER (1)
@@ -59,7 +57,15 @@
 #define MICROPY_PY_THREAD (1)
 #define MICROPY_PY_THREAD_GIL (1)
 #define MICROPY_PY_IO (0)
-#define MICROPY_ENABLE_EXTERNAL_IMPORT (0)
+#define MICROPY_ENABLE_EXTERNAL_IMPORT (1)
+#define MICROPY_LONGINT_IMPL (MICROPY_LONGINT_IMPL_MPZ)
+#define MICROPY_FLOAT_IMPL (MICROPY_FLOAT_IMPL_FLOAT)
+
+#define MICROPY_PY_RE (1)
+#define MICROPY_PY_ASYNC_AWAIT (1)
+#define MICROPY_PY_ERRNO (1)
+#define MICROPY_PY_ERRNO_ERRORCODE (0)
+#define MICROPY_PY_CMATH (1)
 
 #define MICROPY_BANNER_MACHINE "Carbon"
 
@@ -67,11 +73,6 @@ typedef intptr_t mp_int_t;   // must be pointer size
 typedef uintptr_t mp_uint_t; // must be pointer size
 typedef long mp_off_t;
 
-// Need to provide a declaration/definition of alloca()
-#if defined(__FreeBSD__) || defined(__NetBSD__)
-#include <stdlib.h>
-#else
-#include <alloca.h>
-#endif
+#define SSIZE_MAX INT_MAX
 
 #define MICROPY_MPHALPORT_H "port/mphalport.h"

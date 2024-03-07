@@ -17,9 +17,11 @@
  */
 
 #include "carbon_mp.h"
-
+#include "py/builtin.h"
 #include "py/compile.h"
 #include "py/gc.h"
+#include "py/lexer.h"
+#include "py/mperrno.h"
 #include "py/persistentcode.h"
 #include "py/runtime.h"
 #include "py/stackctrl.h"
@@ -86,6 +88,16 @@ void nlr_jump_fail(void *val) {
     RAW_DIAG("exception at %p", val);
     for (;;) {
     }
+}
+
+// There is no filesystem so opening a file raises an exception.
+mp_lexer_t *mp_lexer_new_from_file(qstr filename) {
+    mp_raise_OSError(MP_ENOENT);
+}
+
+mp_import_stat_t mp_import_stat(const char *path) {
+    (void)path;
+    return MP_IMPORT_STAT_NO_EXIST;
 }
 
 #ifndef NDEBUG

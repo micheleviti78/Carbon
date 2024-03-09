@@ -29,9 +29,11 @@
 
 #include <printf.h>
 
-#include <lwip/init.h>/*only to retrieve the version*/
+#include <py/mpconfig.h> /*only to retrieve the version*/
 
-#include <ff.h>/*only to retrieve the version*/
+#include <lwip/init.h> /*only to retrieve the version*/
+
+#include <ff.h> /*only to retrieve the version*/
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -133,6 +135,8 @@ void low_level_init() {
             GET_CMSIS_VERSION_SUB);
     printf_("LwIP version %d.%d.%d\r\n", LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR,
             LWIP_VERSION_REVISION);
+    printf_("Micropython version %d.%d.%d\r\n", MICROPY_VERSION_MAJOR,
+            MICROPY_VERSION_MINOR, MICROPY_VERSION_MICRO);
     printf_("FAT File System revision ID %d\r\n", _FATFS);
 
     /* init SDRAM */

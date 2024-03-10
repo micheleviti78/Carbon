@@ -31,7 +31,6 @@
 #include <string.h>
 
 #include <carbon/diag.hpp>
-#include <printf.h>
 
 // Initialise the runtime.
 void mp_embed_init(void *gc_heap, size_t gc_heap_size, void *sp) {
@@ -88,7 +87,8 @@ void mp_embed_exec_mpy(const uint8_t *mpy, size_t len) {
 
 // Called if an exception is raised outside all C exception-catching handlers.
 void nlr_jump_fail(void *val) {
-    printf_("\r\nmicropython exception at %p", val);
+    DIAG(MP "micropython exception at %p", val);
+    mp_obj_print_exception(&mp_plat_print, MP_OBJ_FROM_PTR(val));
     for (;;) {
     }
 }
@@ -107,8 +107,8 @@ mp_import_stat_t mp_import_stat(const char *path) {
 // Used when debugging is enabled.
 void __assert_func(const char *file, int line, const char *func,
                    const char *expr) {
-    RAW_DIAG("assert function file %s, line %d, func %s, expr %s", file, line,
-             func, expr);
+    DIAG(MP "assert function file %s, line %d, func %s, expr %s", file, line,
+         func, expr);
     for (;;) {
     }
 }

@@ -44,11 +44,11 @@ void carbon_diag_pull();
 #define MP "[mp] "
 
 #ifdef CORE_CM7
-#define DIAG_CPU "[CM7]"
+#define DIAG_CPU "[CM7] "
 #else
-#define DIAG_CPU "[CM4]"
+#define DIAG_CPU "[CM4] "
 #endif
 
-#define RAW_DIAG(...) carbon_raw_diag_print(DIAG_CPU " " __VA_ARGS__)
+#define RAW_DIAG(...) carbon_raw_diag_print(DIAG_CPU __VA_ARGS__)
 
 #define DIAG(...) carbon_diag_push("\n\r" DIAG_CPU __VA_ARGS__)

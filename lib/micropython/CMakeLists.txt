@@ -11,6 +11,8 @@ SET(MICROPY_GENHDR_DIR ${CURRENT_BUILD_DIR}/genhdr/)
 
 include(${MICROPY_DIR}/py/py.cmake)
 
+include(${MICROPY_DIR}/extmod/extmod.cmake)
+
 set(SOURCES_PORT
 	${CMAKE_CURRENT_LIST_DIR}/port/carbon_mp_test.c
     ${CMAKE_CURRENT_LIST_DIR}/port/carbon_mp.c  
@@ -24,15 +26,15 @@ set(SOURCES_PORT
 set(SOURCE_SHARED
 	${MICROPY_DIR}/shared/runtime/gchelper_thumb2.s
 	${MICROPY_DIR}/shared/runtime/gchelper_native.c
-	#${MICROPY_DIR}/shared/runtime/pyexec.c
+	${MICROPY_DIR}/shared/runtime/pyexec.c
 	${MICROPY_DIR}/shared/runtime/sys_stdio_mphal.c
 	${MICROPY_DIR}/shared/runtime/interrupt_char.c
-	#${MICROPY_DIR}/shared/runtime/softtimer.c
 	${MICROPY_DIR}/shared/runtime/stdout_helpers.c
-	#${MICROPY_DIR}/shared/readline/readline.c
+	${MICROPY_DIR}/shared/readline/readline.c
 )
 
 set(MICROPY_SOURCE_QSTR
+	${MICROPY_SOURCE_EXTMOD}
     ${MICROPY_SOURCE_PY}
 	${SOURCE_SHARED}
 	${SOURCES_PORT}
@@ -40,7 +42,7 @@ set(MICROPY_SOURCE_QSTR
 
 set(MICROPYTHON_LIB micropython_${PROJECT_NAME})
 
-add_library(${MICROPYTHON_LIB} ${SOURCES_PORT} ${SOURCE_SHARED} ${MICROPY_SOURCE_PY})
+add_library(${MICROPYTHON_LIB} ${SOURCES_PORT} ${SOURCE_SHARED} ${MICROPY_SOURCE_PY} ${MICROPY_SOURCE_EXTMOD})
 
 target_compile_options(${MICROPYTHON_LIB} PUBLIC -Wno-vla -Wno-undef -Wno-stack-usage)
 

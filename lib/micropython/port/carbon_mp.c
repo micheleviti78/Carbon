@@ -60,6 +60,7 @@ void mp_embed_exec_str(const char *src) {
         nlr_pop();
     } else {
         // Uncaught exception: print it out.
+        DIAG(MP "Uncaught exception from source script");
         mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
     }
 }
@@ -80,6 +81,7 @@ void mp_embed_exec_mpy(const uint8_t *mpy, size_t len) {
         nlr_pop();
     } else {
         // Uncaught exception: print it out.
+        DIAG(MP "Uncaught exception from precompiled code");
         mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
     }
 }

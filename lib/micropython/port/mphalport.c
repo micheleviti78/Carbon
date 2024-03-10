@@ -1,37 +1,66 @@
-/*
- * This file is part of the MicroPython project, http://micropython.org/
+/**
+ ******************************************************************************
+ * @file           mphalport.c
+ * @author         Michele Viti <micheleviti78@gmail.com>
+ * @date           Mar. 2024
+ * @brief          port for HAL function
+ ******************************************************************************
+ * @attention
+ * Copyright (c) 2022 Michele Viti.
+ * All rights reserved.
  *
- * The MIT License (MIT)
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
  *
- * Copyright (c) 2022-2023 Damien P. George
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ ******************************************************************************
  */
 
 #include "py/mphal.h"
+#include "py/obj.h"
 #include <printf.h>
 
 // Send string of given length to stdout, converting \n to \r\n.
-void mp_hal_stdout_tx_strn_cooked(const char *str, size_t len) {
-    printf_("\r\n%.*s", (int)len, str);
+mp_uint_t mp_hal_stdout_tx_strn(const char *str, size_t len) {
+    printf_("%.*s", (int)len, str);
+    return len;
 }
 
 inline void mp_hal_set_interrupt_char(int c) {
-    printf_("mp_hal_set_interrupt_char, char:  %d", c);
+    printf_("\r\nmp_hal_set_interrupt_char, char:  %d", c);
 }
+
+int mp_hal_stdin_rx_chr(void) {
+    printf_("\r\nmp_hal_stdin_rx_chr");
+    return 0;
+}
+
+uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
+    printf_("\r\nmp_hal_stdio_poll");
+    return 0;
+}
+
+void mp_hal_delay_ms(mp_uint_t /*ms*/) { printf_("\r\nmp_hal_delay_ms"); }
+
+void mp_hal_delay_us(mp_uint_t /*us*/) { printf_("\r\nmp_hal_delay_us"); }
+
+mp_uint_t mp_hal_ticks_ms(void) {
+    printf_("\r\nmp_hal_ticks_ms");
+    return 0;
+}
+
+mp_uint_t mp_hal_ticks_us(void) {
+    printf_("\r\nmp_hal_ticks_us");
+    return 0;
+}
+
+mp_uint_t mp_hal_ticks_cpu(void) {
+    printf_("\r\nmp_hal_ticks_cpu");
+    return 0;
+}
+
+mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args,
+                         mp_map_t *kwargs) {
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);

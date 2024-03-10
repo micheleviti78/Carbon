@@ -51,9 +51,9 @@ extern "C" {
  DEFINE CONSTANTS
  ******************************************************************************/
 #define MICROPY_TASK_PRIORITY (1)
-#define MICROPY_TASK_STACK_SIZE ((6 * 1024) + 512) // in bytes
+#define MICROPY_TASK_STACK_SIZE 2097152U /*2 MB size micropython stack*/
 #define MICROPY_TASK_STACK_LEN (MICROPY_TASK_STACK_SIZE / sizeof(StackType_t))
-
+#define MICROPYTHON_HEAP_SIZE 2097152U /*2 MB size micropython heap*/
 /******************************************************************************
  EXPORTED DATA
  ******************************************************************************/

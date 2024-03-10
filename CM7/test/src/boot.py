@@ -142,21 +142,21 @@ for i in sys.argv:
 #11. Use of regex:
 
 # Import re module
-#import re
+import re
 
 # Take any string data
-#string = 'ASDFgh78'
+string = 'ASDFgh78'
 # Define the searching pattern
-#pattern = '^[A-Z]'
+pattern = '^[A-Z]'
 
 # match the pattern with input value
-#found = re.match(pattern, string)
+found = re.match(pattern, string)
 
 # Print message based on the return value
-#if found:
-#  print("The input value is started with the capital letter")
-#else:
-#  print("You have to type string start with the capital letter")
+if found:
+  print("The input value is started with the capital letter")
+else:
+  print("You have to type string start with the capital letter")
 
     
 #*************************************************************************************

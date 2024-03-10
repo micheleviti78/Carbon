@@ -25,11 +25,11 @@
 #include <carbon/diag.hpp>
 
 // This is the static memory (TCB and stack) for the main MicroPython task
-StaticTask_t mpTaskTCB __attribute__((section(".rtos_heap")));
-StackType_t mpTaskStack[MICROPY_TASK_STACK_LEN]
-    __attribute__((section(".sdram_bank2"))) __attribute__((aligned(8)));
+StaticTask_t mpTaskTCB __attribute__((aligned(8), section(".sdram_bank2")));
 
-#define MICROPYTHON_HEAP_SIZE 2097152U /*2 MB size micropython heap*/
+StackType_t mpTaskStack[MICROPY_TASK_STACK_LEN]
+    __attribute__((aligned(8), section(".sdram_bank2")));
+
 static uint8_t micropython_heap[MICROPYTHON_HEAP_SIZE]
     __attribute__((aligned(32), section(".sdram_bank2")));
 
@@ -41,6 +41,9 @@ void TASK_MicroPython(void *pvParameters) {
     sp = (uint8_t *)cortex_m7_get_sp();
 
     DIAG(MP "starting micropython");
+    DIAG(MP "stack at %p length %u", mpTaskStack, MICROPY_TASK_STACK_LEN);
+    DIAG(MP "heap at %p length %u", micropython_heap, MICROPYTHON_HEAP_SIZE);
+    DIAG(MP "executing script at %p\r\n", pvParameters);
 
     mp_embed_init(&micropython_heap[0], MICROPYTHON_HEAP_SIZE, sp);
 

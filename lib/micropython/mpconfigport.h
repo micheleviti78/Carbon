@@ -15,32 +15,6 @@
  *
  ******************************************************************************
  */
-/*
- * This file is part of the MicroPython project, http://micropython.org/
- *
- * The MIT License (MIT)
- *
- * Copyright (c) 2013, 2014 Damien P. George
- * Copyright (c) 2015 Daniel Campora
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 
 #include <alloca.h>
 #include <stdint.h>
@@ -56,30 +30,34 @@
 #define MICROPY_PY_GC (1)
 #define MICROPY_PY_THREAD (1)
 #define MICROPY_PY_THREAD_GIL (1)
-#define MICROPY_PY_IO (0)
-#define MICROPY_ENABLE_EXTERNAL_IMPORT (1)
+// #define MICROPY_PY_IO (0)
+// #define MICROPY_ENABLE_EXTERNAL_IMPORT (1)
 #define MICROPY_LONGINT_IMPL (MICROPY_LONGINT_IMPL_MPZ)
 #define MICROPY_FLOAT_IMPL (MICROPY_FLOAT_IMPL_FLOAT)
 
+#define MICROPY_HELPER_REPL (1)
+#define MICROPY_PY_SYS_PS1_PS2 (1)
+
 #define MICROPY_PY_RE (1)
-#define MICROPY_PY_ASYNC_AWAIT (1)
-#define MICROPY_PY_ERRNO (1)
-#define MICROPY_PY_ERRNO_ERRORCODE (0)
+// #define MICROPY_PY_ASYNC_AWAIT (1)
+// #define MICROPY_PY_ERRNO (1)
+// #define MICROPY_PY_ERRNO_ERRORCODE (0)
 #define MICROPY_PY_CMATH (1)
+// #define MICROPY_NLR_SETJMP (1)
 
-#define MICROPY_PY_BUILTINS_SLICE_ATTRS (1)
-#define MICROPY_PY_BUILTINS_SLICE (1)
-#define MICROPY_PY_BUILTINS_SLICE_INDICES (1)
-#define MICROPY_PY_ARRAY_SLICE_ASSIGN (1)
+// #define MICROPY_PY_BUILTINS_SLICE_ATTRS (1)
+// #define MICROPY_PY_BUILTINS_SLICE (1)
+// #define MICROPY_PY_BUILTINS_SLICE_INDICES (1)
+// #define MICROPY_PY_ARRAY_SLICE_ASSIGN (1)
 
-#define MICROPY_PY_ALL_SPECIAL_METHODS (1)
-#define MICROPY_PY_BUILTINS_BYTES_HEX (1)
-#define MICROPY_PY_BUILTINS_INPUT (0)
+// #define MICROPY_PY_ALL_SPECIAL_METHODS (1)
+// #define MICROPY_PY_BUILTINS_BYTES_HEX (1)
+// #define MICROPY_PY_BUILTINS_INPUT (0)
 
-#define MICROPY_ENABLE_SCHEDULER (0)
-#define MICROPY_PY_SYS_STDIO_BUFFER (0)
+// #define MICROPY_ENABLE_SCHEDULER (0)
+// #define MICROPY_PY_SYS_STDIO_BUFFER (0)
 
-#define MICROPY_CPYTHON_COMPAT (1)
+// #define MICROPY_CPYTHON_COMPAT (1)
 
 #define MICROPY_BANNER_MACHINE "Carbon"
 
@@ -88,6 +66,8 @@ typedef uintptr_t mp_uint_t; // must be pointer size
 typedef long mp_off_t;
 
 #define STATIC static
+
+#define MP_STATE_PORT MP_STATE_VM
 
 #define SSIZE_MAX INT_MAX
 

@@ -3,7 +3,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2022-2023 Damien P. George
+ * Copyright (c) 2014 Damien P. George
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,9 @@
  * THE SOFTWARE.
  */
 
-#include "py/mphal.h"
-#include <printf.h>
+// qstrs specific to this port, only needed if they aren't auto-generated
+// *FORMAT-OFF*
 
-// Send string of given length to stdout, converting \n to \r\n.
-void mp_hal_stdout_tx_strn_cooked(const char *str, size_t len) {
-    printf_("\r\n%.*s", (int)len, str);
-}
-
-inline void mp_hal_set_interrupt_char(int c) {
-    printf_("mp_hal_set_interrupt_char, char:  %d", c);
-}
+// Entries for sys.path
+Q(/)
+Q(/ lib)

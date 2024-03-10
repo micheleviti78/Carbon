@@ -17,6 +17,7 @@
                 "CORE_CM4=1",
                 "HAL_TIM_MODULE_ENABLED=1",
                 "DUAL_CORE=1",
+                "MICROPY_PY_THREAD=1",
                 "FREERTOS_USE_TRACE=1",
                 "TIM2=1",
                 "USE_FULL_LL_DRIVER=1"

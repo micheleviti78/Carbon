@@ -3,7 +3,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2022-2023 Damien P. George
+ * Copyright (c) 2013-2014 Damien P. George
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,20 @@
  * THE SOFTWARE.
  */
 
-#include "py/mphal.h"
-#include <printf.h>
+    .syntax unified
+    .cpu cortex-m7
+    .thumb
 
-// Send string of given length to stdout, converting \n to \r\n.
-void mp_hal_stdout_tx_strn_cooked(const char *str, size_t len) {
-    printf_("\r\n%.*s", (int)len, str);
-}
+    .section .text
+    .align  2
 
-inline void mp_hal_set_interrupt_char(int c) {
-    printf_("mp_hal_set_interrupt_char, char:  %d", c);
-}
+    .global cortex_m7_get_sp
+    .type cortex_m7_get_sp, %function
+
+@ uint cortex_m7_get_sp(void)
+cortex_m7_get_sp:
+    @ return the sp
+    mov     r0, sp
+    bx      lr
+
+    .size cortex_m7_get_sp, .-cortex_m7_get_sp

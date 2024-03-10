@@ -18,7 +18,6 @@
 #include "mptask.h"
 #include "carbon_mp.h"
 
-#include <cmsis_gcc.h>
 #include <cmsis_os.h>
 #include <task.h>
 
@@ -33,11 +32,12 @@ StackType_t mpTaskStack[MICROPY_TASK_STACK_LEN]
 static uint8_t micropython_heap[MICROPYTHON_HEAP_SIZE]
     __attribute__((aligned(32), section(".sdram_bank2")));
 
+uintptr_t cortex_m7_get_sp(void);
 static uint8_t *sp;
 static void TASK_MicroPython(void *pvParameters);
 
 void TASK_MicroPython(void *pvParameters) {
-    sp = (uint8_t *)(__get_PSP());
+    sp = (uint8_t *)cortex_m7_get_sp();
 
     DIAG(MP "starting micropython");
 

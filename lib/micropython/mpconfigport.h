@@ -67,11 +67,27 @@
 #define MICROPY_PY_ERRNO_ERRORCODE (0)
 #define MICROPY_PY_CMATH (1)
 
+#define MICROPY_PY_BUILTINS_SLICE_ATTRS (1)
+#define MICROPY_PY_BUILTINS_SLICE (1)
+#define MICROPY_PY_BUILTINS_SLICE_INDICES (1)
+#define MICROPY_PY_ARRAY_SLICE_ASSIGN (1)
+
+#define MICROPY_PY_ALL_SPECIAL_METHODS (1)
+#define MICROPY_PY_BUILTINS_BYTES_HEX (1)
+#define MICROPY_PY_BUILTINS_INPUT (0)
+
+#define MICROPY_ENABLE_SCHEDULER (0)
+#define MICROPY_PY_SYS_STDIO_BUFFER (0)
+
+#define MICROPY_CPYTHON_COMPAT (1)
+
 #define MICROPY_BANNER_MACHINE "Carbon"
 
 typedef intptr_t mp_int_t;   // must be pointer size
 typedef uintptr_t mp_uint_t; // must be pointer size
 typedef long mp_off_t;
+
+#define STATIC static
 
 #define SSIZE_MAX INT_MAX
 

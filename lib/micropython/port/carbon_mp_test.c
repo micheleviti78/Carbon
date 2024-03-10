@@ -15,46 +15,39 @@
  *
  ******************************************************************************
  */
-/* This file is part of the MicroPython project, http://micropython.org/
- * The MIT License (MIT)
- * Copyright (c) 2022-2023 Damien P. George
- */
 
 #include "carbon_mp_test.h"
 #include "carbon_mp.h"
 
-// This is example 1 script, which will be compiled and executed.
 static const char *example_1 =
     "print('hello world!', list(x + 1 for x in range(10)), end='eol\\n')";
 
-// This is example 2 script, which will be compiled and executed.
-// static const char *example_2 = "for i in range(10):\n"
-//                                "    print('iter {:08}'.format(i))\n"
-//                                "\n"
+static const char *example_2 = "for i in range(10):\n"
+                               "    print('iter {:08}'.format(i))\n"
+                               "\n"
 
-//                                "import gc\n"
-//                                "print('run GC collect')\n"
-//                                "gc.collect()\n"
-//                                "\n"
-//                                "print('finish')\n";
+                               "import gc\n"
+                               "print('run GC collect')\n"
+                               "gc.collect()\n"
+                               "\n"
+                               "print('finish')\n";
 
-// static const char *example_3 = "def addition(number1, number2):\n"
-//                                "result = number1 + number2\n"
-//                                "print(' Addition result : ',result)\n"
-//                                "def area(radius):\n"
-//                                "result = 3.14 * radius * radius\n"
-//                                "return result\n"
-//                                "addition(5, 3)\n"
-//                                "print(' Area of the circle is ',area(2))\n"
-//                                "import gc\n"
-//                                "print('run GC collect')\n"
-//                                "gc.collect()\n"
-//                                "\n"
-//                                "print('finish')\n";
+static const char *example_3 = "def addition(number1, number2):\n"
+                               "result = number1 + number2\n"
+                               "print(' Addition result : ',result)\n"
+                               "def area(radius):\n"
+                               "result = 3.14 * radius * radius\n"
+                               "return result\n"
+                               "addition(5, 3)\n"
+                               "print(' Area of the circle is ',area(2))\n"
+                               "import gc\n"
+                               "print('run GC collect')\n"
+                               "gc.collect()\n"
+                               "\n"
+                               "print('finish')\n";
 
 void carbon_mp_test() {
-    // Run the example scripts (they will be compiled first).
     mp_embed_exec_str(example_1);
-    // mp_embed_exec_str(example_2);
-    // mp_embed_exec_str(example_3);
+    mp_embed_exec_str(example_2);
+    mp_embed_exec_str(example_3);
 }

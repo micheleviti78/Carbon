@@ -17,6 +17,7 @@
  */
 #include "mptask.h"
 #include "carbon_mp.h"
+#include "carbon_mp_test.h"
 
 #include <cmsis_os.h>
 #include <task.h>

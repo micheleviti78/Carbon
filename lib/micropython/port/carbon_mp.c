@@ -17,6 +17,7 @@
  */
 
 #include "carbon_mp.h"
+
 #include "py/builtin.h"
 #include "py/compile.h"
 #include "py/gc.h"
@@ -26,9 +27,11 @@
 #include "py/runtime.h"
 #include "py/stackctrl.h"
 #include "shared/runtime/gchelper.h"
+
 #include <string.h>
 
 #include <carbon/diag.hpp>
+#include <printf.h>
 
 // Initialise the runtime.
 void mp_embed_init(void *gc_heap, size_t gc_heap_size, void *sp) {
@@ -85,7 +88,7 @@ void mp_embed_exec_mpy(const uint8_t *mpy, size_t len) {
 
 // Called if an exception is raised outside all C exception-catching handlers.
 void nlr_jump_fail(void *val) {
-    RAW_DIAG("exception at %p", val);
+    printf_("\r\nmicropython exception at %p", val);
     for (;;) {
     }
 }

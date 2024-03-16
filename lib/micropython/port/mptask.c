@@ -43,7 +43,7 @@ void TASK_MicroPython(void *pvParameters) {
     DIAG(MP "starting micropython");
     DIAG(MP "stack at %p length %u", mpTaskStack, MICROPY_TASK_STACK_LEN);
     DIAG(MP "heap at %p length %u", micropython_heap, MICROPYTHON_HEAP_SIZE);
-    DIAG(MP "executing script at %p\r\n", pvParameters);
+    DIAG(MP "executing script at %p", pvParameters);
 
     mp_embed_init(&micropython_heap[0], MICROPYTHON_HEAP_SIZE, sp);
 

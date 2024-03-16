@@ -1,11 +1,15 @@
 #01. Hello World:
 
 # The following python script will print the text "Hello World!" as output.
-
-print("Hello World!")
+print("")
+print("***************************")
+print("#01. Hello World!")
 
 #*************************************************************************************
 #02. Join two strings:
+print("")
+print("***************************")
+print("#02. Join two strings")
 
 # Two words "Programming" and "Languages" are joined and "ProgrammingLanguages" is printed as output.
 
@@ -16,6 +20,9 @@ print(z)
 
 #*************************************************************************************
 #03. Format floating point in the string:
+print("")
+print("***************************")
+print("#03. Format floating point in the string")
 
 # Use of String Formatting
 x = 462.75897
@@ -27,6 +34,9 @@ print("%5.2f" % y)
 
 #*************************************************************************************
 #04. Raise a number to a power:
+print("")
+print("***************************")
+print("#04. Raise a number to a power")
 
 import math
 # Assign values to a and n
@@ -47,6 +57,9 @@ print("%d to the power %d is %5.2f" % (a,n,b))
 
 #*************************************************************************************
 #05. Working with Boolean types:
+print("")
+print("***************************")
+print("#05. Working with Boolean types")
 
 # Boolean value
 x = True
@@ -69,6 +82,9 @@ print(x < y)
 
 #*************************************************************************************
 #06. If else statement:
+print("")
+print("***************************")
+print("#06. If else statement")
 
 # Assign a numeric value
 x = 35
@@ -81,6 +97,9 @@ else:
 
 #*************************************************************************************    
 #07. Using AND and OR operators:
+print("")
+print("***************************")
+print("#07. Using AND and OR operators")
 
 # Take practical marks
 x = 26
@@ -89,12 +108,15 @@ y = 46
 
 # Check the passing condition using AND and OR operator
 if (x >= 25 and y >= 45) or (x + y) >=70:
-    print("\nYou have passed")
+    print("You have passed")
 else:
-    print("\nYou have failed")
+    print("You have failed")
 
 #*************************************************************************************    
 #08. Switch case statement:
+print("")
+print("***************************")
+print("#08. Switch case statement")
 
 # Switcher for implementing switch case options
 def employee_details(ID):
@@ -114,6 +136,9 @@ print(employee_details(ID))
 
 #*************************************************************************************
 #09. While Loop:
+print("")
+print("***************************")
+print("#09. While Loop")
 
 # Initialize counter
 counter = 1
@@ -126,6 +151,9 @@ while counter < 10:
     
 #*************************************************************************************
 #10. Use of command-line argument:
+print("")
+print("***************************")
+print("#10. Use of command-line argument")
 
 # Import sys module
 import sys
@@ -140,6 +168,9 @@ for i in sys.argv:
     
 #*************************************************************************************
 #11. Use of regex:
+print("")
+print("***************************")
+print("#11. Use of regex")
 
 # Import re module
 import re
@@ -176,6 +207,10 @@ else:
  
 #*************************************************************************************
 #13. Add and remove the item from a list:
+print("")
+print("***************************")
+print("#13. Add and remove the item from a list")
+
 # Declare a fruit list
 fruits = ["Mango","Orange","Guava","Banana"]
 
@@ -195,6 +230,9 @@ print(fruits)
 
 #*************************************************************************************
 #14. List comprehension:
+print("")
+print("***************************")
+print("#14. List comprehension")
 
 # Create a list of characters using list comprehension
 char_list = [ char for char in "Python" ]
@@ -227,6 +265,10 @@ print(site_list)
 
 #*************************************************************************************
 #16. Add and search data in the dictionary:
+print("")
+print("***************************")
+print("#16. Add and search data in the dictionary")
+
 # Define a dictionary
 customers = {'05453':'Ram','04457':'Krishna',
 '02834':'Vishnu','01655':'Shiva', '07559':'David'}
@@ -250,6 +292,9 @@ for customer in customers:
 
 #*************************************************************************************
 #17. Add and search data in the set:
+print("")
+print("***************************")
+print("#17. Add and search data in the set")
 
 # Define the number set
 numbers = {13, 10, 56, 18, 12, 44, 87}
@@ -273,6 +318,9 @@ print(message)
 
 #*************************************************************************************
 #18. Count items in the list:
+print("")
+print("***************************")
+print("#18. Count items in the list")
 
 # Define the string
 string = 'Python Go JavaScript HTML CSS MYSQL Python'
@@ -285,6 +333,9 @@ print("%s appears %d times" % (search, count))
 
 #*************************************************************************************
 #19. Define and call a function:
+print("")
+print("***************************")
+print("#19. Define and call a function")
 
 # Define addition function
 def addition(number1, number2):
@@ -303,6 +354,9 @@ print("Area of the circle is",area(2))
 
 #*************************************************************************************
 #20. Use of throw and catch exception:
+print("")
+print("***************************")
+print("#20. Use of throw and catch exception")
 
 # Try block
 try:
@@ -334,6 +388,9 @@ except (ValueError):
 
 #*************************************************************************************
 #21. Define class and method:
+print("")
+print("***************************")
+print("#21. Define class and method")
 
 # Define the class
 class Employee:
@@ -353,6 +410,9 @@ emp.details()
 
 #*************************************************************************************
 #22. Use of range function:
+print("")
+print("***************************")
+print("#22. Use of range function")
 
 # range() with one parameter
 for val in range(7):
@@ -370,6 +430,9 @@ for val in range(0,4,1):
 
 #*************************************************************************************
 #23. Use of map function:
+print("")
+print("***************************")
+print("#23. Use of map function")
 
 # Define the function to calculate power
 def cal_power(n):    
@@ -386,6 +449,9 @@ print(list(result))
 
 #*************************************************************************************
 #24. Use of filter function:
+print("")
+print("***************************")
+print("#24. Use of filter function")
 
 # Define a list of participant
 participant = ['Ram', 'John', 'David', 'Krishna', 'Prasad']

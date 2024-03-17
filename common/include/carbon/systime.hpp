@@ -18,9 +18,11 @@
 
 #pragma once
 
-#include <stm32h7xx_hal.h>
-
+#ifdef __cplusplus
 #include <cstdint>
+#else
+#include <stdint.h>
+#endif
 
 #define DWT_CLOCKS(dwt) dwt->CYCCNT;
 

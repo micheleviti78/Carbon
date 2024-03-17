@@ -18,7 +18,12 @@
 
 #include "py/mphal.h"
 #include "py/obj.h"
+
 #include <printf.h>
+
+#include <cmsis_os.h>
+
+#include <carbon/systime.hpp>
 
 // Send string of given length to stdout, converting \n to \r\n.
 mp_uint_t mp_hal_stdout_tx_strn(const char *str, size_t len) {
@@ -40,9 +45,9 @@ uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
     return 0;
 }
 
-void mp_hal_delay_ms(mp_uint_t /*ms*/) { printf_("\r\nmp_hal_delay_ms"); }
+void mp_hal_delay_ms(mp_uint_t ms) { osDelay(ms * 1000); }
 
-void mp_hal_delay_us(mp_uint_t /*us*/) { printf_("\r\nmp_hal_delay_us"); }
+void mp_hal_delay_us(mp_uint_t us) { delayUs(us); }
 
 mp_uint_t mp_hal_ticks_ms(void) {
     printf_("\r\nmp_hal_ticks_ms");

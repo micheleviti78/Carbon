@@ -4,12 +4,16 @@
 print("")
 print("***************************")
 print("#01. Hello World!")
+print("***************************")
+print("")
 
 #*************************************************************************************
 #02. Join two strings:
 print("")
 print("***************************")
 print("#02. Join two strings")
+print("***************************")
+print("")
 
 # Two words "Programming" and "Languages" are joined and "ProgrammingLanguages" is printed as output.
 
@@ -23,6 +27,8 @@ print(z)
 print("")
 print("***************************")
 print("#03. Format floating point in the string")
+print("***************************")
+print("")
 
 # Use of String Formatting
 x = 462.75897
@@ -37,6 +43,8 @@ print("%5.2f" % y)
 print("")
 print("***************************")
 print("#04. Raise a number to a power")
+print("***************************")
+print("")
 
 import math
 # Assign values to a and n
@@ -60,6 +68,8 @@ print("%d to the power %d is %5.2f" % (a,n,b))
 print("")
 print("***************************")
 print("#05. Working with Boolean types")
+print("***************************")
+print("")
 
 # Boolean value
 x = True
@@ -85,6 +95,8 @@ print(x < y)
 print("")
 print("***************************")
 print("#06. If else statement")
+print("***************************")
+print("")
 
 # Assign a numeric value
 x = 35
@@ -100,6 +112,8 @@ else:
 print("")
 print("***************************")
 print("#07. Using AND and OR operators")
+print("***************************")
+print("")
 
 # Take practical marks
 x = 26
@@ -117,6 +131,8 @@ else:
 print("")
 print("***************************")
 print("#08. Switch case statement")
+print("***************************")
+print("")
 
 # Switcher for implementing switch case options
 def employee_details(ID):
@@ -139,6 +155,8 @@ print(employee_details(ID))
 print("")
 print("***************************")
 print("#09. While Loop")
+print("***************************")
+print("")
 
 # Initialize counter
 counter = 1
@@ -154,6 +172,8 @@ while counter < 10:
 print("")
 print("***************************")
 print("#10. Use of command-line argument")
+print("***************************")
+print("")
 
 # Import sys module
 import sys
@@ -171,6 +191,8 @@ for i in sys.argv:
 print("")
 print("***************************")
 print("#11. Use of regex")
+print("***************************")
+print("")
 
 # Import re module
 import re
@@ -210,6 +232,8 @@ else:
 print("")
 print("***************************")
 print("#13. Add and remove the item from a list")
+print("***************************")
+print("")
 
 # Declare a fruit list
 fruits = ["Mango","Orange","Guava","Banana"]
@@ -233,6 +257,8 @@ print(fruits)
 print("")
 print("***************************")
 print("#14. List comprehension")
+print("***************************")
+print("")
 
 # Create a list of characters using list comprehension
 char_list = [ char for char in "Python" ]
@@ -246,7 +272,20 @@ site_list = [ site for site in websites ]
 print(site_list)
 
 #*************************************************************************************
-#15. Slice data:
+#15. Slice array:
+print("")
+print("***************************")
+print("#15.Slice array")
+print("***************************")
+print("")
+
+import array as arr 
+
+numbers = arr.array('i', [1, 2, 3, 4, 5])
+
+copy = numbers[:3]
+
+print(copy)
 
 # Assign string value
 #text = "Python Programming Language"
@@ -268,6 +307,8 @@ print(site_list)
 print("")
 print("***************************")
 print("#16. Add and search data in the dictionary")
+print("***************************")
+print("")
 
 # Define a dictionary
 customers = {'05453':'Ram','04457':'Krishna',
@@ -295,6 +336,8 @@ for customer in customers:
 print("")
 print("***************************")
 print("#17. Add and search data in the set")
+print("***************************")
+print("")
 
 # Define the number set
 numbers = {13, 10, 56, 18, 12, 44, 87}
@@ -321,6 +364,8 @@ print(message)
 print("")
 print("***************************")
 print("#18. Count items in the list")
+print("***************************")
+print("")
 
 # Define the string
 string = 'Python Go JavaScript HTML CSS MYSQL Python'
@@ -336,6 +381,8 @@ print("%s appears %d times" % (search, count))
 print("")
 print("***************************")
 print("#19. Define and call a function")
+print("***************************")
+print("")
 
 # Define addition function
 def addition(number1, number2):
@@ -357,6 +404,8 @@ print("Area of the circle is",area(2))
 print("")
 print("***************************")
 print("#20. Use of throw and catch exception")
+print("***************************")
+print("")
 
 # Try block
 try:
@@ -391,6 +440,8 @@ except (ValueError):
 print("")
 print("***************************")
 print("#21. Define class and method")
+print("***************************")
+print("")
 
 # Define the class
 class Employee:
@@ -413,6 +464,8 @@ emp.details()
 print("")
 print("***************************")
 print("#22. Use of range function")
+print("***************************")
+print("")
 
 # range() with one parameter
 for val in range(7):
@@ -433,6 +486,8 @@ for val in range(0,4,1):
 print("")
 print("***************************")
 print("#23. Use of map function")
+print("***************************")
+print("")
 
 # Define the function to calculate power
 def cal_power(n):    
@@ -452,6 +507,8 @@ print(list(result))
 print("")
 print("***************************")
 print("#24. Use of filter function")
+print("***************************")
+print("")
 
 # Define a list of participant
 participant = ['Ram', 'John', 'David', 'Krishna', 'Prasad']
@@ -464,6 +521,37 @@ selectedList = filter(SelectedPerson, participant)
 print('The selected candidates are:')
 for candidate in selectedList:
     print(candidate)
+
+#*************************************************************************************
+#25. Use of filter function:
+# print("")
+# print("***************************")
+# print("#25. Multithreading")
+# print("***************************")
+# print("")
+
+# import _thread
+# import time
+
+# def second_thread():
+#     while True:
+#         print("Hello, I'm here in the second thread writting every second")
+#         time.sleep(1)
+        
+# _thread.start_new_thread(second_thread, ())
+
+# index = 1
+
+# while index < 100:
+#     print("index ",index)
+#     index = index + 1
+#     time.sleep(1)
+
+print("")
+print("***************************")
+print("running garbage collector")
+print("***************************")
+print("")
 
 import gc
 print('run GC collect')

@@ -25,20 +25,19 @@
 
 #include <carbon/systime.hpp>
 
+mp_uint_t mp_carbon_stdout(const char *str, size_t len);
+int mp_carbon_stdint();
+
 // Send string of given length to stdout, converting \n to \r\n.
 mp_uint_t mp_hal_stdout_tx_strn(const char *str, size_t len) {
-    printf_("%.*s", (int)len, str);
-    return len;
+    return mp_carbon_stdout(str, len);
 }
 
 inline void mp_hal_set_interrupt_char(int c) {
-    printf_("\r\nmp_hal_set_interrupt_char, char:  %d", c);
+    // printf_("\r\nmp_hal_set_interrupt_char, char:  %d", c);
 }
 
-int mp_hal_stdin_rx_chr(void) {
-    printf_("\r\nmp_hal_stdin_rx_chr");
-    return 0;
-}
+int mp_hal_stdin_rx_chr(void) { return mp_carbon_stdint(); }
 
 uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
     printf_("\r\nmp_hal_stdio_poll");

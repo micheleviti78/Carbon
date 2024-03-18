@@ -541,7 +541,7 @@ def second_thread():
         
 _thread.start_new_thread(second_thread, ())
 
-time.sleep(10)
+time.sleep(3)
 
 #*************************************************************************************
 #26. Test from micropython embed port:

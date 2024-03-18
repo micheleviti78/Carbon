@@ -15,12 +15,22 @@
  *
  ******************************************************************************
  */
-#include <mpcarbon.h>
-
-#include <cmsis_os.h>
-#include <task.h>
 
 #include <carbon/diag.hpp>
+
+#include <cmsis_os.h>
+#include <lwip/api.h>
+#include <mpcarbon.h>
+#include <printf.h>
+#include <shared/runtime/pyexec.h>
+#include <task.h>
+
+#include <stdint.h>
+
+struct netconn *connection = NULL;
+struct netconn *new_connection = NULL;
+
+#define CARBON_MP_CONSOLE_PORT 6666
 
 #define MICROPY_TASK_PRIORITY (1)
 #define MICROPY_TASK_STACK_SIZE 2097152U /*2 MB size micropython stack*/
@@ -38,8 +48,14 @@ static uint8_t micropython_heap[MICROPYTHON_HEAP_SIZE]
     __attribute__((aligned(32), section(".sdram_bank2")));
 
 uintptr_t cortex_m7_get_sp(void);
+
 static uint8_t *sp;
+
 static void TASK_MicroPython(void *pvParameters);
+
+static bool setup_connection();
+
+static void close_connection();
 
 void TASK_MicroPython(void *pvParameters) {
     sp = (uint8_t *)cortex_m7_get_sp();
@@ -60,8 +76,46 @@ void TASK_MicroPython(void *pvParameters) {
 
     DIAG(MP "python script execution terminated");
 
+    if (!setup_connection()) {
+        DIAG(MP "cannot setup connection");
+        for (;;) {
+            osDelay(10000);
+        }
+    }
+
+    int err = netconn_accept(connection, &new_connection);
+
+    if (err != ERR_OK) {
+        DIAG(MP "error while connecting %d", err);
+        for (;;) {
+            osDelay(10000);
+        }
+    }
+
+    // main script is finished, so now go into REPL mode.
+    // the REPL mode can change, or it can request a soft reset.
     for (;;) {
-        osDelay(10000);
+        int ret = pyexec_friendly_repl();
+        if (ret != 0) {
+            DIAG(MP "error in console %d", ret);
+            close_connection();
+            DIAG(MP "connection close, reconnecting");
+            err = netconn_accept(connection, &new_connection);
+            if (err != ERR_OK) {
+                DIAG(MP "error while reconnection %d", err);
+                break;
+            }
+        } else if (!new_connection) {
+            DIAG(MP "connection close, reconnecting");
+            err = netconn_accept(connection, &new_connection);
+            if (err != ERR_OK) {
+                DIAG(MP "error while reconnection %d", err);
+                break;
+            }
+        }
+        for (;;) {
+            osDelay(10000);
+        }
     }
 }
 
@@ -74,4 +128,91 @@ void startMicropython(void *exec) {
     } else {
         DIAG(MP "micropython task started");
     }
+}
+
+bool setup_connection() {
+    connection = netconn_new(NETCONN_TCP);
+    if (!connection) {
+        DIAG(MP "Failed to create new netconn");
+        return false;
+    }
+
+    uint16_t port = CARBON_MP_CONSOLE_PORT;
+
+    int err = netconn_bind(connection, nullptr, port);
+    if (err != ERR_OK) {
+        DIAG(MP "Can't bind to port %" PRIu16 ": %d", port, err);
+        netconn_delete(connection);
+        return false;
+    }
+
+    err = netconn_listen_with_backlog(connection, 1);
+    if (err != ERR_OK) {
+        DIAG(MP "Can't listen to port %" PRIu16 ": %d", port, err);
+        netconn_delete(connection);
+        return false;
+    }
+
+    DIAG(MP "Accepting connections on port %" PRIu16, port);
+
+    return true;
+}
+
+mp_uint_t mp_carbon_stdout(const char *str, size_t len) {
+    if (new_connection) {
+        int res = netconn_write(new_connection, str, len, NETCONN_COPY);
+        if (res != ERR_OK) {
+            close_connection();
+        }
+    } else {
+        printf_("%.*s", (int)len, str);
+    }
+    return len;
+}
+
+static struct netbuf *carbon_mp_console_recv_netbuf = NULL;
+static void *carbon_mp_console_recv_buf = NULL;
+static uint16_t carbon_mp_console_recv_buf_size = 0;
+
+int mp_carbon_stdint() {
+    int err;
+    if (new_connection) {
+        if (carbon_mp_console_recv_buf_size == 0) {
+            netbuf_delete(carbon_mp_console_recv_netbuf);
+            err = netconn_recv(new_connection, &carbon_mp_console_recv_netbuf);
+            if (err == ERR_OK && carbon_mp_console_recv_netbuf) {
+                netbuf_data(carbon_mp_console_recv_netbuf,
+                            &carbon_mp_console_recv_buf,
+                            &carbon_mp_console_recv_buf_size);
+                char c = *((char *)carbon_mp_console_recv_buf);
+                carbon_mp_console_recv_buf =
+                    (char *)carbon_mp_console_recv_buf + 1;
+                carbon_mp_console_recv_buf_size--;
+                return c;
+            } else {
+                DIAG(MP "error while receiving data %d", err);
+                close_connection();
+                return 0;
+            }
+        } else if (carbon_mp_console_recv_buf &&
+                   carbon_mp_console_recv_buf_size > 0) {
+            char c = *((char *)carbon_mp_console_recv_buf);
+            carbon_mp_console_recv_buf = (char *)carbon_mp_console_recv_buf + 1;
+            carbon_mp_console_recv_buf_size--;
+            return c;
+        } else {
+            DIAG(MP "unexpected error while receiving data");
+            close_connection();
+            return 0;
+        }
+    }
+    return 0;
+}
+
+void close_connection() {
+    DIAG(MP "error while sending, disconnecting client");
+    netbuf_delete(carbon_mp_console_recv_netbuf);
+    carbon_mp_console_recv_buf_size = 0;
+    netconn_close(new_connection);
+    netconn_delete(new_connection);
 }

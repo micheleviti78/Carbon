@@ -21,7 +21,7 @@
 
 #include <sd_diskio.h>
 
-#include <mptask.h>
+#include <carbon/mp_thread.h>
 
 #include <cmsis_os.h>
 #include <task.h>

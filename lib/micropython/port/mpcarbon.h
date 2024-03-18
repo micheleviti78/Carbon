@@ -28,15 +28,20 @@
 extern "C" {
 #endif
 
-void mp_embed_init(void *gc_heap, size_t gc_heap_size, void *sp);
-void mp_embed_deinit();
+#if MICROPY_PY_THREAD
+void mp_carbon_init(void *stack, size_t stack_len, void *gc_heap,
+                    size_t gc_heap_size, void *sp);
+#else
+void mp_carbon_init(void *gc_heap, size_t gc_heap_size, void *sp);
+#endif
+void mp_carbon_deinit();
 
 #if MICROPY_ENABLE_COMPILER
-void mp_embed_exec_str(const char *src);
+void mp_carbon_exec_str(const char *src);
 #endif
 
 #if MICROPY_PERSISTENT_CODE_LOAD
-void mp_embed_exec_mpy(const uint8_t *mpy, size_t len);
+void mp_carbon_exec_mpy(const uint8_t *mpy, size_t len);
 #endif
 
 #ifdef __cplusplus

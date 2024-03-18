@@ -41,7 +41,6 @@
  * THE SOFTWARE.
  */
 
-#include "mptask.h"
 #include "py/gc.h"
 #include "py/mphal.h"
 #include "py/mpthread.h"
@@ -68,7 +67,7 @@ STATIC mp_thread_mutex_t thread_mutex;
 STATIC mp_thread_t thread_entry0;
 STATIC mp_thread_t *thread; // root pointer, handled bp mp_thread_gc_others
 
-void mp_thread_init(void) {
+void mp_thread_init(void *stack, size_t stack_len) {
     mp_thread_mutex_init(&thread_mutex);
     mp_thread_set_state(&mp_state_ctx.thread);
 
@@ -77,8 +76,8 @@ void mp_thread_init(void) {
     thread->id = xTaskGetCurrentTaskHandle();
     thread->ready = 1;
     thread->arg = NULL;
-    thread->stack = mpTaskStack;
-    thread->stack_len = MICROPY_TASK_STACK_LEN;
+    thread->stack = stack;
+    thread->stack_len = stack_len;
     thread->next = NULL;
 }
 

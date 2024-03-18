@@ -524,29 +524,44 @@ for candidate in selectedList:
 
 #*************************************************************************************
 #25. Use of filter function:
-# print("")
-# print("***************************")
-# print("#25. Multithreading")
-# print("***************************")
-# print("")
+print("")
+print("***************************")
+print("#25. Multithreading")
+print("***************************")
+print("")
 
-# import _thread
-# import time
+import _thread
+import time
 
-# def second_thread():
-#     while True:
-#         print("Hello, I'm here in the second thread writting every second")
-#         time.sleep(1)
+def second_thread():
+    index = 1
+    while index < 100:
+        print("Hello, I'm here in the second thread writting every second")
+        index = index + 1
         
-# _thread.start_new_thread(second_thread, ())
+_thread.start_new_thread(second_thread, ())
 
-# index = 1
+time.sleep(10)
 
-# while index < 100:
-#     print("index ",index)
-#     index = index + 1
-#     time.sleep(1)
+#*************************************************************************************
+#26. Test from micropython embed port:
+print("")
+print("***************************")
+print("#26. Test from micropython embed port")
+print("***************************")
+print("")
 
+print('hello world!', list(x + 1 for x in range(10)))
+
+for i in range(10):
+    print('iter {:08}'.format(i))
+try:
+    1//0
+except Exception as er:
+    print('caught exception', repr(er))
+
+#*************************************************************************************
+#running garbage collector:
 print("")
 print("***************************")
 print("running garbage collector")

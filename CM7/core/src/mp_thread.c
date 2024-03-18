@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file           mptask.c
+ * @file           mp_thread.c
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Mar. 2024
  * @brief          source file for the micropython task
@@ -15,19 +15,23 @@
  *
  ******************************************************************************
  */
-#include "mptask.h"
-#include "carbon_mp.h"
-#include "carbon_mp_test.h"
+#include <mpcarbon.h>
 
 #include <cmsis_os.h>
 #include <task.h>
 
 #include <carbon/diag.hpp>
 
-// This is the static memory (TCB and stack) for the main MicroPython task
-StaticTask_t mpTaskTCB __attribute__((aligned(8), section(".sdram_bank2")));
+#define MICROPY_TASK_PRIORITY (1)
+#define MICROPY_TASK_STACK_SIZE 2097152U /*2 MB size micropython stack*/
+#define MICROPY_TASK_STACK_LEN (MICROPY_TASK_STACK_SIZE / sizeof(StackType_t))
+#define MICROPYTHON_HEAP_SIZE 2097152U /*2 MB size micropython heap*/
 
-StackType_t mpTaskStack[MICROPY_TASK_STACK_LEN]
+// This is the static memory (TCB and stack) for the main MicroPython task
+static StaticTask_t mpTaskTCB
+    __attribute__((aligned(8), section(".sdram_bank2")));
+
+static StackType_t mpTaskStack[MICROPY_TASK_STACK_LEN]
     __attribute__((aligned(8), section(".sdram_bank2")));
 
 static uint8_t micropython_heap[MICROPYTHON_HEAP_SIZE]
@@ -41,14 +45,15 @@ void TASK_MicroPython(void *pvParameters) {
     sp = (uint8_t *)cortex_m7_get_sp();
 
     DIAG(MP "starting micropython");
-    DIAG(MP "stack at %p length %u", mpTaskStack, MICROPY_TASK_STACK_LEN);
-    DIAG(MP "heap at %p length %u", micropython_heap, MICROPYTHON_HEAP_SIZE);
+    DIAG(MP "stack at %p size %u", mpTaskStack, MICROPY_TASK_STACK_SIZE);
+    DIAG(MP "heap at %p size %u", micropython_heap, MICROPYTHON_HEAP_SIZE);
     DIAG(MP "executing script at %p", pvParameters);
 
-    mp_embed_init(&micropython_heap[0], MICROPYTHON_HEAP_SIZE, sp);
+    mp_carbon_init(&mpTaskStack[0], MICROPY_TASK_STACK_LEN,
+                   &micropython_heap[0], MICROPYTHON_HEAP_SIZE, sp);
 
     if (pvParameters) {
-        mp_embed_exec_str((const char *)pvParameters);
+        mp_carbon_exec_str((const char *)pvParameters);
     } else {
         DIAG(MP "passed a null ptr");
     }

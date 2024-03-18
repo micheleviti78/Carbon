@@ -16,7 +16,7 @@
  ******************************************************************************
  */
 
-#include "carbon_mp.h"
+#include "mpcarbon.h"
 
 #include "py/builtin.h"
 #include "py/compile.h"
@@ -33,21 +33,29 @@
 #include <carbon/diag.hpp>
 
 // Initialise the runtime.
-void mp_embed_init(void *gc_heap, size_t gc_heap_size, void *sp) {
 #if MICROPY_PY_THREAD
-    mp_thread_init();
-#endif
+void mp_carbon_init(void *stack, size_t stack_len, void *gc_heap,
+                    size_t gc_heap_size, void *sp) {
+    mp_thread_init(stack, stack_len);
     mp_stack_set_top(sp);
     gc_init(gc_heap, (uint8_t *)gc_heap + gc_heap_size);
     mp_init();
 }
+#else
+void mp_carbon_init(void *gc_heap, size_t gc_heap_size, void *sp) {
+    mp_thread_init(stack, stack_len);
+    mp_stack_set_top(sp);
+    gc_init(gc_heap, (uint8_t *)gc_heap + gc_heap_size);
+    mp_init();
+}
+#endif
 
 // Deinitialise MicroPython.
-void mp_embed_deinit() { mp_deinit(); }
+void mp_carbon_deinit() { mp_deinit(); }
 
 #if MICROPY_ENABLE_COMPILER
 // Compile and execute the given source script (Python text).
-void mp_embed_exec_str(const char *src) {
+void mp_carbon_exec_str(const char *src) {
     nlr_buf_t nlr;
     if (nlr_push(&nlr) == 0) {
         // Compile, parse and execute the given string.
@@ -67,7 +75,7 @@ void mp_embed_exec_str(const char *src) {
 #endif
 
 #if MICROPY_PERSISTENT_CODE_LOAD
-void mp_embed_exec_mpy(const uint8_t *mpy, size_t len) {
+void mp_carbon_exec_mpy(const uint8_t *mpy, size_t len) {
     nlr_buf_t nlr;
     if (nlr_push(&nlr) == 0) {
         // Execute the given .mpy data.

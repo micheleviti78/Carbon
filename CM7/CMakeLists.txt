@@ -70,7 +70,8 @@ else()
     ${CMAKE_CURRENT_LIST_DIR}/core/src/app_ethernet.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/ethernetif.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/lan8742.c
-    ${CMAKE_CURRENT_LIST_DIR}/core/src/netif_conf.c)
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/netif_conf.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_thread.c)
 endif(FIFO_TEST)
 
 SET(SOURCE

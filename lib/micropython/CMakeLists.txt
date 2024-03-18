@@ -14,11 +14,9 @@ include(${MICROPY_DIR}/py/py.cmake)
 include(${MICROPY_DIR}/extmod/extmod.cmake)
 
 set(SOURCES_PORT
-	${CMAKE_CURRENT_LIST_DIR}/port/carbon_mp_test.c
-    ${CMAKE_CURRENT_LIST_DIR}/port/carbon_mp.c  
+    ${CMAKE_CURRENT_LIST_DIR}/port/mpcarbon.c  
     ${CMAKE_CURRENT_LIST_DIR}/port/gccollect.c  
-    ${CMAKE_CURRENT_LIST_DIR}/port/mphalport.c 
-    ${CMAKE_CURRENT_LIST_DIR}/port/mptask.c
+    ${CMAKE_CURRENT_LIST_DIR}/port/mphalport.c
     ${CMAKE_CURRENT_LIST_DIR}/port/mpthreadport.c
     ${CMAKE_CURRENT_LIST_DIR}/port/cortex_m7_get_sp.s
 )

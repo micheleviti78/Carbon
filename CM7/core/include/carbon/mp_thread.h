@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           carbon_mp_test.h
+ * @file           mp_thread.h
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Jan. 2024
- * @brief          micropython test
+ * @brief          header file for the micropython task
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -16,17 +16,17 @@
  ******************************************************************************
  */
 
-#ifndef MICROPY_INCLUDED_CARBON_MP_TEST_H
-#define MICROPY_INCLUDED_CARBON_MP_TEST_H
+#ifndef MICROPY_INCLUDED_MPTASK_H
+#define MICROPY_INCLUDED_MPTASK_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void carbon_mp_test();
+void startMicropython(void *exec);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // MICROPY_INCLUDED_CARBON_MP_TEST_H
+#endif // MICROPY_INCLUDED_CC3200_MPTASK_H

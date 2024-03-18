@@ -56,7 +56,7 @@ typedef struct _mp_thread_mutex_t {
     StaticSemaphore_t buffer;
 } mp_thread_mutex_t;
 
-void mp_thread_init(void);
+void mp_thread_init(void *stack, size_t stack_len);
 void mp_thread_gc_others(void);
 
 #ifdef __cplusplus

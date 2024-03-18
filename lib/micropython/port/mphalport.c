@@ -45,9 +45,15 @@ uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
     return 0;
 }
 
-void mp_hal_delay_ms(mp_uint_t ms) { osDelay(ms * 1000); }
+void mp_hal_delay_ms(mp_uint_t ms) {
+    printf_("\r\nmp_hal_delay_ms %u", ms);
+    osDelay(ms);
+}
 
-void mp_hal_delay_us(mp_uint_t us) { delayUs(us); }
+void mp_hal_delay_us(mp_uint_t us) {
+    printf_("\r\nmp_hal_delay_us");
+    delayUs(us);
+}
 
 mp_uint_t mp_hal_ticks_ms(void) {
     printf_("\r\nmp_hal_ticks_ms");

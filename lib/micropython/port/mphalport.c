@@ -45,7 +45,6 @@ uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
 }
 
 void mp_hal_delay_ms(mp_uint_t ms) {
-    printf_("\r\nmp_hal_delay_ms %u", ms);
     osDelay(ms);
 }
 

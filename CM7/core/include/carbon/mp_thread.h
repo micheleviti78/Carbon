@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-void startMicropython(void *exec);
+void start_micropython();
 
 #ifdef __cplusplus
 }

@@ -18,11 +18,17 @@
 
 #include <carbon/diag.hpp>
 
-#include <cmsis_os.h>
 #include <lwip/api.h>
+
 #include <mpcarbon.h>
+
 #include <printf.h>
+
+#include <sd_diskio.h>
+
 #include <shared/runtime/pyexec.h>
+
+#include <cmsis_os.h>
 #include <task.h>
 
 #include <stdint.h>
@@ -63,18 +69,18 @@ void TASK_MicroPython(void *pvParameters) {
     DIAG(MP "starting micropython");
     DIAG(MP "stack at %p size %u", mpTaskStack, MICROPY_TASK_STACK_SIZE);
     DIAG(MP "heap at %p size %u", micropython_heap, MICROPYTHON_HEAP_SIZE);
-    DIAG(MP "executing script at %p", pvParameters);
 
     mp_carbon_init(&mpTaskStack[0], MICROPY_TASK_STACK_LEN,
                    &micropython_heap[0], MICROPYTHON_HEAP_SIZE, sp);
 
     if (pvParameters) {
+        DIAG(MP "executing script at %p", pvParameters);
         mp_carbon_exec_str((const char *)pvParameters);
+        DIAG(MP "python script execution terminated");
+        vPortFree(pvParameters);
     } else {
-        DIAG(MP "passed a null ptr");
+        DIAG(MP "no python script");
     }
-
-    DIAG(MP "python script execution terminated");
 
     if (!setup_connection()) {
         DIAG(MP "cannot setup connection");
@@ -119,10 +125,54 @@ void TASK_MicroPython(void *pvParameters) {
     }
 }
 
-void startMicropython(void *exec) {
-    TaskHandle_t taskHandle =
-        xTaskCreateStatic(TASK_MicroPython, "MicroPy", MICROPY_TASK_STACK_LEN,
-                          exec, MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB);
+void start_micropython() {
+    FIL fs_read;
+    UINT byte_read;
+    uint8_t *readBuffer = NULL;
+
+    FRESULT fres = f_open(&fs_read, "0:/main.py", FA_READ);
+
+    if (fres != 0) {
+        DIAG(MP "error opening file %d", fres);
+    } else {
+
+        FILINFO file_info;
+
+        fres = f_stat("0:/main.py", &file_info);
+
+        if (fres != 0) {
+            DIAG(MP "error reading file stats %d", fres);
+        } else {
+            DIAG(MP "file size %lu", file_info.fsize);
+        }
+
+        readBuffer = (uint8_t *)pvPortMalloc(file_info.fsize + 1);
+
+        if (readBuffer) {
+            size_t byte_to_read = file_info.fsize;
+            uint8_t *head = readBuffer;
+            while (byte_to_read > 0) {
+                fres = f_read(&fs_read, head, byte_to_read, &byte_read);
+                if (fres != 0) {
+                    DIAG(MP "error copying file %d", fres);
+                    vPortFree(readBuffer);
+                    readBuffer = NULL;
+                    break;
+                }
+                byte_to_read -= byte_read;
+                head += byte_read;
+            }
+            *(readBuffer + file_info.fsize) = 0;
+        }
+
+        /* Close open files */
+        f_close(&fs_read);
+        DIAG(MP "file closed");
+    }
+
+    TaskHandle_t taskHandle = xTaskCreateStatic(
+        TASK_MicroPython, "MicroPy", MICROPY_TASK_STACK_LEN, readBuffer,
+        MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB);
     if (taskHandle == NULL) {
         DIAG(MP "failed to start the micropython task");
     } else {
@@ -184,6 +234,8 @@ int mp_carbon_stdint() {
                 netbuf_data(carbon_mp_console_recv_netbuf,
                             &carbon_mp_console_recv_buf,
                             &carbon_mp_console_recv_buf_size);
+                DIAG(MP "%.*s", (int)carbon_mp_console_recv_buf_size,
+                     (char *)carbon_mp_console_recv_buf);
                 char c = *((char *)carbon_mp_console_recv_buf);
                 carbon_mp_console_recv_buf =
                     (char *)carbon_mp_console_recv_buf + 1;
@@ -194,8 +246,7 @@ int mp_carbon_stdint() {
                 close_connection();
                 return 0;
             }
-        } else if (carbon_mp_console_recv_buf &&
-                   carbon_mp_console_recv_buf_size > 0) {
+        } else if (carbon_mp_console_recv_buf_size > 0) {
             char c = *((char *)carbon_mp_console_recv_buf);
             carbon_mp_console_recv_buf = (char *)carbon_mp_console_recv_buf + 1;
             carbon_mp_console_recv_buf_size--;
@@ -210,7 +261,7 @@ int mp_carbon_stdint() {
 }
 
 void close_connection() {
-    DIAG(MP "error while sending, disconnecting client");
+    DIAG(MP "disconnecting client");
     netbuf_delete(carbon_mp_console_recv_netbuf);
     carbon_mp_console_recv_buf_size = 0;
     netconn_close(new_connection);

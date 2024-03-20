@@ -21,8 +21,6 @@
 
 #include <sd_diskio.h>
 
-#include <carbon/mp_thread.h>
-
 #include <cmsis_os.h>
 #include <task.h>
 
@@ -127,53 +125,9 @@ void sd_thread(const void * /*argument*/) {
         }
     }
 
-    FIL fs_read;
-    UINT byte_read;
-
-    fres = f_open(&fs_read, "boot.py", FA_READ);
-
-    if (fres != 0) {
-        DIAG(SD "error opening file %d", fres);
-    }
-
-    FILINFO file_info;
-
-    fres = f_stat("boot.py", &file_info);
-
-    if (fres != 0) {
-        DIAG(SD "error reading file stats %d", fres);
-    } else {
-        DIAG(SD "file size %lu", file_info.fsize);
-    }
-
-    uint8_t *readBuffer =
-        reinterpret_cast<uint8_t *>(pvPortMalloc(file_info.fsize + 1));
-
-    if (readBuffer) {
-        size_t byte_to_read = file_info.fsize;
-        uint8_t *head = readBuffer;
-        while (byte_to_read > 0) {
-            fres = f_read(&fs_read, head, byte_to_read, &byte_read);
-            if (fres != 0) {
-                DIAG(SD "error copying file %d", fres);
-                break;
-            }
-            byte_to_read -= byte_read;
-            head += byte_read;
-        }
-
-        *(readBuffer + file_info.fsize) = 0;
-
-        startMicropython(readBuffer);
-    }
-
-    /* Close open files */
-    f_close(&fs_read);
-    DIAG(SD "file closed");
-
     /* Unmount volume */
-    f_mount(NULL, &sdPath[0], 0);
-    DIAG(SD "volume %s unmounted", &sdPath[0]);
+    // f_mount(NULL, &sdPath[0], 0);
+    // DIAG(SD "volume %s unmounted", &sdPath[0]);
 
     while (1) {
         osDelay(10000);

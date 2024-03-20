@@ -18,6 +18,7 @@
 
 #include <carbon/diag_thread.hpp>
 #include <carbon/main_thread.hpp>
+#include <carbon/mp_thread.h>
 #include <carbon/pin.hpp>
 #include <carbon/sd_thread.hpp>
 #include <carbon/trace_thread.hpp>
@@ -39,6 +40,10 @@ void mainThread(const void *argument) {
 #endif
 
     start_sd_thread();
+
+    osDelay(200);
+
+    start_micropython();
 
     while (1) {
         BSP_LED_Toggle(LED_GREEN);

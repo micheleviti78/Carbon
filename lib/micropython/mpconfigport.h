@@ -27,36 +27,28 @@
 // MicroPython configuration.
 #define MICROPY_ENABLE_COMPILER (1)
 #define MICROPY_ENABLE_GC (1)
+
 #define MICROPY_PY_GC (1)
 #define MICROPY_PY_THREAD (1)
 #define MICROPY_PY_THREAD_GIL (1)
+
 #define MICROPY_LONGINT_IMPL (MICROPY_LONGINT_IMPL_MPZ)
 #define MICROPY_FLOAT_IMPL (MICROPY_FLOAT_IMPL_FLOAT)
+#define MICROPY_PY_CMATH (1)
 
 #define MICROPY_HELPER_REPL (1)
 #define MICROPY_PY_SYS_PS1_PS2 (1)
 
 #define MICROPY_PY_RE (1)
-// #define MICROPY_PY_ASYNC_AWAIT (1)
-// #define MICROPY_PY_ERRNO (1)
-// #define MICROPY_PY_ERRNO_ERRORCODE (0)
-#define MICROPY_PY_CMATH (1)
-
-// #define MICROPY_PY_BUILTINS_SLICE_ATTRS (1)
-#define MICROPY_PY_BUILTINS_SLICE (1)
-// #define MICROPY_PY_BUILTINS_SLICE_INDICES (1)
-// #define MICROPY_PY_ARRAY_SLICE_ASSIGN (1)
 
 #define MICROPY_BANNER_MACHINE "Carbon"
+
+#define MP_STATE_PORT MP_STATE_VM
+
+#define MICROPY_MPHALPORT_H "port/mphalport.h"
 
 typedef intptr_t mp_int_t;   // must be pointer size
 typedef uintptr_t mp_uint_t; // must be pointer size
 typedef long mp_off_t;
 
-#define STATIC static
-
-#define MP_STATE_PORT MP_STATE_VM
-
-#define SSIZE_MAX INT_MAX
-
-#define MICROPY_MPHALPORT_H "port/mphalport.h"
+// #define STATIC static

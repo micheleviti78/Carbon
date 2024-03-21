@@ -84,6 +84,7 @@ SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/trace_thread.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/trace_thread.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/uart.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_user_module/mp_mod_led.cpp
 )
 
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/lwip lwip)

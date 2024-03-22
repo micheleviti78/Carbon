@@ -84,7 +84,12 @@ SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/trace_thread.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/trace_thread.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/uart.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_user_module/mp_mod_led.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/mpcarbon.c  
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/gccollect.c  
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/mphalport.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/mpthreadport.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/cortex_m7_get_sp.s
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/user_module/mp_mod_led.cpp
 )
 
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/lwip lwip)

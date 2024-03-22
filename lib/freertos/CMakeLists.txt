@@ -40,8 +40,8 @@ endif()
 
 target_include_directories(${FREERTOS_LIB}
     PUBLIC
-    include
-    ${PORTINCLUDES}
+    ${CMAKE_CURRENT_LIST_DIR}/include
+    ${CMAKE_CURRENT_LIST_DIR}/${PORTINCLUDES}
     CMSIS_RTOS
     ${PROJECT_CONFIG_DIR}
 )

@@ -16,8 +16,8 @@
  ******************************************************************************
  */
 
-#include "py/mphal.h"
-#include "py/obj.h"
+#include <mphalport.h>
+#include <py/mphal.h>
 
 #include <printf.h>
 

@@ -44,10 +44,10 @@
 
 #include <stdint.h>
 
-#include "gccollect.h"
-#include "py/gc.h"
-#include "py/mpthread.h"
-#include "shared/runtime/gchelper.h"
+#include <carbon/mp_port/gccollect.h>
+#include <py/gc.h>
+#include <py/mpthread.h>
+#include <shared/runtime/gchelper.h>
 
 /******************************************************************************
 DECLARE PUBLIC FUNCTIONS

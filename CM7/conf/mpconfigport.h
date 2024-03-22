@@ -45,7 +45,7 @@
 
 #define MP_STATE_PORT MP_STATE_VM
 
-#define MICROPY_MPHALPORT_H "port/mphalport.h"
+#define MICROPY_MPHALPORT_H "mphalport.h"
 
 typedef intptr_t mp_int_t;   // must be pointer size
 typedef uintptr_t mp_uint_t; // must be pointer size

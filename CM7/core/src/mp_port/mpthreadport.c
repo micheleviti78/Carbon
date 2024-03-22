@@ -41,10 +41,10 @@
  * THE SOFTWARE.
  */
 
-#include "py/gc.h"
-#include "py/mphal.h"
-#include "py/mpthread.h"
-#include "py/runtime.h"
+#include <py/gc.h>
+#include <py/mphal.h>
+#include <py/mpthread.h>
+#include <py/runtime.h>
 
 #include <task.h>
 

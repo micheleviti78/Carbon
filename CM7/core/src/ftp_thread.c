@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           sd_thread.hpp
+ * @file           ftp_thread.c
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Feb. 2024
- * @brief          thread to manage the SD card
+ * @brief          thread to init the SD card, c code
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -16,14 +16,16 @@
  ******************************************************************************
  */
 
-#pragma once
+#include <cmsis_os.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <ftp.h>
 
-void start_sd_thread(void);
+static osThreadId ftp_handle;
 
-#ifdef __cplusplus
+static void ftp_server_wrapper(const void *) { ftp_server(); }
+
+void start_ftp_thread(void) {
+    osThreadDef(FTP_Thread, ftp_server_wrapper, osPriorityNormal, 0,
+                configMINIMAL_STACK_SIZE * 8);
+    ftp_handle = osThreadCreate(osThread(FTP_Thread), NULL);
 }
-#endif

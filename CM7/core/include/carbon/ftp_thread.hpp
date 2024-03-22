@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           sd_thread.hpp
+ * @file           ftp_thread.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Feb. 2024
- * @brief          thread to manage the SD card
+ * @brief          ftp thread
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-void start_sd_thread(void);
+void start_ftp_thread(void);
 
 #ifdef __cplusplus
 }

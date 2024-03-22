@@ -17,6 +17,7 @@
  */
 
 #include <carbon/diag_thread.hpp>
+#include <carbon/ftp_thread.hpp>
 #include <carbon/main_thread.hpp>
 #include <carbon/mp_thread.h>
 #include <carbon/pin.hpp>
@@ -25,7 +26,6 @@
 
 #include <cmsis_os.h>
 
-#include <task.h>
 
 extern "C" {
 
@@ -44,6 +44,8 @@ void mainThread(const void *argument) {
     osDelay(200);
 
     start_micropython();
+
+    start_ftp_thread();
 
     while (1) {
         BSP_LED_Toggle(LED_GREEN);

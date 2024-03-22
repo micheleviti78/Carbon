@@ -84,6 +84,7 @@ SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/uart.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/diag_thread.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/matrix_display_spi.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/ftp_thread.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/mpcarbon.c  
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/gccollect.c  
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/mphalport.c
@@ -95,6 +96,7 @@ SET(SOURCE
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/lwip lwip)
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/micropython micropython)
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/fatfs fatfs)
+add_subdirectory(${PROJECT_ROOT_DIR}/lib/FTP FTP)
 
 SET(STARTUP_SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/startup/startup_stm32h747xihx.s
@@ -116,6 +118,7 @@ target_link_libraries(${PROJECT_NAME}
     backtrace_${PROJECT_NAME} 
     micropython_${PROJECT_NAME}
     fatfs_${PROJECT_NAME}
+    ftp_${PROJECT_NAME}
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

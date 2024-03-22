@@ -9,6 +9,7 @@ lib/modbus/.*
 lib/msgpack/.*
 lib/printf/.*
 lib/USB/.*
+lib/FTP/src/*
 
 modified:   CM4/STM32H747XIHx_FLASH_CM4.ld
 modified:   CM7/STM32H747XIHx_FLASH_CM7.ld

@@ -18,6 +18,7 @@
 
 #include <carbon/diag_thread.hpp>
 #include <carbon/display_matrix_spi.hpp>
+#include <carbon/ftp_thread.hpp>
 #include <carbon/main_thread.hpp>
 #include <carbon/mp_thread.h>
 #include <carbon/pin.hpp>
@@ -26,7 +27,6 @@
 
 #include <cmsis_os.h>
 
-#include <task.h>
 
 static DiagThread diagThread;
 #ifdef FREERTOS_USE_TRACE
@@ -55,6 +55,8 @@ void MainThread::run() {
     osDelay(200);
 
     start_micropython();
+
+    start_ftp_thread();
 
     while (1) {
         BSP_LED_Toggle(LED_GREEN);

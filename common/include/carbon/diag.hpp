@@ -44,6 +44,7 @@ void carbon_diag_pull();
 #define MP "[mp] "
 #define SPI_DIAG "[spi] "
 #define MATRIX_DIS_DIAG "[md] "
+#define FTP "[ftp] "
 
 #ifdef CORE_CM7
 #define DIAG_CPU "[CM7] "

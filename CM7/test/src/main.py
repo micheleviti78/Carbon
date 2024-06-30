@@ -561,6 +561,21 @@ except Exception as er:
     print('caught exception', repr(er))
 
 #*************************************************************************************
+#27. import led module:
+
+import led
+import time
+
+index=1
+
+while index < 30:
+    led.toggle_red()
+    time.sleep(0.5)
+    led.toggle_orange()
+    time.sleep(0.5)
+    index = index + 1
+
+#*************************************************************************************
 #running garbage collector:
 print("")
 print("***************************")

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,4 +32,95 @@ void Error_Handler(void);
 
 #ifdef __cplusplus
 }
-#endif
+#endif // Define error groups
+
+enum class ErrorGroupType : uint16_t {
+    None = 0,
+    Network = 1,
+    FileSystem = 2,
+    Hardware = 3,
+    Software = 4
+};
+
+// Define specific errors
+enum class ErrorType : uint16_t {
+    NoError = 0,
+    NetworkTimeout = 1,
+    NetworkUnavailable = 2,
+    FileNotFound = 3,
+    DiskFull = 4,
+    SensorFailure = 5,
+    Internal = 6
+};
+
+// Class to hold an error and its associated group
+class Error {
+public:
+    // Default constructor (required for constexpr)
+    constexpr Error()
+        : group_(ErrorGroupType::None), error_(ErrorType::NoError) {}
+
+    // Constructor to initialize the error and its group
+    constexpr Error(ErrorGroupType group, ErrorType error)
+        : group_(group), error_(error) {}
+
+    // Retrieve the error group
+    constexpr ErrorGroupType group() const { return group_; }
+
+    // Retrieve the specific error
+    constexpr ErrorType error() const { return error_; }
+
+    // Overload the equality operator
+    constexpr bool operator==(const Error &other) const {
+        return group_ == other.group_ && error_ == other.error_;
+    }
+
+    // Overload the inequality operator
+    constexpr bool operator!=(const Error &other) const {
+        return !(*this == other);
+    }
+
+    // Cast to bool operator
+    explicit constexpr operator bool() const {
+        return group_ != ErrorGroupType::None || error_ != ErrorType::NoError;
+    }
+
+private:
+    ErrorGroupType group_;
+    ErrorType error_;
+};
+
+static_assert(sizeof(Error) == 4);
+
+constexpr Error Success;
+
+constexpr Error InternalError(ErrorGroupType::Software, ErrorType::Internal);
+
+constexpr Error InternalHardwareError(ErrorGroupType::Hardware,
+                                      ErrorType::Internal);
+
+// Template class to hold either a value or an error
+// Simplified version for std::expected
+template <typename T> class Result {
+public:
+    // Constructor for a successful result
+    Result(const T &value) : success_(true), value_(value), errorInfo_() {}
+
+    // Constructor for an error result
+    Result(const Error &errorInfo)
+        : success_(false), value_(), errorInfo_(errorInfo) {}
+
+    // Check if the result is an error
+    bool isError() const { return !success_; }
+
+    // Retrieve the value (only call if not an error)
+    const T &value() const { return value_; }
+
+    // Retrieve the error (only call if isError() returns true)
+    const Error &error() const { return errorInfo_; }
+
+private:
+    bool success_;
+    T value_;
+    Error errorInfo_;
+};

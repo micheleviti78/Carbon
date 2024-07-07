@@ -301,6 +301,10 @@ static void SystemClock_Config(void) {
     PeriphClkInitStruct.PeriphClockSelection |= RCC_PERIPHCLK_SDMMC;
     PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL;
 
+    // PLL3R 120MHZ for SPI2
+    PeriphClkInitStruct.PeriphClockSelection |= RCC_PERIPHCLK_SPI123;
+    PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL3;
+
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         assert_param(0);
     }

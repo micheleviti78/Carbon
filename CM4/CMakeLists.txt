@@ -35,6 +35,7 @@ SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/msp.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/interrupts.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/uart.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/matrix_display_spi.cpp
 )
 
 SET(STARTUP_SOURCE

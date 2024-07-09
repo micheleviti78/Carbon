@@ -24,6 +24,8 @@
 #include <cstdint>
 #endif
 
+#include <carbon/diag.hpp>
+
 #define PREVENT_COPY(class_name)                                               \
     class_name(const class_name &) = delete;                                   \
     class_name &operator=(const class_name &) = delete;
@@ -43,3 +45,13 @@
     class_name &operator=(const class_name &) = default;                       \
     class_name(class_name &&) = default;                                       \
     class_name &operator=(class_name &&) = default;
+
+#define ASSERT(cond)                                                           \
+    do {                                                                       \
+        if (!(cond)) {                                                         \
+            RAW_DIAG("Assertion failed: %s, file %s, line %d", #cond,          \
+                     __FILE__, __LINE__);                                      \
+            __asm volatile("BKPT #01");                                        \
+        }                                                                      \
+    } while (0);
+//end of the file

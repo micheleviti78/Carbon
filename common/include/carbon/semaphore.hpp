@@ -38,7 +38,7 @@ public:
         __disable_irq();
         if (!isInit_) {
             osSemaphoreDef_t sem_def;
-            _semaphore = osSemaphoreCreate(&sem_def, count);
+            _semaphore = osSemaphoreCreate(&sem_def, count_);
             ASSERT(_semaphore != NULL);
             isInit_ = true;
         }
@@ -46,21 +46,20 @@ public:
     };
 
     bool acquire(uint32_t timeout = osWaitForever) {
-        ASSERT(isInit);
+        ASSERT(isInit_);
         return osSemaphoreWait(_semaphore, timeout) == osOK;
     }
 
     bool release() {
-        ASSERT(isInit);
+        ASSERT(isInit_);
         return osSemaphoreRelease(_semaphore) == osOK;
     }
-}
 
-protected :
-
+protected:
     uint32_t count_;
-bool isInit_;
-osSemaphoreId _semaphore;
+    bool isInit_;
+    osSemaphoreId _semaphore;
+};
 
 class BinarySemaphore : public Semaphore {
 public:

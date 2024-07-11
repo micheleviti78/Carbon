@@ -17,6 +17,7 @@
  */
 
 #include <carbon/diag_thread.hpp>
+#include <carbon/display_matrix_spi.hpp>
 #include <carbon/main_thread.hpp>
 #include <carbon/mp_thread.h>
 #include <carbon/pin.hpp>
@@ -29,10 +30,24 @@
 
 extern "C" {
 
+static uint32_t buffer __attribute__((aligned(4))) = 0xAAAAAAAA;
+
 void netif_config(void);
 
 void mainThread(const void *argument) {
     start_diag_thread();
+
+    DIAG(SYSTEM_DIAG "buffer pointer %p", &buffer);
+
+    /*init matrix display spi*/
+    if (getDisplayMatrixSpi().init()) {
+        DIAG(SYSTEM_DIAG "error init");
+    } else {
+        if (getDisplayMatrixSpi().DMATransmit(&buffer, 4))
+            DIAG(SYSTEM_DIAG "error transmitting the data");
+        if (getDisplayMatrixSpi().DMATransmit(&buffer, 4))
+            DIAG(SYSTEM_DIAG "error transmitting the data");
+    }
 
     netif_config();
 #ifdef FREERTOS_USE_TRACE

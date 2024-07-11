@@ -26,21 +26,21 @@
 
 class Spi {
 public:
-    Spi(SPI_HandleTypeDef &spiHandle, BinarySemaphore &txSemaphore,
-        BinarySemaphore &rxSemaphore);
+    Spi() = default;
+    // Spi(SPI_HandleTypeDef &spiHandle);
+    // , BinarySemaphore &txSemaphore,
+    //     BinarySemaphore &rxSemaphore);
     virtual ~Spi() = default;
     PREVENT_COPY_AND_MOVE(Spi)
     virtual Error init() = 0;
-    Error DMATransmit(void *buffer, uint16_t bufferSize);
+    virtual Error DMATransmit(void *buffer, uint16_t bufferSize) = 0;
 
 protected:
-    SPI_HandleTypeDef &spiHandle_;
-    bool isInitialized_{false};
+    // SPI_HandleTypeDef &spiHandle_;
+    // bool isInitialized_{false};
 
-    static constexpr uint32_t timeout = 10000;
+    static constexpr uint32_t timeout = 1000;
 
-    static void voidCallback(SPI_HandleTypeDef * /*spiHandle*/) {}
-
-    BinarySemaphore &txSemaphore_;
-    BinarySemaphore &rxSemaphore_;
+    // BinarySemaphore &txSemaphore_;
+    // BinarySemaphore &rxSemaphore_;
 };

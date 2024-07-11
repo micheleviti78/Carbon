@@ -23,8 +23,6 @@
 #include <cmsis_os.h>
 
 void carbon_hw_us_systime_tim_isr(void);
-void carbon_hw_matrix_display_spi_isr(void);
-void carbon_hw_matrix_display_dma_isr(void);
 void hsem_isr(void);
 
 #include <backtrace.h>
@@ -224,13 +222,3 @@ void TIM5_IRQHandler(void) { carbon_hw_us_systime_tim_isr(); }
  */
 
 void HSEM2_IRQHandler(void) { hsem_isr(); }
-
-/**
- * @brief This function handles DMA1 stream0 global interrupt.
- */
-void DMA1_Stream0_IRQHandler(void) { carbon_hw_matrix_display_dma_isr(); }
-
-/**
- * @brief This function handles SPI2 global interrupt.
- */
-void SPI2_IRQHandler(void) { carbon_hw_matrix_display_spi_isr(); }

@@ -27,6 +27,8 @@ extern ETH_HandleTypeDef heth;
 
 void fmc_isr(void);
 void carbon_hw_us_systime_tim_isr(void);
+void carbon_hw_matrix_display_spi_isr(void);
+void carbon_hw_matrix_display_dma_isr(void);
 void hsem_isr(void);
 
 #include <backtrace.h>
@@ -256,3 +258,13 @@ void SDMMC1_IRQHandler(void) { BSP_SD_IRQHandler(0); }
  */
 
 void EXTI9_5_IRQHandler(void) { HAL_EXTI_IRQHandler(&hsd_exti[0]); }
+
+/**
+ * @brief This function handles DMA1 stream0 global interrupt.
+ */
+void DMA1_Stream0_IRQHandler(void) { carbon_hw_matrix_display_dma_isr(); }
+
+/**
+ * @brief This function handles SPI2 global interrupt.
+ */
+void SPI2_IRQHandler(void) { carbon_hw_matrix_display_spi_isr(); }

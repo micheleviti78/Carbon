@@ -107,7 +107,7 @@ SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/shared_memory.cpp
     ${PROJECT_ROOT_DIR}/common/src/start_os.c
     ${PROJECT_ROOT_DIR}/common/src/pin.cpp
-    ${PROJECT_ROOT_DIR}/common/src/spi.cpp
+    #${PROJECT_ROOT_DIR}/common/src/spi.cpp
     ${PROJECT_ROOT_DIR}/common/src/rand.c
     ${PROJECT_ROOT_DIR}/common/src/system_stm32h7xx_dualcore_boot_cm4_cm7.c
 )

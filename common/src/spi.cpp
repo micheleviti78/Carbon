@@ -25,15 +25,20 @@ Spi::Spi(SPI_HandleTypeDef &spiHandle, BinarySemaphore &txSemaphore,
       rxSemaphore_(rxSemaphore) {}
 
 Error Spi::DMATransmit(void *buffer, uint16_t bufferSize) {
+    __DSB();
+    DIAG(SPI_DIAG "Starting DMA transfer");
     auto res = HAL_SPI_Transmit_DMA(
         &spiHandle_, reinterpret_cast<uint8_t *>(buffer), bufferSize);
     if (res != 0) {
         DIAG(SPI_DIAG "Error DMA Trasmit: %u", res);
+        DIAG(SPI_DIAG "SPI error code: %lu", HAL_SPI_GetError(&spiHandle_));
         return InternalHardwareError;
     }
-    if (txSemaphore_.acquire(timeout)) {
+    DIAG(SPI_DIAG "DMA started");
+    if (!txSemaphore_.acquire(timeout)) {
         DIAG(SPI_DIAG "time out waiting TX DMA");
         return InternalHardwareError;
     }
+    DIAG(SPI_DIAG "SPI error code: %lu", HAL_SPI_GetError(&spiHandle_));
     return Success;
 }

@@ -95,7 +95,6 @@ SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/sys/newlib.c
     ${PROJECT_ROOT_DIR}/common/src/sys/cpp.cpp
     ${PROJECT_ROOT_DIR}/common/src/sys/oshooks.cpp
-    ${PROJECT_ROOT_DIR}/common/src/diag_thread.c
     ${PROJECT_ROOT_DIR}/common/src/diag.cpp
     ${PROJECT_ROOT_DIR}/common/src/error.cpp
     ${PROJECT_ROOT_DIR}/common/src/freeRTOSTrace.cpp
@@ -105,7 +104,7 @@ SET(COMMON_SOURCE
     ${PROJECT_ROOT_DIR}/common/src/systime.cpp
     ${PROJECT_ROOT_DIR}/common/src/sdram.cpp
     ${PROJECT_ROOT_DIR}/common/src/shared_memory.cpp
-    ${PROJECT_ROOT_DIR}/common/src/start_os.c
+    ${PROJECT_ROOT_DIR}/common/src/setup_idle_task.c
     ${PROJECT_ROOT_DIR}/common/src/pin.cpp
     #${PROJECT_ROOT_DIR}/common/src/spi.cpp
     ${PROJECT_ROOT_DIR}/common/src/rand.c

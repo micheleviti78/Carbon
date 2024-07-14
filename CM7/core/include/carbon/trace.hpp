@@ -18,14 +18,11 @@
 
 #pragma once
 
-#ifdef FREERTOS_USE_TRACE
 #include <carbon/common.hpp>
 #include <carbon/trace_format.hpp>
 
 #include <lwip/api.h>
-
 namespace CARBON {
-
 class Trace {
 public:
     Trace() = default;
@@ -47,4 +44,3 @@ private:
 };
 
 } // namespace CARBON
-#endif

@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file           diag_thread.c
+ * @file           diag_thread.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Dec. 2022
  * @brief          starting diag thread
@@ -16,23 +16,15 @@
  ******************************************************************************
  */
 
-#include <carbon/diag.hpp>
+#pragma once
 
-#include <cmsis_os.h>
+#include <carbon/thread.hpp>
 
-static osThreadId diag_handle;
+class DiagThread : public Thread {
+public:
+    DiagThread();
+    ~DiagThread() override = default;
 
-static void diag_thread(const void *argument);
-
-void start_diag_thread(void) {
-    osThreadDef(Diag, diag_thread, osPriorityBelowNormal, 0,
-                configMINIMAL_STACK_SIZE * 10);
-    diag_handle = osThreadCreate(osThread(Diag), NULL);
-}
-
-void diag_thread(const void *argument) {
-    while (1) {
-        carbon_diag_pull();
-        osDelay(1);
-    }
-}
+protected:
+    void run() override;
+};

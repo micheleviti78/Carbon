@@ -27,8 +27,6 @@ using namespace CARBON;
 
 extern "C" {
 
-void mainThread(const void */*argument*/){}
-
 /**
  * @brief  The application entry point.
  * @retval int

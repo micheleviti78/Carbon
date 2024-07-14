@@ -3,7 +3,7 @@
  * @file           trace_thread.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Jan. 2024
- * @brief          starting trace thread
+ * @brief          trace thread
  ******************************************************************************
  * @attention
  * Copyright (c) 2024 Michele Viti.
@@ -18,16 +18,12 @@
 
 #pragma once
 
-#ifdef FREERTOS_USE_TRACE
+#include <carbon/thread.hpp>
+class TraceThread : public Thread {
+public:
+    TraceThread();
+    ~TraceThread() = default;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void start_trace_thread(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+protected:
+    void run() override;
+};

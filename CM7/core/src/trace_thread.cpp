@@ -3,7 +3,7 @@
  * @file           trace_thread.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Jan. 2024
- * @brief          starting trace thread
+ * @brief          trace thread
  ******************************************************************************
  * @attention
  * Copyright (c) 2024 Michele Viti.
@@ -15,33 +15,25 @@
  *
  ******************************************************************************
  */
-
-#ifdef FREERTOS_USE_TRACE
-
 #include <carbon/diag.hpp>
 #include <carbon/trace.hpp>
+#include <carbon/trace_thread.hpp>
 
 #include <cmsis_os.h>
 
-extern "C" {
+TraceThread::TraceThread()
+    : Thread("trace_thread", osPriorityNormal, configMINIMAL_STACK_SIZE * 5) {}
 
-void start_trace_thread_imp(void);
-
-void start_trace_thread(void) {
-    if (CARBON::Trace::instance().init()) {
-        start_trace_thread_imp();
-    } else {
+void TraceThread::run() {
+    if (!CARBON::Trace::instance().init()) {
         DIAG(TRACE_DIAG "trace initialization error");
+        while (1) {
+            osDelay(10000);
+        }
     }
-}
-
-void trace_thread(const void *argument) {
     CARBON::Trace::instance().runConnection();
     while (1) {
         DIAG(TRACE_DIAG "trace connection error");
         osDelay(1000);
     }
 }
-}
-
-#endif

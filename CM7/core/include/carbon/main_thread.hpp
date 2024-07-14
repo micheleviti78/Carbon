@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           diag_thread.hpp
+ * @file           main_thread.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Dec. 2022
- * @brief          starting diag thread
+ * @date           Nov. 2022
+ * @brief          CM7 main thread class
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -18,14 +18,13 @@
 
 #pragma once
 
-#include <carbon/diag.hpp>
+#include <carbon/thread.hpp>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+class MainThread : public Thread {
+public:
+    MainThread();
+    ~MainThread() override = default;
 
-void start_diag_thread(void);
-
-#ifdef __cplusplus
-}
-#endif
+protected:
+    void run() override;
+};

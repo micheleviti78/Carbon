@@ -17,25 +17,31 @@
  */
 
 #include <carbon/diag.hpp>
+#include <carbon/main_thread.hpp>
 
 #include <stm32h7xx_hal.h>
 
-extern "C" {
+static MainThread mainThread;
 
-void start_os(void);
+extern "C" {
 
 /**
  * @brief  The application entry point.
  * @retval int
  */
 int main(void) {
-    DIAG(SYSTEM_DIAG "CM7 ready");
+    RAW_DIAG(SYSTEM_DIAG "CM7 ready");
 
-    /* starting OS */
-    start_os();
+    mainThread.start();
 
-    while (1)
-        ;
+    RAW_DIAG(SYSTEM_DIAG "starting OS");
+
+    osKernelStart();
+
+    RAW_DIAG(SYSTEM_DIAG "ERROR OS");
+
+    while (1) {
+    }
 }
 
 #ifdef USE_FULL_ASSERT

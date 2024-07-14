@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           main_thread.hpp
+ * @file           diag_thread.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Nov. 2022
- * @brief          CM7 main thread header
+ * @date           Dec. 2022
+ * @brief          diag thread
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -16,14 +16,16 @@
  ******************************************************************************
  */
 
-#pragma once
+#include <carbon/diag.hpp>
+#include <carbon/diag_thread.hpp>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+DiagThread::DiagThread()
+    : Thread("diag_thread", osPriorityBelowNormal,
+             configMINIMAL_STACK_SIZE * 10) {}
 
-void mainThread(const void *argument);
-
-#ifdef __cplusplus
+void DiagThread::run() {
+    while (1) {
+        carbon_diag_pull();
+        osDelay(1);
+    }
 }
-#endif

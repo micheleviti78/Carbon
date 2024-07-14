@@ -82,8 +82,8 @@ SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/interrupts.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/trace.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/trace_thread.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/core/src/trace_thread.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/uart.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/diag_thread.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/matrix_display_spi.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/mpcarbon.c  
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/gccollect.c  

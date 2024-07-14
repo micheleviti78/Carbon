@@ -19,6 +19,7 @@
 #pragma once
 
 #include <carbon/common.hpp>
+#include <carbon/diag.hpp>
 
 #include <cmsis_os.h>
 
@@ -42,10 +43,11 @@ public:
         osThreadDef_t thread_def;
         thread_def.pthread = &Thread::threadEntry;
         thread_def.tpriority = priority_;
-        thread_def.instances = 1; // Single instance of the thread
+        thread_def.instances = 0; // Single instance of the thread
         thread_def.stacksize = stackSize_;
         thread_def.name = const_cast<char *>(name_); // Cast away constness
-
+        thread_def.buffer = NULL;
+        thread_def.controlblock = NULL;
         id_ = osThreadCreate(&thread_def, this);
         ASSERT(id_ != nullptr);
     }
@@ -68,5 +70,3 @@ private:
     uint32_t stackSize_;  // Stack size for the thread
     osThreadId id_;       // Thread ID
 };
-
-#endif // CMSIS_THREAD_WRAPPER_H

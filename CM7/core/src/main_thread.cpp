@@ -3,7 +3,7 @@
  * @file           main_thread.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Nov. 2022
- * @brief          CM7 main thread source
+ * @brief          CM7 main thread class
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -28,30 +28,26 @@
 
 #include <task.h>
 
+static DiagThread diagThread;
+#ifdef FREERTOS_USE_TRACE
+static TraceThread traceThread;
+#endif
+
 extern "C" {
-
-static uint32_t buffer __attribute__((aligned(4))) = 0xAAAAAAAA;
-
 void netif_config(void);
+void start_sd_thread();
+void start_micropython();
+}
 
-void mainThread(const void *argument) {
-    start_diag_thread();
+MainThread::MainThread()
+    : Thread("main_thread", osPriorityNormal, configMINIMAL_STACK_SIZE * 10) {}
 
-    DIAG(SYSTEM_DIAG "buffer pointer %p", &buffer);
-
-    /*init matrix display spi*/
-    if (getDisplayMatrixSpi().init()) {
-        DIAG(SYSTEM_DIAG "error init");
-    } else {
-        if (getDisplayMatrixSpi().DMATransmit(&buffer, 4))
-            DIAG(SYSTEM_DIAG "error transmitting the data");
-        if (getDisplayMatrixSpi().DMATransmit(&buffer, 4))
-            DIAG(SYSTEM_DIAG "error transmitting the data");
-    }
+void MainThread::run() {
+    diagThread.start();
 
     netif_config();
 #ifdef FREERTOS_USE_TRACE
-    start_trace_thread();
+    traceThread.start();
 #endif
 
     start_sd_thread();
@@ -64,5 +60,4 @@ void mainThread(const void *argument) {
         BSP_LED_Toggle(LED_GREEN);
         osDelay(1000);
     }
-}
 }

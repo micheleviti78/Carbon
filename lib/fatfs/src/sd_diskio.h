@@ -38,7 +38,7 @@
 #define __SD_DISKIO_H
 
 /* Includes ------------------------------------------------------------------*/
-#include <carbon/sd_card.h>
+#include <carbon/sd_card.hpp>
 
 #include "ff_gen_drv.h"
 

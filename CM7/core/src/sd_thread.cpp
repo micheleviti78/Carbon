@@ -3,7 +3,7 @@
  * @file           sd_thread.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Feb. 2024
- * @brief          thread to test the SD card, cpp code
+ * @brief          thread to mount/unmount the SD card
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -18,25 +18,15 @@
 
 #include <carbon/diag.hpp>
 #include <carbon/error.hpp>
+#include <carbon/sd_thread.hpp>
 
 #include <sd_diskio.h>
 
 #include <cmsis_os.h>
 #include <task.h>
 
-extern "C" {
-
 static char sdPath[4];
 static FATFS sdFATFS;
-
-static const char msg[] =
-    "Dopo quella diamantata pazzesca la contessina Serbelloni Mazzanti Vien "
-    "Dal mare gli fece conoscere alcuni amici e gli presentò "
-    "nell'ordine:\n\rla "
-    "signora Bolla, i coniugi Bertani, la contessa Ruffino, i fratelli Gancia, "
-    "Donna Folonari, il barone Ricasoli, il marchese Antinori, i Serristori "
-    "Branca e i Moretti, quelli della birra.\n\rA metà di quel giro di "
-    "presentazioni Fantozzi era già completamente ubriaco!";
 
 static uint8_t workBuffer[_MAX_SS]
     __attribute__((aligned(32), section(".sdram_bank2")));
@@ -44,11 +34,10 @@ static uint8_t workBuffer[_MAX_SS]
 static BSP_SD_CardInfo cardInfo;
 static BSP_SD_CardCID cardCID;
 
-void start_sd_thread_imp(void);
+SDThread::SDThread()
+    : Thread("sd_thread", osPriorityNormal, configMINIMAL_STACK_SIZE * 64) {}
 
-void start_sd_thread(void) { start_sd_thread_imp(); }
-
-void sd_thread(const void * /*argument*/) {
+void SDThread::run() {
     BSP_SD_DeInit(0);
 
     int32_t res = BSP_SD_Init(0);
@@ -132,5 +121,4 @@ void sd_thread(const void * /*argument*/) {
     while (1) {
         osDelay(10000);
     }
-}
 }

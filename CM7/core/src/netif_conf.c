@@ -62,7 +62,7 @@ void netif_config(void) {
 
 #if LWIP_DHCP
     /* Start DHCPClient */
-    osThreadDef(DHCP, DHCP_Thread, osPriorityHigh, 0,
+    osThreadDef(DHCP, DHCP_Thread, osPriorityNormal, 0,
                 configMINIMAL_STACK_SIZE * 6);
     osThreadCreate(osThread(DHCP), &gnetif);
 #endif

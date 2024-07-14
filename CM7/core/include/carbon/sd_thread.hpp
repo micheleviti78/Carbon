@@ -3,7 +3,7 @@
  * @file           sd_thread.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Feb. 2024
- * @brief          thread to test the SD card
+ * @brief          thread to mount/unmount the SD card
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -18,12 +18,12 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <carbon/thread.hpp>
+class SDThread : public Thread {
+public:
+    SDThread();
+    ~SDThread() = default;
 
-void start_sd_thread(void);
-
-#ifdef __cplusplus
-}
-#endif
+protected:
+    void run() override;
+};

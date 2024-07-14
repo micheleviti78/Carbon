@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file           sd_card.h
+ * @file           sd_card.hpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Feb. 2024
  * @brief          SD Card Interface
@@ -34,33 +34,14 @@
  ******************************************************************************
  */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef STM32H747I_DISCO_SD_H
-#define STM32H747I_DISCO_SD_H
+#pragma once
+
+#include <carbon/sd_errno.h>
+#include <stm32h7xx_hal_conf.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* Includes ------------------------------------------------------------------*/
-#include <carbon/sd_errno.h>
-#include <stm32h7xx_hal_conf.h>
-
-/** @addtogroup BSP
- * @{
- */
-
-/** @addtogroup STM32H747I_DISCO
- * @{
- */
-
-/** @addtogroup STM32H747I_DISCO_SD
- * @{
- */
-
-/** @defgroup STM32H747I_DISCO_SD_Exported_Types Exported Types
- * @{
- */
 
 /**
  * @brief SD Card information structure
@@ -74,13 +55,7 @@ typedef struct {
     void (*pMspDeInitCb)(SD_HandleTypeDef *);
 } BSP_SD_Cb_t;
 #endif /* (USE_HAL_SD_REGISTER_CALLBACKS == 1) */
-/**
- * @}
- */
 
-/** @defgroup STM32H747I_DISCO_SD_Exported_Constants Exported Constants
- * @{
- */
 #define SD_INSTANCES_NBR 1UL
 
 #ifndef SD_WRITE_TIMEOUT
@@ -113,9 +88,6 @@ typedef struct {
 #define SD_PRESENT 1UL
 #define SD_NOT_PRESENT 0UL
 
-/**
- * @brief SD-detect signal
- */
 #define SD_DETECT_PIN GPIO_PIN_8
 #define SD_DETECT_GPIO_PORT GPIOI
 #define SD_DETECT_GPIO_CLK_ENABLE() __HAL_RCC_GPIOI_CLK_ENABLE()
@@ -125,23 +97,9 @@ typedef struct {
 #define SD_DETECT_EXTI_LINE EXTI_LINE_8
 #define SD_DetectIRQHandler() HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8)
 
-/**
- * @}
- */
-
-/** @addtogroup STM32H747I_DISCO_SD_Exported_Variables
- * @{
- */
 extern SD_HandleTypeDef hsd_sdmmc[];
 extern EXTI_HandleTypeDef hsd_exti[];
 
-/**
- * @}
- */
-
-/** @addtogroup STM32H747I_DISCO_SD_Exported_Functions
- * @{
- */
 int32_t BSP_SD_Init(uint32_t Instance);
 int32_t BSP_SD_DeInit(uint32_t Instance);
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
@@ -180,24 +138,6 @@ void BSP_SD_DetectCallback(uint32_t Instance);
 void HAL_SD_DriveTransciver_1_8V_Callback(FlagStatus status);
 HAL_StatusTypeDef MX_SDMMC1_SD_Init(SD_HandleTypeDef *hsd);
 
-/**
- * @}
- */
-
-/**
- * @}
- */
-
-/**
- * @}
- */
-
-/**
- * @}
- */
-
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* STM32H747I_DISCO_SD_H */

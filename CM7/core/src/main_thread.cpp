@@ -32,10 +32,10 @@ static DiagThread diagThread;
 #ifdef FREERTOS_USE_TRACE
 static TraceThread traceThread;
 #endif
+static SDThread sdThread;
 
 extern "C" {
 void netif_config(void);
-void start_sd_thread();
 void start_micropython();
 }
 
@@ -50,7 +50,7 @@ void MainThread::run() {
     traceThread.start();
 #endif
 
-    start_sd_thread();
+    sdThread.start();
 
     osDelay(200);
 

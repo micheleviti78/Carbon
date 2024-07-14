@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file           sd_card.c
+ * @file           sd_card.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Feb. 2024
  * @brief          SD Card Interface
@@ -84,68 +84,31 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include <carbon/diag.hpp>
-#include <carbon/sd_card.h>
+#include <carbon/sd_card.hpp>
+#include <carbon/semaphore.hpp>
 
 #include <cmsis_os.h>
 
-/** @addtogroup BSP
- * @{
- */
-
-/** @addtogroup STM32H747I_DISCO
- * @{
- */
-
-/** @defgroup STM32H747I_DISCO_SD SD
- * @{
- */
 #define BLOCK_SIZE 512U
 
-/** @defgroup STM32H747I_DISCO_SD_Private_TypesDefinitions Private
- * TypesDefinitions
- * @{
- */
-// #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
-// /* Is Msp Callbacks registered */
-// static uint32_t IsMspCallbacksValid[SD_INSTANCES_NBR] = {0};
-// #endif
 typedef void (*BSP_EXTI_LineCallback)(void);
-/**
- * @}
- */
 
-/** @defgroup STM32H747I_DISCO_SD_Exported_Variables Exported Variables
- * @{
- */
 SD_HandleTypeDef hsd_sdmmc[SD_INSTANCES_NBR];
 EXTI_HandleTypeDef hsd_exti[SD_INSTANCES_NBR];
-/**
- * @}
- */
 
-/** @defgroup STM32H747I_DISCO_SD_Private_Variables Private Variables
- * @{
- */
 static uint32_t PinDetect[SD_INSTANCES_NBR] = {SD_DETECT_PIN};
-/**
- * @}
- */
 
-/** @defgroup SD Semaphore
- * @{
- */
-osSemaphoreDef(semDMATX);
-osSemaphoreId semDMATX[SD_INSTANCES_NBR];
-osSemaphoreDef(semDMARX);
-osSemaphoreId semDMARX[SD_INSTANCES_NBR];
+static BinarySemaphore semDMATX;
+static BinarySemaphore semDMARX;
 
-osSemaphoreDef(semDetect);
-osSemaphoreId semDetect[SD_INSTANCES_NBR];
+static BinarySemaphore semDetect;
 
 #define DMA_TIMEOUT 10000UL
 /**
  * @}
  */
+
+extern "C" {
 
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
 /* Is Msp Callbacks registered   */
@@ -184,7 +147,7 @@ static void SD_EXTI_Callback(void);
  * @retval BSP status
  */
 int32_t BSP_SD_Init(uint32_t Instance) {
-    osSemaphoreWait(semDetect[Instance], osWaitForever);
+    semDetect.acquire();
 
     int32_t ret = BSP_ERROR_NONE;
     GPIO_InitTypeDef gpio_init_structure;
@@ -263,11 +226,8 @@ int32_t BSP_SD_Init(uint32_t Instance) {
         }
     }
 
-    semDMARX[Instance] = osSemaphoreCreate(osSemaphore(semDMARX), 1);
-    semDMATX[Instance] = osSemaphoreCreate(osSemaphore(semDMATX), 1);
-
-    osSemaphoreWait(semDMARX[Instance], 0);
-    osSemaphoreWait(semDMATX[Instance], 0);
+    semDMARX.init();
+    semDMATX.init();
 
     return ret;
 }
@@ -444,9 +404,9 @@ int32_t BSP_SD_DetectITConfig(uint32_t Instance) {
  * @retval None.
  */
 int32_t BSP_SD_Init_Detect_Notify(uint32_t Instance) {
-    semDetect[Instance] = osSemaphoreCreate(osSemaphore(semDetect), 1);
-    if (BSP_SD_IsDetected(Instance) == SD_NOT_PRESENT) {
-        osSemaphoreWait(semDetect[Instance], 0);
+    semDetect.init();
+    if (BSP_SD_IsDetected(Instance) == SD_PRESENT) {
+        semDetect.release();
     }
     return BSP_ERROR_NONE;
 }
@@ -461,7 +421,7 @@ void BSP_SD_DetectCallback(uint32_t Instance) {
 
     if (status == (int32_t)SD_PRESENT) {
         DIAG(SD "SD Inserted");
-        osSemaphoreRelease(semDetect[Instance]);
+        semDetect.release();
     } else if (status == (int32_t)SD_NOT_PRESENT) {
         DIAG(SD "SD Removed");
     }
@@ -597,7 +557,7 @@ int32_t BSP_SD_ReadBlocks_DMA(uint32_t Instance, uint32_t *pData,
             return ret;
         }
 
-        if (osSemaphoreWait(semDMARX[Instance], DMA_TIMEOUT) == osErrorOS) {
+        if (!semDMARX.acquire(DMA_TIMEOUT)) {
             DIAG(SD "time out waiting RX DMA");
             ret = BSP_ERROR_PERIPH_FAILURE;
         }
@@ -643,7 +603,7 @@ int32_t BSP_SD_WriteBlocks_DMA(uint32_t Instance, uint32_t *pData,
             ret = BSP_ERROR_PERIPH_FAILURE;
             return ret;
         }
-        if (osSemaphoreWait(semDMATX[Instance], DMA_TIMEOUT) == osErrorOS) {
+        if (!semDMATX.acquire(DMA_TIMEOUT)) {
             DIAG(SD "time out waiting TX DMA");
             ret = BSP_ERROR_PERIPH_FAILURE;
         }
@@ -868,18 +828,14 @@ __weak void BSP_SD_AbortCallback(uint32_t Instance) {
  * @param  Instance     SD Instance
  * @retval None
  */
-__weak void BSP_SD_WriteCpltCallback(uint32_t Instance) {
-    osSemaphoreRelease(semDMATX[Instance]);
-}
+__weak void BSP_SD_WriteCpltCallback(uint32_t Instance) { semDMATX.release(); }
 
 /**
  * @brief BSP Rx Transfer completed callbacks
  * @param  Instance     SD Instance
  * @retval None
  */
-__weak void BSP_SD_ReadCpltCallback(uint32_t Instance) {
-    osSemaphoreRelease(semDMARX[Instance]);
-}
+__weak void BSP_SD_ReadCpltCallback(uint32_t Instance) { semDMARX.release(); }
 
 /**
  * @}
@@ -1024,19 +980,4 @@ static void SD_MspDeInit(SD_HandleTypeDef *hsd) {
         HAL_GPIO_DeInit(GPIOD, gpio_init_structure.Pin);
     }
 }
-
-/**
- * @}
- */
-
-/**
- * @}
- */
-
-/**
- * @}
- */
-
-/**
- * @}
- */
+}

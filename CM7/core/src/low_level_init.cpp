@@ -19,7 +19,7 @@
 #include <carbon/hsem.hpp>
 #include <carbon/pin.hpp>
 #include <carbon/rand.hpp>
-#include <carbon/sd_card.h>
+#include <carbon/sd_card.hpp>
 #include <carbon/sdram.hpp>
 #include <carbon/shared_memory.hpp>
 #include <carbon/systime.hpp>

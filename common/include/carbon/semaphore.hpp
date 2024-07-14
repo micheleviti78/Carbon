@@ -19,6 +19,7 @@
 #pragma once
 
 #include <carbon/common.hpp>
+#include <carbon/diag.hpp>
 
 #include <cmsis_os.h>
 
@@ -34,12 +35,12 @@ public:
 
     PREVENT_COPY_AND_MOVE(Semaphore)
 
-    void init() {
+    virtual void init() {
         __disable_irq();
         if (!isInit_) {
-            osSemaphoreDef_t sem_def;
-            _semaphore = osSemaphoreCreate(&sem_def, count_);
-            ASSERT(_semaphore != NULL);
+            osSemaphoreDef_t sem_def{0, NULL};
+            semaphore_ = osSemaphoreCreate(&sem_def, count_);
+            ASSERT(semaphore_ != NULL);
             isInit_ = true;
         }
         __enable_irq();
@@ -47,24 +48,26 @@ public:
 
     bool acquire(uint32_t timeout = osWaitForever) {
         ASSERT(isInit_);
-        return osSemaphoreWait(_semaphore, timeout) == osOK;
+        return osSemaphoreWait(semaphore_, timeout) == osOK;
     }
 
     bool release() {
         ASSERT(isInit_);
-        return osSemaphoreRelease(_semaphore) == osOK;
+        return osSemaphoreRelease(semaphore_) == osOK;
     }
 
 protected:
     uint32_t count_;
     bool isInit_;
-    osSemaphoreId _semaphore;
+    osSemaphoreId semaphore_;
 };
 
 class BinarySemaphore : public Semaphore {
 public:
-    BinarySemaphore() : Semaphore(1) {
-        osSemaphoreWait(_semaphore, 0); // reset status of the Semaphore
-    }
+    BinarySemaphore() : Semaphore(1) {}
     ~BinarySemaphore() override = default;
+    void init() override {
+        Semaphore::init();
+        osSemaphoreWait(semaphore_, 0); // reset status of the Semaphore
+    }
 };

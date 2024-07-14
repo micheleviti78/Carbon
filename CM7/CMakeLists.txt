@@ -65,7 +65,6 @@ else()
     SET(SOURCE_MAIN 
     ${CMAKE_CURRENT_LIST_DIR}/core/src/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/main_thread.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/core/src/sd_thread.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/sd_thread.cpp 
     ${CMAKE_CURRENT_LIST_DIR}/core/src/app_ethernet.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/ethernetif.c
@@ -77,7 +76,7 @@ endif(FIFO_TEST)
 SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/hsem.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/low_level_init.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/core/src/sd_card.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/sd_card.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/msp.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/interrupts.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/trace.cpp

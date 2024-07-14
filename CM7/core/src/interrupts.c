@@ -17,7 +17,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <carbon/diag.hpp>
-#include <carbon/sd_card.h>
+#include <carbon/sd_card.hpp>
 
 #include <stm32h7xx_hal.h>
 

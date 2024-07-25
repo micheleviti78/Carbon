@@ -38,87 +38,91 @@ SDThread::SDThread()
     : Thread("sd_thread", osPriorityNormal, configMINIMAL_STACK_SIZE * 64) {}
 
 void SDThread::run() {
-    BSP_SD_DeInit(0);
+    while (1) {
+        int32_t res = BSP_SD_Init(0);
 
-    int32_t res = BSP_SD_Init(0);
-
-    if (res < 0) {
-        DIAG(SD "SD card init failed: %ld", res);
-        while (1) {
-            osDelay(10000);
-        }
-    }
-
-    DIAG(SD "SD initialized");
-
-    if (BSP_SD_GetCardInfo(0, &cardInfo) < 0) {
-        DIAG(SD "Error reading SD card Info or no card");
-    } else {
-        DIAG(SD "SD card type %lu", cardInfo.CardType);
-        DIAG(SD "SD card version %lu", cardInfo.CardVersion);
-        DIAG(SD "SD card class %lu", cardInfo.Class);
-        DIAG(SD "SD card number of blocks %lu", cardInfo.BlockNbr);
-        DIAG(SD "SD card block size %lu", cardInfo.BlockSize);
-        DIAG(SD "SD card number of logical blocks %lu", cardInfo.LogBlockNbr);
-        DIAG(SD "SD card logical block size %lu", cardInfo.LogBlockSize);
-        DIAG(SD "SD card speed %lu", cardInfo.CardSpeed);
-
-        if (BSP_SD_GetCardCID(0, &cardCID) < 0) {
-            DIAG(SD "Error reading SD card CID or no card");
-        } else {
-            DIAG(SD "SD card Manufactorer ID %lu", cardCID.ManufacturerID);
-            DIAG(SD "SD card Manufactorer OEMID %lu", cardCID.OEM_AppliID);
-            DIAG(SD "SD card Manufacturing Date %lu", cardCID.ManufactDate);
-        }
-    }
-
-    if (FATFS_LinkDriver(&SD_Driver, &sdPath[0]) != 0) {
-        DIAG(SD "cannot register diskio driver");
-        while (1) {
-            osDelay(10000);
-        }
-    } else {
-        DIAG(SD "Logical path for sd card volume %s", &sdPath[0]);
-    }
-
-    FRESULT fres = f_mount(&sdFATFS, &sdPath[0], 1);
-
-    if (fres == 0) {
-        DIAG(SD "Logical volume %s for sd card mounted", &sdPath[0]);
-    } else if (fres == 13) {
-        fres = f_mkfs(&sdPath[0], FM_ANY, 0, workBuffer, sizeof(workBuffer));
-        if (fres == 0) {
-            DIAG(SD "Logical volume %s formatted", &sdPath[0]);
-            fres = f_mount(&sdFATFS, &sdPath[0], 1);
-            if (fres == 0) {
-                DIAG(SD "Logical volume %s mounted after formatting",
-                     &sdPath[0]);
-            } else {
-                DIAG(SD "Error mounting logical volume %s: %d", &sdPath[0],
-                     fres);
-                while (1) {
-                    osDelay(10000);
-                }
-            }
-        } else {
-            DIAG(SD "Logical volume %s error %d while formatting", &sdPath[0],
-                 fres);
+        if (res < 0) {
+            DIAG(SD "SD card init failed: %ld", res);
             while (1) {
                 osDelay(10000);
             }
         }
-    } else {
-        DIAG(SD "Error mounting logical volume %s: %d", &sdPath[0], fres);
-        while (1) {
-            osDelay(10000);
+
+        DIAG(SD "SD initialized");
+
+        if (BSP_SD_GetCardInfo(0, &cardInfo) < 0) {
+            DIAG(SD "Error reading SD card Info or no card");
+        } else {
+            DIAG(SD "SD card type %lu", cardInfo.CardType);
+            DIAG(SD "SD card version %lu", cardInfo.CardVersion);
+            DIAG(SD "SD card class %lu", cardInfo.Class);
+            DIAG(SD "SD card number of blocks %lu", cardInfo.BlockNbr);
+            DIAG(SD "SD card block size %lu", cardInfo.BlockSize);
+            DIAG(SD "SD card number of logical blocks %lu",
+                 cardInfo.LogBlockNbr);
+            DIAG(SD "SD card logical block size %lu", cardInfo.LogBlockSize);
+            DIAG(SD "SD card speed %lu", cardInfo.CardSpeed);
+
+            if (BSP_SD_GetCardCID(0, &cardCID) < 0) {
+                DIAG(SD "Error reading SD card CID or no card");
+            } else {
+                DIAG(SD "SD card Manufactorer ID %lu", cardCID.ManufacturerID);
+                DIAG(SD "SD card Manufactorer OEMID %lu", cardCID.OEM_AppliID);
+                DIAG(SD "SD card Manufacturing Date %lu", cardCID.ManufactDate);
+            }
         }
-    }
 
-    /* Unmount volume */
-    // f_mount(NULL, &sdPath[0], 0);
-    // DIAG(SD "volume %s unmounted", &sdPath[0]);
+        if (FATFS_LinkDriver(&SD_Driver, &sdPath[0]) != 0) {
+            DIAG(SD "cannot register diskio driver");
+            while (1) {
+                osDelay(10000);
+            }
+        } else {
+            DIAG(SD "Logical path for sd card volume %s", &sdPath[0]);
+        }
 
-    while (1) {
-        osDelay(10000);
+        FRESULT fres = f_mount(&sdFATFS, &sdPath[0], 1);
+
+        if (fres == 0) {
+            DIAG(SD "Logical volume %s for sd card mounted", &sdPath[0]);
+        } else if (fres == 13) {
+            fres =
+                f_mkfs(&sdPath[0], FM_ANY, 0, workBuffer, sizeof(workBuffer));
+            if (fres == 0) {
+                DIAG(SD "Logical volume %s formatted", &sdPath[0]);
+                fres = f_mount(&sdFATFS, &sdPath[0], 1);
+                if (fres == 0) {
+                    DIAG(SD "Logical volume %s mounted after formatting",
+                         &sdPath[0]);
+                } else {
+                    DIAG(SD "Error mounting logical volume %s: %d", &sdPath[0],
+                         fres);
+                    // while (1) {
+                    //     osDelay(10000);
+                    // }
+                }
+            } else {
+                DIAG(SD "Logical volume %s error %d while formatting",
+                     &sdPath[0], fres);
+                // while (1) {
+                //     osDelay(10000);
+                // }
+            }
+        } else {
+            DIAG(SD "Error mounting logical volume %s: %d", &sdPath[0], fres);
+            // while (1) {
+            //     osDelay(10000);
+            // }
+        }
+
+        BSP_SD_DeInit(0);
+        /* Unmount volume */
+        f_mount(NULL, &sdPath[0], 0);
+        DIAG(SD "volume %s unmounted", &sdPath[0]);
+        if (FATFS_UnLinkDriverEx(&sdPath[0], 0) != 0) {
+            DIAG(SD "cannot unregister diskio driver");
+        }
+
+        // osDelay(10000);
     }
 }

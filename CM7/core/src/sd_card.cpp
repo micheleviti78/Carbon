@@ -84,10 +84,17 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include <carbon/diag.hpp>
+#include <carbon/error.hpp>
 #include <carbon/sd_card.hpp>
 #include <carbon/semaphore.hpp>
+#include <stm32h7xx_ll_tim.h>
 
 #include <cmsis_os.h>
+
+#define PIN_DETECT_TIM TIM6
+#define PIN_DETECT_PERIOD 10000UL
+#define PIN_DETECT_IRQ TIM6_DAC_IRQn
+#define PIN_DETECT_CLK_EN() __HAL_RCC_TIM6_CLK_ENABLE();
 
 #define BLOCK_SIZE 512U
 
@@ -103,25 +110,24 @@ static BinarySemaphore semDMARX;
 
 static BinarySemaphore semDetect;
 
+static TIM_HandleTypeDef pin_detect_tim_handle{};
+static RCC_ClkInitTypeDef clkConfig{};
+
 #define DMA_TIMEOUT 10000UL
-/**
- * @}
- */
 
 extern "C" {
+
+static Error init_detect_pin_tim();
+static void stop_counter();
+static void dummy_callback(TIM_HandleTypeDef * /*handle*/);
+static void update_callback(TIM_HandleTypeDef * /*handle*/);
+static void start_detect_pin_suppression();
 
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
 /* Is Msp Callbacks registered   */
 static uint32_t IsMspCallbacksValid[SD_INSTANCES_NBR] = {0};
 #endif
-/**
- * @}
- */
 
-/** @defgroup STM32H747I_DISCO_SD_Private_Functions_Prototypes Private Functions
- * Prototypes
- * @{
- */
 static void SD_MspInit(SD_HandleTypeDef *hsd);
 static void SD_MspDeInit(SD_HandleTypeDef *hsd);
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
@@ -238,6 +244,7 @@ int32_t BSP_SD_Init(uint32_t Instance) {
  * @retval SD status
  */
 int32_t BSP_SD_DeInit(uint32_t Instance) {
+    semDetect.acquire();
     int32_t ret = BSP_ERROR_NONE;
     // GPIO_InitTypeDef gpio_init_structure;
 
@@ -393,6 +400,9 @@ int32_t BSP_SD_DetectITConfig(uint32_t Instance) {
         } else {
             ret = BSP_ERROR_NONE;
         }
+        if (init_detect_pin_tim()) {
+            DIAG(SD "detect pin tim init error");
+        }
     }
     /* Return BSP status */
     return ret;
@@ -424,6 +434,10 @@ void BSP_SD_DetectCallback(uint32_t Instance) {
         semDetect.release();
     } else if (status == (int32_t)SD_NOT_PRESENT) {
         DIAG(SD "SD Removed");
+        HAL_NVIC_DisableIRQ((IRQn_Type)(SD_DETECT_EXTI_IRQn));
+        HAL_NVIC_ClearPendingIRQ((IRQn_Type)(SD_DETECT_EXTI_IRQn));
+        semDetect.release();
+        start_detect_pin_suppression();
     }
     /* This function should be implemented by the user application.
        It is called into this driver when an event on JoyPin is triggered. */
@@ -979,5 +993,83 @@ static void SD_MspDeInit(SD_HandleTypeDef *hsd) {
         gpio_init_structure.Pin = GPIO_PIN_2;
         HAL_GPIO_DeInit(GPIOD, gpio_init_structure.Pin);
     }
+}
+
+Error init_detect_pin_tim() {
+    uint32_t latency;
+    HAL_RCC_GetClockConfig(&clkConfig, &latency);
+
+    auto apb1Prescaler = clkConfig.APB1CLKDivider;
+
+    auto pclk1Freq = HAL_RCC_GetPCLK1Freq();
+
+    uint32_t timClk;
+    switch (apb1Prescaler) {
+    case RCC_APB1_DIV1:
+        timClk = pclk1Freq;
+        break;
+    case RCC_APB1_DIV2:
+        timClk = 2 * pclk1Freq;
+        break;
+    default:
+        return InternalHardwareError;
+    }
+
+    auto timPrescaler =
+        static_cast<uint32_t>((timClk / 10000) - 1); // 10 kHz clock
+
+    PIN_DETECT_CLK_EN();
+
+    pin_detect_tim_handle.Instance = PIN_DETECT_TIM;
+    pin_detect_tim_handle.Init.Period = PIN_DETECT_PERIOD;
+    pin_detect_tim_handle.Init.Prescaler = timPrescaler;
+    pin_detect_tim_handle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    pin_detect_tim_handle.Init.CounterMode = TIM_COUNTERMODE_UP;
+    if (HAL_TIM_Base_Init(&pin_detect_tim_handle) != HAL_OK) {
+        return InternalHardwareError;
+    }
+
+    __HAL_TIM_UIFREMAP_DISABLE(&pin_detect_tim_handle);
+
+    HAL_NVIC_SetPriority(PIN_DETECT_IRQ, 15, 0);
+
+    for (unsigned char i = 0; i < 28; i++) {
+        HAL_TIM_RegisterCallback(&pin_detect_tim_handle,
+                                 static_cast<HAL_TIM_CallbackIDTypeDef>(i),
+                                 &dummy_callback);
+    }
+
+    return Success;
+}
+
+void start_detect_pin_suppression() {
+    HAL_TIM_RegisterCallback(&pin_detect_tim_handle,
+                             HAL_TIM_PERIOD_ELAPSED_CB_ID, &update_callback);
+    __HAL_TIM_ENABLE_IT(&pin_detect_tim_handle, TIM_IT_UPDATE);
+
+    HAL_NVIC_EnableIRQ(PIN_DETECT_IRQ);
+
+    __HAL_TIM_SET_COUNTER(&pin_detect_tim_handle, 0);
+
+    HAL_TIM_Base_Start(&pin_detect_tim_handle);
+}
+
+void dummy_callback(TIM_HandleTypeDef * /*handle*/) {}
+
+void update_callback(TIM_HandleTypeDef * /*handle*/) {
+    stop_counter();
+    HAL_NVIC_EnableIRQ((IRQn_Type)(SD_DETECT_EXTI_IRQn));
+    DIAG(SD "detect pin enabled again");
+}
+
+void carbon_hw_us_pin_detect_tim_isr() {
+    HAL_TIM_IRQHandler(&pin_detect_tim_handle);
+}
+
+void stop_counter() {
+    __HAL_TIM_DISABLE_IT(&pin_detect_tim_handle, TIM_IT_UPDATE);
+    HAL_NVIC_DisableIRQ(PIN_DETECT_IRQ);
+    HAL_NVIC_ClearPendingIRQ(PIN_DETECT_IRQ);
+    HAL_TIM_Base_Stop(&pin_detect_tim_handle);
 }
 }

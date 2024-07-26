@@ -97,22 +97,13 @@ void SDThread::run() {
                 } else {
                     DIAG(SD "Error mounting logical volume %s: %d", &sdPath[0],
                          fres);
-                    // while (1) {
-                    //     osDelay(10000);
-                    // }
                 }
             } else {
                 DIAG(SD "Logical volume %s error %d while formatting",
                      &sdPath[0], fres);
-                // while (1) {
-                //     osDelay(10000);
-                // }
             }
         } else {
             DIAG(SD "Error mounting logical volume %s: %d", &sdPath[0], fres);
-            // while (1) {
-            //     osDelay(10000);
-            // }
         }
 
         BSP_SD_DeInit(0);
@@ -122,7 +113,5 @@ void SDThread::run() {
         if (FATFS_UnLinkDriverEx(&sdPath[0], 0) != 0) {
             DIAG(SD "cannot unregister diskio driver");
         }
-
-        // osDelay(10000);
     }
 }

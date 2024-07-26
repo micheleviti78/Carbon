@@ -133,7 +133,12 @@ void start_micropython() {
     FRESULT fres = f_open(&fs_read, "0:/main.py", FA_READ);
 
     if (fres != 0) {
-        DIAG(MP "error opening file %d", fres);
+        if (fres == FR_NOT_ENABLED)
+            DIAG(MP "SD card not present or not mounted");
+        else if (fres == FR_NO_FILE)
+            DIAG(MP "file main.py not found");
+        else
+            DIAG(MP "error opening file %d", fres);
     } else {
 
         FILINFO file_info;

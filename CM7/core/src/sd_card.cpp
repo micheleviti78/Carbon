@@ -98,6 +98,10 @@
 
 #define BLOCK_SIZE 512U
 
+enum class DetectPinStatus { STABLE, CHECKING_STABILITY, SUPPRESSED };
+
+static DetectPinStatus detectPinStatus{DetectPinStatus::STABLE};
+
 typedef void (*BSP_EXTI_LineCallback)(void);
 
 SD_HandleTypeDef hsd_sdmmc[SD_INSTANCES_NBR];
@@ -119,9 +123,11 @@ extern "C" {
 
 static Error init_detect_pin_tim();
 static void stop_counter();
-static void dummy_callback(TIM_HandleTypeDef * /*handle*/);
-static void update_callback(TIM_HandleTypeDef * /*handle*/);
+static void dummy_callback(TIM_HandleTypeDef *handle);
 static void start_detect_pin_suppression();
+static void detect_pin_suppression_callback(TIM_HandleTypeDef *handle);
+static void detect_pin_check_stability();
+static void detect_pin_check_stability_callback(TIM_HandleTypeDef *handle);
 
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
 /* Is Msp Callbacks registered   */
@@ -428,19 +434,25 @@ int32_t BSP_SD_Init_Detect_Notify(uint32_t Instance) {
  */
 void BSP_SD_DetectCallback(uint32_t Instance) {
     int32_t status = BSP_SD_IsDetected(Instance);
-
-    if (status == (int32_t)SD_PRESENT) {
-        DIAG(SD "SD Inserted");
-        semDetect.release();
-    } else if (status == (int32_t)SD_NOT_PRESENT) {
-        DIAG(SD "SD Removed");
-        HAL_NVIC_DisableIRQ((IRQn_Type)(SD_DETECT_EXTI_IRQn));
-        HAL_NVIC_ClearPendingIRQ((IRQn_Type)(SD_DETECT_EXTI_IRQn));
-        semDetect.release();
-        start_detect_pin_suppression();
+    switch (detectPinStatus) {
+    case DetectPinStatus::STABLE:
+        if (status == (int32_t)SD_PRESENT) {
+            detect_pin_check_stability();
+            detectPinStatus = DetectPinStatus::CHECKING_STABILITY;
+        } else if (status == (int32_t)SD_NOT_PRESENT) {
+            detectPinStatus = DetectPinStatus::SUPPRESSED;
+            HAL_NVIC_DisableIRQ((IRQn_Type)(SD_DETECT_EXTI_IRQn));
+            HAL_NVIC_ClearPendingIRQ((IRQn_Type)(SD_DETECT_EXTI_IRQn));
+            DIAG(SD "SD Removed");
+            start_detect_pin_suppression();
+            semDetect.release();
+        }
+        break;
+    case DetectPinStatus::CHECKING_STABILITY:
+        __HAL_TIM_SET_COUNTER(&pin_detect_tim_handle, 0);
+    case DetectPinStatus::SUPPRESSED:
+        break;
     }
-    /* This function should be implemented by the user application.
-       It is called into this driver when an event on JoyPin is triggered. */
 }
 
 /**
@@ -1044,7 +1056,8 @@ Error init_detect_pin_tim() {
 
 void start_detect_pin_suppression() {
     HAL_TIM_RegisterCallback(&pin_detect_tim_handle,
-                             HAL_TIM_PERIOD_ELAPSED_CB_ID, &update_callback);
+                             HAL_TIM_PERIOD_ELAPSED_CB_ID,
+                             &detect_pin_suppression_callback);
     __HAL_TIM_ENABLE_IT(&pin_detect_tim_handle, TIM_IT_UPDATE);
 
     HAL_NVIC_EnableIRQ(PIN_DETECT_IRQ);
@@ -1056,10 +1069,31 @@ void start_detect_pin_suppression() {
 
 void dummy_callback(TIM_HandleTypeDef * /*handle*/) {}
 
-void update_callback(TIM_HandleTypeDef * /*handle*/) {
+void detect_pin_suppression_callback(TIM_HandleTypeDef * /*handle*/) {
     stop_counter();
     HAL_NVIC_EnableIRQ((IRQn_Type)(SD_DETECT_EXTI_IRQn));
+    detectPinStatus = DetectPinStatus::STABLE;
     DIAG(SD "detect pin enabled again");
+}
+
+void detect_pin_check_stability() {
+    HAL_TIM_RegisterCallback(&pin_detect_tim_handle,
+                             HAL_TIM_PERIOD_ELAPSED_CB_ID,
+                             &detect_pin_check_stability_callback);
+    __HAL_TIM_ENABLE_IT(&pin_detect_tim_handle, TIM_IT_UPDATE);
+
+    HAL_NVIC_EnableIRQ(PIN_DETECT_IRQ);
+
+    __HAL_TIM_SET_COUNTER(&pin_detect_tim_handle, 0);
+
+    HAL_TIM_Base_Start(&pin_detect_tim_handle);
+}
+
+void detect_pin_check_stability_callback(TIM_HandleTypeDef * /*handle*/) {
+    stop_counter();
+    detectPinStatus = DetectPinStatus::STABLE;
+    semDetect.release();
+    DIAG(SD "SD Inserted");
 }
 
 void carbon_hw_us_pin_detect_tim_isr() {

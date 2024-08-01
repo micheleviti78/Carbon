@@ -26,6 +26,11 @@
 
 #include <carbon/diag.hpp>
 
+extern "C" {
+void carbon_assert(unsigned long line, const char *filename,
+                   const char *message) __attribute__((noreturn));
+}
+
 #define PREVENT_COPY(class_name)                                               \
     class_name(const class_name &) = delete;                                   \
     class_name &operator=(const class_name &) = delete;
@@ -47,11 +52,8 @@
     class_name &operator=(class_name &&) = default;
 
 #define ASSERT(cond)                                                           \
-    do {                                                                       \
-        if (!(cond)) {                                                         \
-            RAW_DIAG("Assertion failed: %s, file %s, line %d", #cond,          \
-                     __FILE__, __LINE__);                                      \
-            __asm volatile("BKPT #01");                                        \
-        }                                                                      \
-    } while (0);
-//end of the file
+    if (!(cond)) {                                                             \
+        carbon_assert(__LINE__, __FILE__, #cond);                              \
+    }
+
+// end of the file

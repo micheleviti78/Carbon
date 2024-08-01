@@ -20,6 +20,7 @@
 
 #include <carbon/common.hpp>
 #include <carbon/diag.hpp>
+#include <carbon/irq.hpp>
 
 #include <cmsis_os.h>
 
@@ -36,14 +37,14 @@ public:
     PREVENT_COPY_AND_MOVE(Semaphore)
 
     virtual void init() {
-        __disable_irq();
+        CARBON::IRQ::lockRecursive();
         if (!isInit_) {
             osSemaphoreDef_t sem_def{0, NULL};
             semaphore_ = osSemaphoreCreate(&sem_def, count_);
             ASSERT(semaphore_ != NULL);
             isInit_ = true;
         }
-        __enable_irq();
+        CARBON::IRQ::unLockRecursive();
     };
 
     bool acquire(uint32_t timeout = osWaitForever) {

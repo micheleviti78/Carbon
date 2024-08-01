@@ -20,6 +20,7 @@
 
 #include <carbon/common.hpp>
 #include <carbon/diag.hpp>
+#include <carbon/irq.hpp>
 
 #include <cmsis_os.h>
 

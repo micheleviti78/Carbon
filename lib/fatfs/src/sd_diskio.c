@@ -182,7 +182,7 @@ DSTATUS SD_status(BYTE lun) { return SD_CheckStatus(lun); }
  */
 DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count) {
     DRESULT res = RES_ERROR;
-    int32_t returnSD;
+    int32_t returnSD = 0L;
 
     /*
      * ensure the SDCard is ready for a new operation
@@ -234,7 +234,7 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count) {
 #if _USE_WRITE == 1
 DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count) {
     DRESULT res = RES_ERROR;
-    int32_t returnSD;
+    int32_t returnSD = 0L;
 
     /*
      * ensure the SDCard is ready for a new operation

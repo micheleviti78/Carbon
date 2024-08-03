@@ -34,7 +34,7 @@ void hsem_isr(void);
 
 #include <backtrace.h>
 
-#define BACKTRACE_SIZE 128
+#define BACKTRACE_SIZE 3
 
 static inline void __attribute__((always_inline)) do_backtrace(uint32_t pc) {
     static backtrace_t backtrace_buf[BACKTRACE_SIZE];

@@ -64,7 +64,7 @@ void low_level_system_time() {
 
     auto pclk1Freq = HAL_RCC_GetPCLK1Freq();
 
-    uint32_t timClk;
+    uint32_t timClk{0};
     switch (apb1Prescaler) {
     case RCC_APB1_DIV1:
         timClk = pclk1Freq;

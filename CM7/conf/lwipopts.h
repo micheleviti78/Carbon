@@ -27,11 +27,7 @@
 /* Current version of LwIP supported by CubeMx: 2.1.2 -*/
 /*-----------------------------------------------------------------------------*/
 
-/* Within 'USER CODE' section, code will be kept by default at each generation
- */
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,6 +51,8 @@ extern "C" {
 #define MEM_ALIGNMENT 4
 /*----- Default Value for H7 devices: 0x30044000 -----*/
 #define LWIP_RAM_HEAP_POINTER 0x30044000
+// /*----- Value in opt.h for MEM_SIZE: 1600 -----*/
+// #define MEM_SIZE                    (50*1024)
 /*----- Value supported for H7 devices: 1 -----*/
 #define LWIP_SUPPORT_CUSTOM_PBUF 1
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
@@ -97,17 +95,17 @@ extern "C" {
 /*----- Value in opt.h for DEFAULT_ACCEPTMBOX_SIZE: 0 -----*/
 #define DEFAULT_ACCEPTMBOX_SIZE 6
 /*----- Value in opt.h for RECV_BUFSIZE_DEFAULT: INT_MAX -----*/
-#define RECV_BUFSIZE_DEFAULT 2000000000
+//#define RECV_BUFSIZE_DEFAULT 2000000000
 /*----- Value in opt.h for LWIP_STATS: 1 -----*/
 #define LWIP_STATS 0
 /*----- Value in opt.h for CHECKSUM_GEN_IP: 1 -----*/
 #define CHECKSUM_GEN_IP 0
 /*----- Value in opt.h for CHECKSUM_GEN_UDP: 1 -----*/
-#define CHECKSUM_GEN_UDP 0
+#define CHECKSUM_GEN_UDP 1
 /*----- Value in opt.h for CHECKSUM_GEN_TCP: 1 -----*/
-#define CHECKSUM_GEN_TCP 0
+#define CHECKSUM_GEN_TCP 1
 /*----- Value in opt.h for CHECKSUM_GEN_ICMP: 1 -----*/
-#define CHECKSUM_GEN_ICMP 0
+#define CHECKSUM_GEN_ICMP 1
 /*----- Value in opt.h for CHECKSUM_GEN_ICMP6: 1 -----*/
 #define CHECKSUM_GEN_ICMP6 0
 /*----- Value in opt.h for CHECKSUM_CHECK_IP: 1 -----*/
@@ -125,7 +123,43 @@ extern "C" {
 #define LWIP_DHCP 1
 #define LWIP_NETCONN 1
 #define LWIP_SOCKET 1
-/* USER CODE END 1 */
+#define LWIP_SO_RCVTIMEO 1
+#define MEMP_NUM_NETCONN 8
+#define MEMP_NUM_NETBUF 4
+
+#define LWIP_DEBUG 1
+#define ETHARP_DEBUG LWIP_DBG_OFF
+#define NETIF_DEBUG LWIP_DBG_OFF
+#define PBUF_DEBUG LWIP_DBG_OFF
+#define API_LIB_DEBUG LWIP_DBG_OFF
+#define API_MSG_DEBUG LWIP_DBG_OFF
+#define SOCKETS_DEBUG LWIP_DBG_OFF
+#define ICMP_DEBUG LWIP_DBG_OFF
+#define IGMP_DEBUG LWIP_DBG_OFF
+#define INET_DEBUG LWIP_DBG_OFF
+#define IP_DEBUG LWIP_DBG_OFF
+#define IP_REASS_DEBUG LWIP_DBG_OFF
+#define RAW_DEBUG LWIP_DBG_OFF
+#define MEM_DEBUG LWIP_DBG_OFF
+#define MEMP_DEBUG LWIP_DBG_OFF
+#define SYS_DEBUG LWIP_DBG_OFF
+#define TIMERS_DEBUG LWIP_DBG_OFF
+#define TCP_DEBUG LWIP_DBG_OFF
+#define TCP_INPUT_DEBUG LWIP_DBG_OFF
+#define TCP_FR_DEBUG LWIP_DBG_OFF
+#define TCP_RTO_DEBUG LWIP_DBG_OFF
+#define TCP_CWND_DEBUG LWIP_DBG_OFF
+#define TCP_WND_DEBUG LWIP_DBG_OFF
+#define TCP_OUTPUT_DEBUG LWIP_DBG_OFF
+#define TCP_RST_DEBUG LWIP_DBG_OFF
+#define TCP_QLEN_DEBUG LWIP_DBG_OFF
+#define UDP_DEBUG LWIP_DBG_OFF
+#define TCPIP_DEBUG LWIP_DBG_OFF
+#define SLIP_DEBUG LWIP_DBG_OFF
+#define DHCP_DEBUG LWIP_DBG_OFF
+#define AUTOIP_DEBUG LWIP_DBG_OFF
+#define DNS_DEBUG LWIP_DBG_OFF
+#define IP6_DEBUG LWIP_DBG_OFF
 
 #ifdef __cplusplus
 }

@@ -66,12 +66,13 @@ target_include_directories(${LWIP_LIB}
 )
 
 if (DEBUG_LWIP)
-    target_compile_definitions(${LWIP_LIB} PUBLIC -DLWIP_DEBUG)
+    target_compile_definitions(${LWIP_LIB} PRIVATE -DLWIP_DEBUG)
 endif (DEBUG_LWIP)
 
 target_compile_options(${LWIP_LIB}
     PRIVATE
     -Wformat=0
+    -Wno-unused-variable
 )
 
 target_link_libraries(${LWIP_LIB} freertos_${PROJECT_NAME})

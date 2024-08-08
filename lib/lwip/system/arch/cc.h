@@ -78,19 +78,22 @@ typedef int sys_prot_t;
 #define PACK_STRUCT_FIELD(x) x
 
 #endif
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 extern void carbon_assert(unsigned long line, const char *filename,
                           const char *message) __attribute__((noreturn));
+extern void carbon_diag_push(const char *format, ...);
 extern uint32_t carbon_rand(void);
-#ifdef __cplusplus
-}
-#endif
+
 #define LWIP_PLATFORM_ASSERT(x)                                                \
     do {                                                                       \
         carbon_assert(__LINE__, __FILE__, x);                                  \
     } while (0);
+
+#define LWIP_PLATFORM_DIAG(x)                                                  \
+    do {                                                                       \
+        carbon_diag_push x;                                                    \
+        carbon_diag_push("\r");                                                \
+    } while (0)
 
 /* Define random number generator function */
 #define LWIP_RAND() ((u32_t)carbon_rand())

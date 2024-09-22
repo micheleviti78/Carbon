@@ -180,8 +180,6 @@ void start_micropython() {
         MICROPY_TASK_PRIORITY, mpTaskStack, &mpTaskTCB);
     if (taskHandle == NULL) {
         DIAG(MP "failed to start the micropython task");
-    } else {
-        DIAG(MP "micropython task started");
     }
 }
 

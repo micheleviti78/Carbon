@@ -294,6 +294,12 @@ extern "C" {
 #define BSP_SD_IT_PRIORITY 14U
 #define BSP_SD_RX_IT_PRIORITY 14U
 #define BSP_SD_TX_IT_PRIORITY 15U
+#define USE_SD_TRANSCEIVER 0
+
+/* ########################### SPI Configuration #########################
+ */
+
+#define USE_SPI_CRC 0
 
 /* ########################## Assert Selection ############################## */
 /**

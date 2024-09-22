@@ -27,6 +27,11 @@
 
 #include <cmsis_os.h>
 
+#if 0
+static uint32_t buffer1 __attribute__((aligned(4))) = 0xA5A5A5A5;
+static uint32_t buffer2 __attribute__((aligned(4))) = 0xAABBCCDD;
+static uint32_t buffer3 __attribute__((aligned(4))) = 0xFFEEDDCC;
+#endif
 
 static DiagThread diagThread;
 #ifdef FREERTOS_USE_TRACE
@@ -50,6 +55,18 @@ void MainThread::run() {
     traceThread.start();
 #endif
 
+    /*init matrix display spi*/
+    if (getDisplayMatrixSpi().init()) {
+        Error_Handler();
+    }
+#if 0
+    if (getDisplayMatrixSpi().DMATransmit(&buffer1, 1))
+        DIAG(SYSTEM_DIAG "error transmitting the data");
+    if (getDisplayMatrixSpi().DMATransmit(&buffer2, 1))
+        DIAG(SYSTEM_DIAG "error transmitting the data");
+    if (getDisplayMatrixSpi().DMATransmit(&buffer3, 1))
+        DIAG(SYSTEM_DIAG "error transmitting the data");
+#endif
     sdThread.start();
 
     osDelay(200);

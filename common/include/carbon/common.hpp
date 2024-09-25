@@ -56,4 +56,7 @@ void carbon_assert(unsigned long line, const char *filename,
         carbon_assert(__LINE__, __FILE__, #cond);                              \
     }
 
+#define ALIGN(value, alignment) ((value + alignment - 1)) & (~(alignment - 1))
+#define CACHE_ALIGNMENT 32
+
 // end of the file

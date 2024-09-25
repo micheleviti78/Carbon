@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <cmsis_os.h>
 #include <lwip/err.h>
 #include <lwip/netif.h>
 

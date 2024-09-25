@@ -33,9 +33,6 @@
 extern "C" {
 #endif
 
-/* STM32CubeMX Specific Parameters (not defined in opt.h)
- * ---------------------*/
-/* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
 /*----- WITH_RTOS enabled (Since FREERTOS is set) -----*/
 #define WITH_RTOS 1
 /*----- CHECKSUM_BY_HARDWARE enabled -----*/
@@ -46,7 +43,7 @@ extern "C" {
  * -*/
 /* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
 /*----- Default value in ETH configuration GUI in CubeMx: 1524 -----*/
-#define ETH_RX_BUFFER_SIZE 1524
+#define ETH_RX_BUFFER_SIZE 1528
 /*----- Value in opt.h for MEM_ALIGNMENT: 1 -----*/
 #define MEM_ALIGNMENT 4
 /*----- Default Value for H7 devices: 0x30044000 -----*/

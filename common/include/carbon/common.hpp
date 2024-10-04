@@ -26,10 +26,14 @@
 
 #include <carbon/diag.hpp>
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 void carbon_assert(unsigned long line, const char *filename,
                    const char *message) __attribute__((noreturn));
+#ifdef __cplusplus
 }
+#endif
 
 #define PREVENT_COPY(class_name)                                               \
     class_name(const class_name &) = delete;                                   \

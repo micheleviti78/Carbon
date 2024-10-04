@@ -1,22 +1,24 @@
 /**
  ******************************************************************************
- * @file           ethernetif.cpp
- * @author         Michele Viti <micheleviti78@gmail.com>
- * @date           Sept. 2024
- * @brief          Ethernet driver
+ * File Name          : ethernetif.c
+ * Description        : This file provides code for the configuration
+ *                      of the ethernetif.c MiddleWare.
  ******************************************************************************
  * @attention
- * Copyright (c) 2022 Michele Viti.
- * All rights reserved.
  *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
+ * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under Ultimate Liberty license
+ * SLA0044, the "License"; You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ *                             www.st.com/SLA0044
  *
  ******************************************************************************
  */
 
-#include <carbon/common.hpp>
+/* Includes ------------------------------------------------------------------*/
+
 #include <carbon/ethernetif.h>
 
 #include <lan8742.h>
@@ -33,6 +35,12 @@
 #include <netif/ethernet.h>
 
 #include <string.h>
+
+/* Within 'USER CODE' section, code will be kept by default at each generation
+ */
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
 
 /* Private define ------------------------------------------------------------*/
 #define ETH_TX_EN_Pin GPIO_PIN_11
@@ -75,7 +83,13 @@
 
 /* ETH Setting  */
 #define ETH_DMA_TRANSMIT_TIMEOUT (20U)
+/* ETH_RX_BUFFER_SIZE parameter is defined in lwipopts.h */
 
+/* USER CODE BEGIN 1 */
+
+/* USER CODE END 1 */
+
+/* Private variables ---------------------------------------------------------*/
 /*
 @Note: This interface is implemented to operate in zero-copy mode only:
         - Rx buffers are allocated statically and passed directly to the LwIP
@@ -94,20 +108,45 @@ updated value will be generated in stm32xxxx_hal_conf.h
   2.a. Rx Buffers number must be between ETH_RX_DESC_CNT and 2*ETH_RX_DESC_CNT
   2.b. Rx Buffers must have the same size: ETH_RX_BUFFER_SIZE, this value must
        passed to ETH DMA in the init field (heth.Init.RxBuffLen)
-  2.c  The RX Buffers addresses and sizes must be properly defined to be aligned
+  2.c  The RX Ruffers addresses and sizes must be properly defined to be aligned
        to L1-CACHE line size (32 bytes).
  */
 
-#define ETH_RX_BUFFER_SIZE_ALIGNED ALIGN(ETH_RX_BUFFER_SIZE, CACHE_ALIGNMENT)
+#if defined(__ICCARM__) /*!< IAR Compiler */
+
+#pragma location = 0x30040000
+ETH_DMADescTypeDef
+    DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+#pragma location = 0x30040060
+ETH_DMADescTypeDef
+    DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+#pragma location = 0x30040200
+uint8_t Rx_Buff[ETH_RX_DESC_CNT]
+               [ETH_RX_BUFFER_SIZE]; /* Ethernet Receive Buffers */
+
+#elif defined(__CC_ARM) /* MDK ARM Compiler */
+
+__attribute__((at(0x30040000))) ETH_DMADescTypeDef
+    DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+__attribute__((at(0x30040060))) ETH_DMADescTypeDef
+    DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+__attribute__((at(0x30040200))) uint8_t
+    Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE]; /* Ethernet Receive Buffer */
+
+#elif defined(__GNUC__) /* GNU Compiler */
 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((
     section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((
     section(".TxDecripSection"))); /* Ethernet Tx DMA Descriptors */
-static uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE_ALIGNED]
+uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE]
     __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
-static uint8_t Tx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE_ALIGNED]
-    __attribute__((section(".TxArraySection"))); /* Ethernet Transmit Buffers */
+
+#endif
+
+/* USER CODE BEGIN 2 */
+
+/* USER CODE END 2 */
 
 osSemaphoreId RxPktSemaphore = NULL; /* Semaphore to signal incoming packets */
 
@@ -133,6 +172,10 @@ lan8742_IOCtx_t LAN8742_IOCtx = {ETH_PHY_IO_Init, ETH_PHY_IO_DeInit,
                                  ETH_PHY_IO_WriteReg, ETH_PHY_IO_ReadReg,
                                  ETH_PHY_IO_GetTick};
 
+/* USER CODE BEGIN 3 */
+
+/* USER CODE END 3 */
+
 /* Private functions ---------------------------------------------------------*/
 void pbuf_free_custom(struct pbuf *p);
 void Error_Handler(void);
@@ -140,6 +183,9 @@ void Error_Handler(void);
 void HAL_ETH_MspInit(ETH_HandleTypeDef *ethHandle) {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     if (ethHandle->Instance == ETH) {
+        /* USER CODE BEGIN ETH_MspInit 0 */
+
+        /* USER CODE END ETH_MspInit 0 */
         /* Enable Peripheral clock */
         __HAL_RCC_ETH1MAC_CLK_ENABLE();
         __HAL_RCC_ETH1TX_CLK_ENABLE();
@@ -183,11 +229,17 @@ PC5     ------> ETH_RXD1
         /* Peripheral interrupt init */
         HAL_NVIC_SetPriority(ETH_IRQn, 5, 0);
         HAL_NVIC_EnableIRQ(ETH_IRQn);
+        /* USER CODE BEGIN ETH_MspInit 1 */
+
+        /* USER CODE END ETH_MspInit 1 */
     }
 }
 
 void HAL_ETH_MspDeInit(ETH_HandleTypeDef *ethHandle) {
     if (ethHandle->Instance == ETH) {
+        /* USER CODE BEGIN ETH_MspDeInit 0 */
+
+        /* USER CODE END ETH_MspDeInit 0 */
         /* Disable Peripheral clock */
         __HAL_RCC_ETH1MAC_CLK_DISABLE();
         __HAL_RCC_ETH1TX_CLK_DISABLE();
@@ -213,6 +265,10 @@ PC5     ------> ETH_RXD1
 
         /* Peripheral interrupt Deinit*/
         HAL_NVIC_DisableIRQ(ETH_IRQn);
+
+        /* USER CODE BEGIN ETH_MspDeInit 1 */
+
+        /* USER CODE END ETH_MspDeInit 1 */
     }
 }
 
@@ -224,6 +280,10 @@ PC5     ------> ETH_RXD1
 void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth) {
     osSemaphoreRelease(RxPktSemaphore);
 }
+
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
 
 /*******************************************************************************
                        LL Driver Interface ( LwIP stack --> ETH)
@@ -255,7 +315,11 @@ static void low_level_init(struct netif *netif) {
     heth.Init.MediaInterface = HAL_ETH_RMII_MODE;
     heth.Init.TxDesc = DMATxDscrTab;
     heth.Init.RxDesc = DMARxDscrTab;
-    heth.Init.RxBuffLen = ETH_RX_BUFFER_SIZE_ALIGNED;
+    heth.Init.RxBuffLen = 1524;
+
+    /* USER CODE BEGIN MACADDRESS */
+
+    /* USER CODE END MACADDRESS */
 
     hal_eth_init_status = HAL_ETH_Init(&heth);
 
@@ -301,13 +365,17 @@ static void low_level_init(struct netif *netif) {
     /* create a binary semaphore used for informing ethernetif of frame
      * reception */
     RxPktSemaphore = xSemaphoreCreateBinary();
-    osSemaphoreWait(RxPktSemaphore, 0);
 
     /* create the task that handles the ETH_MAC */
+    /* USER CODE BEGIN OS_THREAD_NEW_CMSIS_RTOS_V2 */
     osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0,
                 INTERFACE_THREAD_STACK_SIZE);
     osThreadCreate(osThread(EthIf), netif);
 
+    /* USER CODE END OS_THREAD_NEW_CMSIS_RTOS_V2 */
+    /* USER CODE BEGIN PHY_PRE_CONFIG */
+
+    /* USER CODE END PHY_PRE_CONFIG */
     /* Set PHY IO functions */
     LAN8742_RegisterBusIO(&LAN8742, &LAN8742_IOCtx);
 
@@ -354,12 +422,20 @@ static void low_level_init(struct netif *netif) {
             HAL_ETH_Start_IT(&heth);
             netif_set_up(netif);
             netif_set_link_up(netif);
+
+            /* USER CODE BEGIN PHY_POST_CONFIG */
+
+            /* USER CODE END PHY_POST_CONFIG */
         }
 
     } else {
         Error_Handler();
     }
 #endif /* LWIP_ARP || LWIP_ETHERNET */
+
+    /* USER CODE BEGIN LOW_LEVEL_INIT */
+
+    /* USER CODE END LOW_LEVEL_INIT */
 }
 
 /**
@@ -439,8 +515,10 @@ static struct pbuf *low_level_input(struct netif *netif) {
         /* Build Rx descriptor to be ready for next data reception */
         HAL_ETH_BuildRxDescriptors(&heth);
 
+#if !defined(DUAL_CORE) || defined(CORE_CM7)
         /* Invalidate data cache for ETH Rx Buffers */
         SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff->buffer, framelength);
+#endif
 
         custom_pbuf = (struct pbuf_custom *)LWIP_MEMPOOL_ALLOC(RX_POOL);
         if (custom_pbuf != NULL) {
@@ -491,6 +569,10 @@ static err_t low_level_output_arp_off(struct netif *netif, struct pbuf *q,
                                       const ip4_addr_t *ipaddr) {
     err_t errval;
     errval = ERR_OK;
+
+    /* USER CODE BEGIN 5 */
+
+    /* USER CODE END 5 */
 
     return errval;
 }
@@ -558,6 +640,8 @@ void pbuf_free_custom(struct pbuf *p) {
     LWIP_MEMPOOL_FREE(RX_POOL, custom_pbuf);
 }
 
+/* USER CODE BEGIN 6 */
+
 /**
  * @brief  Returns the current time in milliseconds
  *         when LWIP_TIMERS == 1 and NO_SYS == 1
@@ -573,6 +657,8 @@ u32_t sys_jiffies(void) { return HAL_GetTick(); }
  * @retval Current Time value
  */
 u32_t sys_now(void) { return HAL_GetTick(); }
+
+/* USER CODE END 6 */
 
 /*******************************************************************************
                        PHI IO Functions
@@ -650,6 +736,9 @@ void ethernet_link_thread(void const *argument) {
     uint32_t linkchanged = 0, speed = 0, duplex = 0;
 
     struct netif *netif = (struct netif *)argument;
+    /* USER CODE BEGIN ETH link init */
+
+    /* USER CODE END ETH link init */
 
     for (;;) {
         PHYLinkState = LAN8742_GetLinkState(&LAN8742);
@@ -699,7 +788,14 @@ void ethernet_link_thread(void const *argument) {
             }
         }
 
+        /* USER CODE BEGIN ETH link Thread core code for User BSP */
+
+        /* USER CODE END ETH link Thread core code for User BSP */
+
         osDelay(100);
     }
 }
-}
+/* USER CODE BEGIN 8 */
+
+/* USER CODE END 8 */
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

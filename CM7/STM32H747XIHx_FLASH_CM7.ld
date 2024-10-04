@@ -203,15 +203,15 @@ SECTIONS
   } >RAM_D2_SR2 
  
   .lwip_sec (NOLOAD) : {
-    . = ABSOLUTE(0x30040000)
-    . = ALIGN(4);
-    *(.RxDecripSection) 
-    . = ALIGN(4);
-    *(.TxDecripSection)
+    . = ABSOLUTE(0x30040000);
     . = ALIGN(4);
     *(.RxArraySection) 
     . = ALIGN(4);
     *(.TxArraySection) 
+    . = ALIGN(4);
+    *(.RxDecripSection) 
+    . = ALIGN(4);
+    *(.TxDecripSection)
   } >RAM_D2_SR3 AT> FLASH
   
   .ARM.attributes 0 : { *(.ARM.attributes) }

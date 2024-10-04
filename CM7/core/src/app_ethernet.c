@@ -26,6 +26,8 @@
 #include <carbon/ethernetif.h>
 #include <carbon/pin.hpp>
 
+#include <cmsis_os.h>
+
 #include <stm32h7xx_hal.h>
 
 /* Private typedef -----------------------------------------------------------*/

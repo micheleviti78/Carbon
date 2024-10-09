@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file           ethernetif.cpp
+ * @file           ethernetif.c
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Sept. 2024
  * @brief          Ethernet driver
@@ -398,7 +398,11 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p) {
 
         Txbuffer[i].buffer = q->payload;
         Txbuffer[i].len = q->len;
-
+#if 0
+        DIAG(ETH_DIAG "low level output: pbuf payload: %p", q->payload);
+        DIAG(ETH_DIAG "low level output: pbuf size %u", q->len);
+        DIAG(ETH_DIAG "low level output: chain index %lu", i);
+#endif
         if (i > 0) {
             Txbuffer[i - 1].next = &Txbuffer[i];
         }
@@ -412,6 +416,8 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p) {
 
     TxConfig.Length = p->tot_len;
     TxConfig.TxBuffer = Txbuffer;
+
+    SCB_CleanDCache_by_Addr((uint32_t *)Txbuffer[0].buffer, p->tot_len);
 
     int result = HAL_ETH_Transmit(&heth, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
 
@@ -449,8 +455,10 @@ static struct pbuf *low_level_input(struct netif *netif) {
     if (status == HAL_OK) {
         status = HAL_ETH_GetRxDataLength(&heth, &framelength);
         if (status != HAL_OK) {
+#if 0
             DIAG(ETH_DIAG "low level input: error retrieving frame length %d",
                  status);
+#endif
             return p;
         }
 
@@ -485,9 +493,13 @@ static struct pbuf *low_level_input(struct netif *netif) {
         } else {
             DIAG(ETH_DIAG "low level input: cannot allocate pbuf");
         }
-    } else {
+    }
+#if 0
+    else {
+
         DIAG(ETH_DIAG "low level input: error retrieving RxBUff %d", status);
     }
+#endif
 
     return p;
 }
@@ -510,8 +522,12 @@ void ethernetif_input(const void *argument) {
             do {
                 p = low_level_input(netif);
                 if (p != NULL) {
-                    if (netif->input(p, netif) != ERR_OK) {
-                        DIAG(ETH_DIAG "error pushing data to the stack");
+                    err_t err = netif->input(p, netif);
+                    if (err != ERR_OK) {
+                        DIAG(
+                            ETH_DIAG
+                            "error %d pushing pbuf %p, payload %p to the stack",
+                            err, p, p->payload);
                         pbuf_free(p);
                     }
                 }

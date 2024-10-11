@@ -262,10 +262,10 @@ static void low_level_init(struct netif *netif) {
     hal_eth_init_status = HAL_ETH_Init(&heth);
 
     memset(&TxConfig, 0, sizeof(ETH_TxPacketConfig));
-    TxConfig.Attributes =
-        ETH_TX_PACKETS_FEATURES_CSUM | ETH_TX_PACKETS_FEATURES_CRCPAD;
-    TxConfig.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
-    TxConfig.CRCPadCtrl = ETH_CRC_PAD_INSERT;
+    // TxConfig.Attributes =
+    //     ETH_TX_PACKETS_FEATURES_CSUM | ETH_TX_PACKETS_FEATURES_CRCPAD;
+    // TxConfig.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
+    // TxConfig.CRCPadCtrl = ETH_CRC_PAD_INSERT;
 
     /* End ETH HAL Init */
 

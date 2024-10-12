@@ -101,16 +101,19 @@ updated value will be generated in stm32xxxx_hal_conf.h
 
 #define ETH_RX_BUFFER_SIZE_ALIGNED ALIGN(ETH_RX_BUFFER_SIZE, CACHE_ALIGNMENT)
 
-ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((
-    section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
-ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((
-    section(".TxDecripSection"))); /* Ethernet Tx DMA Descriptors */
+/* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT]
+    __attribute__((aligned(32), section(".RxDecripSection")));
+/* Ethernet Tx DMA Descriptors */
+ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT]
+    __attribute__((aligned(32), section(".TxDecripSection")));
+/* Ethernet Receive Buffers */
 static uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE_ALIGNED]
-    __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
+    __attribute__((aligned(32), section(".RxArraySection")));
+/* Ethernet Transmit Buffers */
 // static uint8_t Tx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE_ALIGNED]
-//     __attribute__((section(".TxArraySection"))); /* Ethernet Transmit Buffers
-//     */
-
+//     __attribute__((aligned(32), section(".TxArraySection")));
+static ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT] __attribute__((aligned(32)));
 osSemaphoreId RxPktSemaphore = NULL; /* Semaphore to signal incoming packets */
 
 /* Global Ethernet handle */
@@ -386,7 +389,6 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p) {
     uint32_t i = 0;
     struct pbuf *q;
     err_t errval = ERR_OK;
-    ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT];
 
     memset(Txbuffer, 0, ETH_TX_DESC_CNT * sizeof(ETH_BufferTypeDef));
 

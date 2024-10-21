@@ -17,6 +17,8 @@
                 "CORE_CM4=1",
                 "HAL_TIM_MODULE_ENABLED=1",
                 "DUAL_CORE=1",
+                "HAL_ETH_MODULE_ENABLED=1",
+                "ETH=1",
                 "MICROPY_PY_THREAD=1",
                 "FREERTOS_USE_TRACE=1",
                 "TIM2=1",

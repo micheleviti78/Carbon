@@ -45,6 +45,7 @@ void carbon_diag_pull();
 #define SPI_DIAG "[spi] "
 #define MATRIX_DIS_DIAG "[md] "
 #define FTP "[ftp] "
+#define ETH_DIAG "[eth] "
 
 #ifdef CORE_CM7
 #define DIAG_CPU "[CM7] "
@@ -54,4 +55,6 @@ void carbon_diag_pull();
 
 #define RAW_DIAG(...) carbon_raw_diag_print(DIAG_CPU __VA_ARGS__)
 
-#define DIAG(...) carbon_diag_push("\n\r" DIAG_CPU __VA_ARGS__)
+#define DIAG_HELPER(fmt, ...)                                                  \
+    carbon_diag_push(DIAG_CPU fmt "\n\r", ##__VA_ARGS__)
+#define DIAG(...) DIAG_HELPER(__VA_ARGS__)

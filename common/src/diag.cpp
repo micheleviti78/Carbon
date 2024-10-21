@@ -60,7 +60,7 @@ void carbon_diag_push(const char *format, ...) {
     va_end(vl);
     diagFifoClass::ContextPush context(diagFifo, len, hsemDiag);
     if (context.isOverflow()) {
-        carbon_raw_diag_print("???????????");
+        RAW_DIAG("???????????");
         return;
     }
     /*writing into buffer, using vfctprintf*/

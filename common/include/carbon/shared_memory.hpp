@@ -61,7 +61,7 @@ void resetSyncFlag();
 
 /*DIAG FIFO*/
 
-FIFO_DECLARATION_8BIT_ALIG(diag, uint8_t, 2048, Diag)
+FIFO_DECLARATION_8BIT_ALIG(diag, uint8_t, 4096, Diag)
 
 #ifdef FREERTOS_USE_TRACE
 /*TRACE FIFO*/

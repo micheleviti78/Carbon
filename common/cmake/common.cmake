@@ -1,6 +1,6 @@
 enable_language(C CXX ASM)
 
-#set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Debug)
 
 set(WARN_FLAGS
     -Wall

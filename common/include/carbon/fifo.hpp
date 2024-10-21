@@ -108,6 +108,8 @@ public:
 
         ~ContextPush() {
             LockGuard<Lock> lockGuard(lock_);
+            if (isOverflow_)
+                return;
             uint32_t index1 = fifo_pos_start_ / 8u;
             uint32_t index2 = fifo_pos_end_ / 8u;
             if (index1 == index2) {

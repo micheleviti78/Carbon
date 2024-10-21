@@ -26,10 +26,14 @@
 
 #include <carbon/diag.hpp>
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 void carbon_assert(unsigned long line, const char *filename,
                    const char *message) __attribute__((noreturn));
+#ifdef __cplusplus
 }
+#endif
 
 #define PREVENT_COPY(class_name)                                               \
     class_name(const class_name &) = delete;                                   \
@@ -55,5 +59,8 @@ void carbon_assert(unsigned long line, const char *filename,
     if (!(cond)) {                                                             \
         carbon_assert(__LINE__, __FILE__, #cond);                              \
     }
+
+#define ALIGN(value, alignment) ((value + alignment - 1)) & (~(alignment - 1))
+#define CACHE_ALIGNMENT 32
 
 // end of the file

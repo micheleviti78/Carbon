@@ -42,7 +42,11 @@ __weak void ftp_disconnected_callback(void) {}
 // static variables
 static const char *no_conn_allowed = "421 No more connections allowed\r\n";
 static server_stru_t ftp_links[FTP_NBR_CLIENTS];
+#if FTP_TASK_STATIC == 1
 static TaskHandle_t task_handle;
+#else
+static BaseType_t task_handle;
+#endif
 
 // single ftp connection loop
 static void ftp_task(void *param) {
@@ -106,8 +110,9 @@ static void ftp_start_task(server_stru_t *data, uint8_t index) {
         DIAG(FTP "%s not started", name);
     }
 #else
-    if (task_handle = xTaskCreate(ftp_task, name, FTP_TASK_STACK_SIZE, data, 2,
-                                  data->task_handle) != pdPASS) {
+    task_handle = xTaskCreate(ftp_task, name, FTP_TASK_STACK_SIZE, data, 2,
+                              data->task_handle);
+    if (task_handle != pdPASS) {
         // if creation of the task fails, close and clean up the connection
         netconn_close(data->ftp_connection);
         netconn_delete(data->ftp_connection);

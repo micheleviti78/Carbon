@@ -229,7 +229,7 @@ _NORTC_MON, /  _NORTC_MDAY and _NORTC_YEAR have no effect.
 /  These options have no effect at read-only configuration (_FS_READONLY = 1).
 */
 
-#define _FS_LOCK 2
+#define _FS_LOCK 50
 /* The option _FS_LOCK switches file lock function to control duplicated file
 open /  and illegal operation to open objects. This option must be 0 when
 _FS_READONLY /  is 1.

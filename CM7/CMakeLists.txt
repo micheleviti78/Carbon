@@ -84,7 +84,7 @@ SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/uart.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/diag_thread.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/matrix_display_spi.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/core/src/ftp_thread.c
+    ${CMAKE_CURRENT_LIST_DIR}/core/src/ftp_thread.cpp
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/mpcarbon.c  
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/gccollect.c  
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/mphalport.c

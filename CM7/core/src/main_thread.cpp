@@ -38,6 +38,7 @@ static DiagThread diagThread;
 static TraceThread traceThread;
 #endif
 static SDThread sdThread;
+static FTPThread ftpThread;
 
 extern "C" {
 void netif_config(void);
@@ -73,7 +74,7 @@ void MainThread::run() {
 
     start_micropython();
 
-    start_ftp_thread();
+    ftpThread.start();
 
     while (1) {
         BSP_LED_Toggle(LED_GREEN);

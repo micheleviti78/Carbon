@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file           ftp_thread.c
+ * @file           ftp_thread.cpp
  * @author         Michele Viti <micheleviti78@gmail.com>
  * @date           Feb. 2024
- * @brief          thread to init the SD card, c code
+ * @brief          ftp server thread
  ******************************************************************************
  * @attention
  * Copyright (c) 2022 Michele Viti.
@@ -16,16 +16,15 @@
  ******************************************************************************
  */
 
+#include <carbon/ftp_thread.hpp>
+
 #include <cmsis_os.h>
 
+extern "C" {
 #include <ftp.h>
-
-static osThreadId ftp_handle;
-
-static void ftp_server_wrapper(const void *) { ftp_server(); }
-
-void start_ftp_thread(void) {
-    osThreadDef(FTP_Thread, ftp_server_wrapper, osPriorityNormal, 0,
-                configMINIMAL_STACK_SIZE * 8);
-    ftp_handle = osThreadCreate(osThread(FTP_Thread), NULL);
 }
+
+FTPThread::FTPThread()
+    : Thread("ftp_thread", osPriorityNormal, configMINIMAL_STACK_SIZE * 8) {}
+
+void FTPThread::run() { ftp_server(); }

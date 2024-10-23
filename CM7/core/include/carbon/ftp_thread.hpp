@@ -18,12 +18,12 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <carbon/thread.hpp>
+class FTPThread : public Thread {
+public:
+    FTPThread();
+    ~FTPThread() = default;
 
-void start_ftp_thread(void);
-
-#ifdef __cplusplus
-}
-#endif
+protected:
+    void run() override;
+};

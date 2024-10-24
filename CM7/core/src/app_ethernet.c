@@ -116,8 +116,8 @@ void DHCP_Thread(void const *argument) {
             break;
         }
 
-        /* wait 500 ms */
-        osDelay(500);
+        /* wait 100 ms */
+        osDelay(100);
     }
 }
 #endif /* LWIP_DHCP */

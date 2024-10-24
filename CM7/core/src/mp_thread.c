@@ -119,10 +119,12 @@ void TASK_MicroPython(void *pvParameters) {
                 break;
             }
         }
-        for (;;) {
-            osDelay(10000);
-        }
     }
+
+    DIAG(MP "not recoverable error");
+
+    while (1)
+        osDelay(10000);
 }
 
 void start_micropython() {
@@ -231,14 +233,15 @@ int mp_carbon_stdint() {
     int err;
     if (new_connection) {
         if (carbon_mp_console_recv_buf_size == 0) {
-            netbuf_delete(carbon_mp_console_recv_netbuf);
+            if (carbon_mp_console_recv_netbuf) {
+                netbuf_delete(carbon_mp_console_recv_netbuf);
+                carbon_mp_console_recv_netbuf = NULL;
+            }
             err = netconn_recv(new_connection, &carbon_mp_console_recv_netbuf);
             if (err == ERR_OK && carbon_mp_console_recv_netbuf) {
                 netbuf_data(carbon_mp_console_recv_netbuf,
                             &carbon_mp_console_recv_buf,
                             &carbon_mp_console_recv_buf_size);
-                DIAG(MP "%.*s", (int)carbon_mp_console_recv_buf_size,
-                     (char *)carbon_mp_console_recv_buf);
                 char c = *((char *)carbon_mp_console_recv_buf);
                 carbon_mp_console_recv_buf =
                     (char *)carbon_mp_console_recv_buf + 1;
@@ -249,24 +252,26 @@ int mp_carbon_stdint() {
                 close_connection();
                 return 0;
             }
-        } else if (carbon_mp_console_recv_buf_size > 0) {
+        } else {
             char c = *((char *)carbon_mp_console_recv_buf);
             carbon_mp_console_recv_buf = (char *)carbon_mp_console_recv_buf + 1;
             carbon_mp_console_recv_buf_size--;
             return c;
-        } else {
-            DIAG(MP "unexpected error while receiving data");
-            close_connection();
-            return 0;
         }
     }
     return 0;
 }
 
 void close_connection() {
-    DIAG(MP "disconnecting client");
-    netbuf_delete(carbon_mp_console_recv_netbuf);
+    if (carbon_mp_console_recv_netbuf) {
+        netbuf_delete(carbon_mp_console_recv_netbuf);
+        carbon_mp_console_recv_netbuf = NULL;
+    }
     carbon_mp_console_recv_buf_size = 0;
-    netconn_close(new_connection);
-    netconn_delete(new_connection);
+    if (new_connection) {
+        netconn_close(new_connection);
+        netconn_delete(new_connection);
+        new_connection = NULL;
+    }
+    DIAG(MP "client disconnected");
 }

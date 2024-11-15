@@ -242,7 +242,7 @@ control. Note that the file /      lock control is independent of re-entrancy.
 */
 
 #define _FS_REENTRANT 1
-#define _USE_MUTEX 0
+#define _USE_MUTEX 1
 /* Use CMSIS-OS mutexes as _SYNC_t object instead of Semaphores */
 
 #if _FS_REENTRANT

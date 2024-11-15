@@ -36,7 +36,9 @@
 
 #pragma once
 
+#include <carbon/diag.hpp>
 #include <carbon/sd_errno.h>
+
 #include <stm32h7xx_hal_conf.h>
 
 #ifdef __cplusplus

@@ -13,7 +13,7 @@ set(WARN_FLAGS
     -Wformat-overflow=2
     -Wformat-signedness
     -Wno-format-nonliteral
-    -Wstack-usage=1024
+    -Wstack-usage=2048
     -Wno-unused-parameter
     -Wlogical-op
     -Wdouble-promotion

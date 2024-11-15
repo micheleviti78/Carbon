@@ -20,6 +20,7 @@
 #include <carbon/error.hpp>
 #include <carbon/sd_thread.hpp>
 
+#include <io_utils.h>
 #include <sd_diskio.h>
 
 #include <cmsis_os.h>
@@ -33,6 +34,10 @@ static uint8_t workBuffer[_MAX_SS]
 
 static BSP_SD_CardInfo cardInfo;
 static BSP_SD_CardCID cardCID;
+
+extern "C" {
+FRESULT copy_file(const char *srcPath, const char *dstPath);
+}
 
 SDThread::SDThread()
     : Thread("sd_thread", osPriorityNormal, configMINIMAL_STACK_SIZE * 64) {}
@@ -105,7 +110,52 @@ void SDThread::run() {
         } else {
             DIAG(SD "Error mounting logical volume %s: %d", &sdPath[0], fres);
         }
+#if 0
+        FRESULT test_res = copy_file("0:/original/ocean_birds.avi",
+                                     "0:/test1/ocean_birds.avi");
+        DIAG(SD "copying file 1 error %lu", test_res);
 
+        test_res =
+            copy_file("0:/original/rain_drops.avi", "0:/test1/rain_drops.avi");
+        DIAG(SD "copying file 2 error %lu", test_res);
+
+        test_res = copy_file("0:/original/Stream.avi", "0:/test1/Stream.avi");
+        DIAG(SD "copying file 3 error %lu", test_res);
+
+        test_res = copy_file("0:/original/tropicalfish.avi",
+                             "0:/test1/tropicalfish.avi");
+        DIAG(SD "copying file 4 error %lu", test_res);
+
+        test_res = copy_file("0:/original/ocean_birds.avi",
+                                     "0:/test2/ocean_birds.avi");
+        DIAG(SD "copying file 1 error %lu", test_res);
+
+        test_res =
+            copy_file("0:/original/rain_drops.avi", "0:/test2/rain_drops.avi");
+        DIAG(SD "copying file 2 error %lu", test_res);
+
+        test_res = copy_file("0:/original/Stream.avi", "0:/test2/Stream.avi");
+        DIAG(SD "copying file 3 error %lu", test_res);
+
+        test_res = copy_file("0:/original/tropicalfish.avi",
+                             "0:/test2/tropicalfish.avi");
+        DIAG(SD "copying file 4 error %lu", test_res);
+
+        test_res = copy_file("0:/original/ocean_birds.avi",
+                                     "0:/test3/ocean_birds.avi");
+        DIAG(SD "copying file 1 error %lu", test_res);
+
+        test_res =
+            copy_file("0:/original/rain_drops.avi", "0:/test3/rain_drops.avi");
+        DIAG(SD "copying file 2 error %lu", test_res);
+
+        test_res = copy_file("0:/original/Stream.avi", "0:/test3/Stream.avi");
+        DIAG(SD "copying file 3 error %lu", test_res);
+
+        test_res = copy_file("0:/original/tropicalfish.avi",
+                             "0:/test3/tropicalfish.avi");
+        DIAG(SD "copying file 4 error %lu", test_res);
+#endif
         BSP_SD_DeInit(0);
         /* Unmount volume */
         f_mount(NULL, &sdPath[0], 0);

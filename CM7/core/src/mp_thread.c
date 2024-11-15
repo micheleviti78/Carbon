@@ -105,14 +105,14 @@ void TASK_MicroPython(void *pvParameters) {
         if (ret != 0) {
             DIAG(MP "error in console %d", ret);
             close_connection();
-            DIAG(MP "connection close, reconnecting");
+            DIAG(MP "waiting for new connection");
             err = netconn_accept(connection, &new_connection);
             if (err != ERR_OK) {
                 DIAG(MP "error while reconnection %d", err);
                 break;
             }
         } else if (!new_connection) {
-            DIAG(MP "connection close, reconnecting");
+            DIAG(MP "waiting for new connection");
             err = netconn_accept(connection, &new_connection);
             if (err != ERR_OK) {
                 DIAG(MP "error while reconnection %d", err);

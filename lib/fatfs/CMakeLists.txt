@@ -3,6 +3,7 @@ set(FATFS_SOURCES
     src/ff.c  
     src/ff_gen_drv.c  
     src/sd_diskio.c
+    src/io_utils.c
 )
 
 set(FATFS_OPTIONS
@@ -15,10 +16,10 @@ set(FATFS_LIB fatfs_${PROJECT_NAME})
 
 add_library(${FATFS_LIB} ${FATFS_SOURCES} ${FATFS_OPTIONS})
 
+target_link_libraries(${FATFS_LIB} hal_${PROJECT_NAME} freertos_${PROJECT_NAME})
+
 target_include_directories(${FATFS_LIB}
     PUBLIC
     src
     ${PROJECT_CONFIG_DIR}
 )
-
-target_link_libraries(${FATFS_LIB} hal_${PROJECT_NAME} freertos_${PROJECT_NAME})

@@ -448,7 +448,7 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p) {
 static struct pbuf *low_level_input(struct netif *netif) {
     struct pbuf *p = NULL;
     ETH_BufferTypeDef RxBuff[ETH_RX_DESC_CNT];
-    uint32_t framelength = 0, i = 0;
+    uint32_t i = 0;
     struct pbuf_custom *custom_pbuf;
     HAL_StatusTypeDef status;
 
@@ -460,41 +460,53 @@ static struct pbuf *low_level_input(struct netif *netif) {
 
     status = HAL_ETH_GetRxDataBuffer(&heth, RxBuff);
 
-    if (status == HAL_OK) {
-        status = HAL_ETH_GetRxDataLength(&heth, &framelength);
-        if (status != HAL_OK) {
-            DIAG(ETH_DIAG "low level input: error retrieving frame length %d",
-                 status);
+    if (status != HAL_OK || RxBuff[0].buffer == NULL) {
+        return p;
+    }
+
+    custom_pbuf = (struct pbuf_custom *)LWIP_MEMPOOL_ALLOC(RX_POOL);
+    if (custom_pbuf == NULL) {
+        DIAG(ETH_DIAG "low level input: cannot allocate pbuf");
+        return p;
+    }
+    custom_pbuf->custom_free_function = pbuf_free_custom;
+
+    p = (struct pbuf *)custom_pbuf;
+    ETH_BufferTypeDef *ethBuf = &RxBuff[0];
+    i = 0;
+
+    while (i < ETH_RX_DESC_CNT) {
+        SCB_InvalidateDCache_by_Addr((uint32_t *)ethBuf->buffer,
+                                     ETH_RX_BUFFER_SIZE_ALIGNED);
+
+        if (!pbuf_alloced_custom(PBUF_RAW, ethBuf->len, PBUF_REF, custom_pbuf,
+                                 ethBuf->buffer, ETH_RX_BUFFER_SIZE_ALIGNED)) {
+            DIAG(ETH_DIAG "low level input: pbuf not initialized");
+            if (p) {
+                pbuf_free(p);
+                p = NULL;
+            }
             return p;
         }
 
-        /* Build Rx descriptor to be ready for next data reception */
-        status = HAL_ETH_BuildRxDescriptors(&heth);
-
-        for (i = 0; i < ETH_RX_DESC_CNT; i++) {
-            if (((uintptr_t)(RxBuff[i].buffer) & 0x1F) != 0) {
-                DIAG(ETH_DIAG "low level input: rx buffer not 32-byte aligned");
-                return p;
-            }
-
-            /* Invalidate data cache for ETH Rx Buffers */
-            SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff[i].buffer,
-                                         ETH_RX_BUFFER_SIZE_ALIGNED);
+        ethBuf = ethBuf->next;
+        if (!ethBuf->buffer) {
+            break;
         }
-        custom_pbuf = (struct pbuf_custom *)LWIP_MEMPOOL_ALLOC(RX_POOL);
-        if (custom_pbuf != NULL) {
-            custom_pbuf->custom_free_function = pbuf_free_custom;
-            p = pbuf_alloced_custom(PBUF_RAW, framelength, PBUF_REF,
-                                    custom_pbuf, RxBuff->buffer, framelength);
-            if (!p)
-                DIAG(ETH_DIAG "low level input: pbuf not initialized");
-            else if ((uint32_t)custom_pbuf != (uint32_t)p)
-                DIAG(ETH_DIAG
-                     "low level input: custom_pbuf %p NOT EQUAL pbuf %p",
-                     custom_pbuf, p);
-        } else {
+
+        custom_pbuf->pbuf.next = (struct pbuf *)LWIP_MEMPOOL_ALLOC(RX_POOL);
+        custom_pbuf = (struct pbuf_custom *)custom_pbuf->pbuf.next;
+        if (custom_pbuf == NULL) {
             DIAG(ETH_DIAG "low level input: cannot allocate pbuf");
+            if (p) {
+                pbuf_free(p);
+                p = NULL;
+            }
+            return p;
         }
+        custom_pbuf->custom_free_function = pbuf_free_custom;
+
+        i++;
     }
 
     return p;
@@ -526,6 +538,8 @@ void ethernetif_input(const void *argument) {
                             err, p, p->payload);
                         pbuf_free(p);
                     }
+                    // Build Rx descriptor to be ready for next data reception
+                    HAL_ETH_BuildRxDescriptors(&heth);
                 }
             } while (p != NULL);
         }

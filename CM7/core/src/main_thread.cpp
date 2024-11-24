@@ -23,6 +23,7 @@
 #include <carbon/mp_thread.h>
 #include <carbon/pin.hpp>
 #include <carbon/sd_thread.hpp>
+#include <carbon/tcp_test_thread.hpp>
 #include <carbon/trace_thread.hpp>
 
 #include <cmsis_os.h>
@@ -39,6 +40,7 @@ static TraceThread traceThread;
 #endif
 static SDThread sdThread;
 static FTPThread ftpThread;
+static TCPTestThread tcpTestThread;
 
 extern "C" {
 void netif_config(void);
@@ -75,6 +77,8 @@ void MainThread::run() {
     start_micropython();
 
     ftpThread.start();
+
+    tcpTestThread.start();
 
     while (1) {
         BSP_LED_Toggle(LED_GREEN);

@@ -46,6 +46,7 @@ void carbon_diag_pull();
 #define MATRIX_DIS_DIAG "[md] "
 #define FTP "[ftp] "
 #define ETH_DIAG "[eth] "
+#define ETH_TEST_DIAG "[ethtest] "
 
 #ifdef CORE_CM7
 #define DIAG_CPU "[CM7] "

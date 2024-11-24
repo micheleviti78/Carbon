@@ -26,7 +26,9 @@
                 "USE_FULL_LL_DRIVER=1",
                 "LWIP_NETIF_LINK_CALLBACK=1",
                 "MICROPY_VFS_FAT=1",
-                "MICROPY_VFS=1"
+                "MICROPY_VFS=1",
+                "LWIP_NETCONN=1",
+                "LWIP_SOCKET=1"
             ],
             "compilerPath": "/opt/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gcc",
             "cStandard": "c23",

@@ -91,6 +91,8 @@ SET(SOURCE
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/mpthreadport.c
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/cortex_m7_get_sp.s
     ${CMAKE_CURRENT_LIST_DIR}/core/src/mp_port/user_module/mp_mod_led.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/test/src/tcp_test_thread.cpp
 )
 
 add_subdirectory(${PROJECT_ROOT_DIR}/lib/lwip lwip)

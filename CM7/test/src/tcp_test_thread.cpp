@@ -57,9 +57,10 @@ void TCPTestThread::run() {
     while (1) {
         err = netconn_accept(conn_, &newConn_);
         if (err == ERR_OK && newConn_) {
-            DIAG(ETH_TEST_DIAG "start testing");
+            DIAG(ETH_TEST_DIAG "start test");
             receiveTestFile();
         }
+        DIAG(ETH_TEST_DIAG "test done");
         if (newConn_) {
             netconn_close(newConn_);
             netconn_delete(newConn_);
@@ -73,6 +74,7 @@ void TCPTestThread::receiveTestFile() {
     recvNetbuf_ = nullptr;
     recvBuf_ = nullptr;
     recvBufSize_ = 0;
+    void *startBufPtr = nullptr;
     uint8_t c = 0;
     uint32_t blockIndex = 0;
     nblock_ = 0;
@@ -80,15 +82,22 @@ void TCPTestThread::receiveTestFile() {
         err_t error = netconn_recv(newConn_, &recvNetbuf_);
         if (error == ERR_OK && recvNetbuf_) {
             netbuf_data(recvNetbuf_, &recvBuf_, &recvBufSize_);
+            startBufPtr = recvBuf_;
             while (recvBufSize_ > 0) {
                 c = *(reinterpret_cast<uint8_t *>(recvBuf_));
                 block_[blockIndex] = c;
                 blockIndex++;
                 if (blockIndex == TCP_TEST_BLOCK_SIZE) {
                     blockIndex = 0;
-                    if (!checkBlock())
-                        DIAG(ETH_TEST_DIAG "ERROR block %lu corrupted",
-                             nblock_);
+                    if (!checkBlock()) {
+                        DIAG(ETH_TEST_DIAG
+                             "ERROR block %lu corrupted, buffer %p",
+                             nblock_, startBufPtr);
+                        netbuf_delete(recvNetbuf_);
+                        recvNetbuf_ = nullptr;
+                        recvBuf_ = nullptr;
+                        return;
+                    }
                     nblock_++;
                     if (nblock_ % 10000 == 0)
                         DIAG(ETH_TEST_DIAG "checked %lu blocks", nblock_);
@@ -104,6 +113,9 @@ void TCPTestThread::receiveTestFile() {
             break;
         }
     }
+    netbuf_delete(recvNetbuf_);
+    recvNetbuf_ = nullptr;
+    recvBuf_ = nullptr;
 
     DIAG(ETH_TEST_DIAG "data received %lu ", totalRecv);
     DIAG(ETH_TEST_DIAG "blocks received %lu ", nblock_);
@@ -115,7 +127,9 @@ bool TCPTestThread::checkBlock() {
     // Check the first 27 bytes are 0x00
     for (size_t i = 0; i < 27; ++i) {
         if (block_[i] != 0x00) {
-            // printf("Error: Byte %zu is not 0x00, but %u\n", i, block_[i]);
+            DIAG(ETH_TEST_DIAG "Error: Byte %zu is not 0x00, but 0x%X", i,
+                 block_[i]);
+            osDelay(5);
             isOK = false;
         }
     }
@@ -123,7 +137,9 @@ bool TCPTestThread::checkBlock() {
     // Check the next 99 bytes are 0xAE
     for (size_t i = 27; i < 126; ++i) {
         if (block_[i] != 0xAE) {
-            // printf("Error: Byte %zu is not 0xAE, but %u\n", i, block_[i]);
+            DIAG(ETH_TEST_DIAG "Error: Byte %zu is not 0xAE, but 0x%X", i,
+                 block_[i]);
+            osDelay(5);
             isOK = false;
         }
     }
@@ -131,8 +147,10 @@ bool TCPTestThread::checkBlock() {
     // Check the next 129 bytes have the same index value
     for (size_t i = 126; i < 255; ++i) {
         if (block_[i] != static_cast<uint8_t>(nblock_)) {
-            // printf("Error: Byte %zu is not equal to index value %u, but
-            // %u\n", i, index_value, block_[i]);
+            DIAG(ETH_TEST_DIAG
+                 "Error: Byte %zu is not equal to index value %u, but %u",
+                 i, static_cast<uint8_t>(nblock_), block_[i]);
+            osDelay(5);
             isOK = false;
         }
     }
@@ -140,7 +158,9 @@ bool TCPTestThread::checkBlock() {
     // Check the next 70 bytes are 0xAA
     for (size_t i = 255; i < 325; ++i) {
         if (block_[i] != 0xAA) {
-            // printf("Error: Byte %zu is not 0xAA, but %u\n", i, block_[i]);
+            DIAG(ETH_TEST_DIAG "Error: Byte %zu is not 0xAA, but 0x%X", i,
+                 block_[i]);
+            osDelay(5);
             isOK = false;
         }
     }
@@ -148,7 +168,9 @@ bool TCPTestThread::checkBlock() {
     // Check the remaining 187 bytes are 0x01
     for (size_t i = 325; i < TCP_TEST_BLOCK_SIZE; ++i) {
         if (block_[i] != 0x01) {
-            // printf("Error: Byte %zu is not 0x01, but %u\n", i, block_[i]);
+            DIAG(ETH_TEST_DIAG "Error: Byte %zu is not 0x01, but 0x%X", i,
+                 block_[i]);
+            osDelay(5);
             isOK = false;
         }
     }

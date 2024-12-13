@@ -768,3 +768,5 @@ void ethernet_link_thread(void const *argument) {
         osDelay(100);
     }
 }
+
+void carbon_hw_ethernet_isr() {}

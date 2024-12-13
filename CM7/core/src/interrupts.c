@@ -30,6 +30,7 @@ void carbon_hw_us_systime_tim_isr(void);
 void carbon_hw_us_pin_detect_tim_isr(void);
 void carbon_hw_matrix_display_spi_isr(void);
 void carbon_hw_matrix_display_dma_isr(void);
+void carbon_hw_ethernet_isr(void);
 void hsem_isr(void);
 
 #include <backtrace.h>

@@ -6,16 +6,16 @@
 #include <unistd.h>
 
 #define SERVER_PORT 9999           // Server port
-#define SERVER_IP "192.168.178.54" // Server IP address
 #define BUFFER_SIZE 1024           // Buffer size for reading file
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <binary file path>\n", argv[0]);
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <binary file path> <ip address>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
     const char *file_path = argv[1];
+    const char *ip_addr = argv[2];
     int sock, file_fd;
     struct sockaddr_in server_addr;
     char buffer[BUFFER_SIZE];
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     // Define server address
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(SERVER_PORT);
-    if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, ip_addr, &server_addr.sin_addr) <= 0) {
         perror("Invalid address/ Address not supported");
         close(sock);
         exit(EXIT_FAILURE);

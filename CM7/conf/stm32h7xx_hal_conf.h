@@ -277,8 +277,8 @@ extern "C" {
 
 /* ########################### Ethernet Configuration #########################
  */
-#define ETH_TX_DESC_CNT 4 /* number of Ethernet Tx DMA descriptors */
-#define ETH_RX_DESC_CNT 4 /* number of Ethernet Rx DMA descriptors */
+#define ETH_TX_DESC_CNT 2 /* number of Ethernet Tx DMA descriptors */
+#define ETH_RX_DESC_CNT 9 /* number of Ethernet Rx DMA descriptors */
 
 #define ETH_MAC_ADDR0 (0x02UL)
 #define ETH_MAC_ADDR1 (0x00UL)
@@ -295,6 +295,7 @@ extern "C" {
 #define BSP_SD_RX_IT_PRIORITY 14U
 #define BSP_SD_TX_IT_PRIORITY 15U
 #define USE_SD_TRANSCEIVER 0
+#define USE_SD_HIGH_PERFORMANCE 1
 
 /* ########################### SPI Configuration #########################
  */

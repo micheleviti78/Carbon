@@ -44,7 +44,7 @@ void netif_config(void) {
 #endif /* LWIP_DHCP */
 
     /* add the network interface */
-    netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init,
+    netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &carbon_lwip_init,
               &tcpip_input);
 
     /*  Registers the default network interface. */
@@ -55,7 +55,7 @@ void netif_config(void) {
 #if LWIP_NETIF_LINK_CALLBACK
     netif_set_link_callback(&gnetif, ethernet_link_status_updated);
 
-    osThreadDef(EthLink, ethernet_link_thread, osPriorityNormal, 0,
+    osThreadDef(EthLink, carbon_lwip_link_thread, osPriorityNormal, 0,
                 configMINIMAL_STACK_SIZE * 6);
     osThreadCreate(osThread(EthLink), &gnetif);
 #endif

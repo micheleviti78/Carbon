@@ -4,6 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
+                "/home/michele/Software/Carbon/CM7/conf/",
                 "/home/michele/Software/Carbon/lib/CMSIS/include",
                 "/home/michele/Software/Carbon/lib/CMSIS/device/ST/STM32H7xx/include",
                 "/home/michele/Software/Carbon/lib/hal/Inc/Legacy",

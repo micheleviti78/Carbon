@@ -36,6 +36,8 @@
 #define TCP_SND_BUF                 (4*TCP_MSS)
 #define TCP_SND_QUEUELEN            (2*TCP_SND_BUF/TCP_MSS)
 #define TCP_WND                     (2*TCP_MSS)
+#define LWIP_ETHERNET               1
+#define LWIP_ARP                    1 
 #define ARP_QUEUEING                1
 #define LWIP_ICMP                   1
 #define LWIP_UDP                    1

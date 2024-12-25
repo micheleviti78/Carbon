@@ -7,7 +7,7 @@ int main() {
     const char *filename = "output.bin";
     const size_t block_size = 512;
     const size_t num_blocks =
-        50000; // Change this to the desired number of blocks
+        500000; // Change this to the desired number of blocks
 
     // Open the file in binary write mode
     FILE *file = fopen(filename, "wb");

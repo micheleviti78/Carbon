@@ -24,7 +24,7 @@
 #include <lwip/tcpip.h>
 
 // static task allocation?
-#define FTP_TASK_STATIC 1
+#define FTP_TASK_STATIC 0
 
 // stack size for ftp task
 #define FTP_TASK_STACK_SIZE 1536

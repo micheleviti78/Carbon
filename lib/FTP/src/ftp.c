@@ -41,12 +41,15 @@ __weak void ftp_disconnected_callback(void) {}
 
 // static variables
 static const char *no_conn_allowed = "421 No more connections allowed\r\n";
-static server_stru_t ftp_links[FTP_NBR_CLIENTS];
+// static server_stru_t ftp_links[FTP_NBR_CLIENTS];
 #if FTP_TASK_STATIC == 1
 static TaskHandle_t task_handle;
 #else
 static BaseType_t task_handle;
 #endif
+
+LWIP_MEMPOOL_DECLARE(ftp_client_pool, 5, sizeof(server_stru_t),
+                     "FTP connection pool");
 
 // single ftp connection loop
 static void ftp_task(void *param) {
@@ -69,6 +72,9 @@ static void ftp_task(void *param) {
     // service FTP server
     ftp_service(ftp->ftp_connection, &ftp->ftp_data);
 
+    // close the connection
+    netconn_close(ftp->ftp_connection);
+
     // delete the connection.
     netconn_delete(ftp->ftp_connection);
 
@@ -81,11 +87,13 @@ static void ftp_task(void *param) {
     // callback
     ftp_disconnected_callback();
 
-    // delete this task
-    vTaskDelete(NULL);
-
     // clear handle
     ftp->task_handle = NULL;
+
+    LWIP_MEMPOOL_FREE(ftp_client_pool, ftp);
+
+    // delete this task
+    vTaskDelete(NULL);
 }
 
 static void ftp_start_task(server_stru_t *data, uint8_t index) {
@@ -105,7 +113,7 @@ static void ftp_start_task(server_stru_t *data, uint8_t index) {
         netconn_close(data->ftp_connection);
         netconn_delete(data->ftp_connection);
         data->ftp_connection = NULL;
-
+        LWIP_MEMPOOL_FREE(ftp_client_pool, data);
         // feedback to CMS log
         DIAG(FTP "%s not started", name);
     }
@@ -117,13 +125,15 @@ static void ftp_start_task(server_stru_t *data, uint8_t index) {
         netconn_close(data->ftp_connection);
         netconn_delete(data->ftp_connection);
         data->ftp_connection = NULL;
-
+        LWIP_MEMPOOL_FREE(ftp_client_pool, data);
         // feedback to CMS log
         DIAG(FTP "%s not started", name);
     }
 #endif
     else {
+#if FTP_TASK_STATIC == 1
         data->task_handle = &task_handle;
+#endif
         // feedback to CMS log
         DIAG(FTP "%s started", name);
     }
@@ -133,7 +143,10 @@ static void ftp_start_task(server_stru_t *data, uint8_t index) {
 void ftp_server(void) {
     struct netconn *ftp_srv_conn;
     struct netconn *ftp_client_conn;
+    server_stru_t *ftp_links;
     uint8_t index = 0;
+
+    LWIP_MEMPOOL_INIT(ftp_client_pool);
 
     // Create the TCP connection handle
     ftp_srv_conn = netconn_new(NETCONN_TCP);
@@ -156,20 +169,15 @@ void ftp_server(void) {
     while (1) {
         // Wait for incoming connections
         if (netconn_accept(ftp_srv_conn, &ftp_client_conn) == ERR_OK) {
-            // Look for the first unused connection
-            for (index = 0; index < FTP_NBR_CLIENTS; index++) {
-                if (ftp_links[index].ftp_connection == NULL &&
-                    ftp_links[index].task_handle == NULL)
-                    break;
-            }
-
+            ftp_links = (server_stru_t *)LWIP_MEMPOOL_ALLOC(ftp_client_pool);
             // all connections in use?
-            if (index >= FTP_NBR_CLIENTS) {
+            if (ftp_links == NULL) {
                 // tell that no connections are allowed
                 netconn_write(ftp_client_conn, no_conn_allowed,
                               strlen(no_conn_allowed), NETCONN_COPY);
 
-                // delete the connection.
+                // close and delete the connection.
+                netconn_close(ftp_client_conn);
                 netconn_delete(ftp_client_conn);
 
                 // reset the socket to be sure
@@ -184,13 +192,15 @@ void ftp_server(void) {
             // not all connections in use
             else {
                 // copy client connection
-                ftp_links[index].ftp_connection = ftp_client_conn;
+                ftp_links->ftp_connection = ftp_client_conn;
 
                 // zero out client connection
                 ftp_client_conn = NULL;
 
                 // try and start the FTP task for this connection
-                ftp_start_task(&ftp_links[index], index);
+                ftp_start_task(ftp_links, index);
+
+                index++;
             }
         }
     }

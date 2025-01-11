@@ -1237,6 +1237,7 @@ void carbon_lwip_input(const void *argument) {
 #define DISCARD_DESCRIPTOR(descr_pointer, bufferPtr)                           \
     osMutexWait(rx_ptk_mutex, osWaitForever);                                  \
     INCREASE_RX_POINTER(descr_pointer);                                        \
+    eth_handle.rxDescList.toProcessPointer = (uint32_t)descr_pointer;          \
     carbon_lwip_prepare_rx_descriptor(bufferPtr);                              \
     osMutexRelease(rx_ptk_mutex);
 

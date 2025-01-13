@@ -34,13 +34,14 @@
 
 #define __weak __attribute__((weak))
 
-//#define netconn_set_recvtimeout(conn, timeout)
+// #define netconn_set_recvtimeout(conn, timeout)
 
 static char *ftp_user_name = FTP_USER_NAME_DEFAULT;
 static char *ftp_user_pass = FTP_USER_PASS_DEFAULT;
 
 #define DEBUG_PRINT(ftp, f, ...)                                               \
-    DIAG(FTP "[%d] " f, ftp->ftp_con_num, ##__VA_ARGS__)
+    {}
+//    DIAG(FTP "[%d] " f, ftp->ftp_con_num, ##__VA_ARGS__)
 
 #define FTP_USER_NAME_OK(name) (!strcmp(name, ftp_user_name))
 #define FTP_USER_PASS_OK(pass) (!strcmp(pass, ftp_user_pass))
@@ -963,6 +964,8 @@ static void ftp_cmd_retr(ftp_data_t *ftp) {
     // close data socket
     data_con_close(ftp);
 
+    DIAG(FTP "File successfully transferred");
+
     // stop transfer
     ftp_send(ftp, "226 File successfully transferred\r\n");
 }
@@ -1110,6 +1113,8 @@ static void ftp_cmd_stor(ftp_data_t *ftp) {
 
     // close data connection
     data_con_close(ftp);
+
+    DIAG(FTP "File successfully transferred");
 
     // all was good
     ftp_send(ftp, "226 File successfully transferred\r\n");

@@ -1222,12 +1222,17 @@ void carbon_lwip_input(const void *argument) {
             if (p != NULL) {
                 // DIAG(ETH_DIAG "pushing buffer %p", p->payload);
                 err_t err = netif->input(p, netif);
-                if (err != ERR_OK) {
-                    DIAG(ETH_DIAG
-                         "error %d pushing pbuf %p, payload %p to the stack",
-                         err, p, p->payload);
-                    pbuf_free(p);
+                if (err == ERR_OK)
+                    continue;
+                if (err == ERR_MEM) {
+                    DIAG(ETH_DIAG "warning, out of memory, pbuf %p, payload %p",
+                         p, p->payload);
+
+                } else {
+                    DIAG(ETH_DIAG "error %d pushing pbuf %p, payload %p", err,
+                         p, p->payload);
                 }
+                pbuf_free(p);
             } else
                 break;
         }

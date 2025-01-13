@@ -134,8 +134,6 @@ static void ftp_start_task(server_stru_t *data, uint8_t index) {
 #if FTP_TASK_STATIC == 1
         data->task_handle = &task_handle;
 #endif
-        // feedback to CMS log
-        DIAG(FTP "%s started", name);
     }
 }
 

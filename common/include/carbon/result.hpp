@@ -34,7 +34,7 @@ public:
         : success_(false), value_(), errorInfo_(errorInfo) {}
 
     // Check if the result is an error
-    bool isError() const { return !success_; }
+    bool hasValue() const { return !success_; }
 
     // Retrieve the value (only call if not an error)
     const T &value() const { return value_; }

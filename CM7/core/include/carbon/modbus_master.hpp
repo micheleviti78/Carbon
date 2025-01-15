@@ -33,6 +33,12 @@ public:
 
     // Structure to hold slave IP and ID
     struct ModbusSlave {
+        bool setIP(const char *ipStr) {
+            if (ipaddr_aton(ipStr, &slaveIp))
+                return true;
+            else
+                return false;
+        }
         ip_addr_t slaveIp;
         uint8_t slaveId;
     };

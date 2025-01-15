@@ -18,7 +18,11 @@
 
 #pragma once
 
+#ifdef __cplusplus
 #include <cstdint>
+#else
+#include <stdint.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,33 +36,39 @@ void Error_Handler(void);
 
 #ifdef __cplusplus
 }
-#endif // Define error groups
+#endif
 
+// Define error groups
 enum class ErrorGroupType : uint16_t {
     None = 0,
-    Network = 1,
-    FileSystem = 2,
-    Hardware = 3,
-    Software = 4
+    Network,
+    Modbus,
+    FileSystem,
+    Hardware,
+    Software
 };
 
 // Define specific errors
 enum class ErrorType : uint16_t {
-    NoError = 0,
-    NetworkTimeout = 1,
-    NetworkUnavailable = 2,
-    FileNotFound = 3,
-    DiskFull = 4,
-    SensorFailure = 5,
-    Internal = 6
+    None = 0,
+    NetworkTimeout,
+    NetworkUnavailable,
+    NetworkConnectionFailed,
+    NetworkInvalidIP,
+    ModbusIPNotSet,
+    ModbusRequestFailed,
+    ModbusResponseFailed,
+    FileNotFound,
+    DiskFull,
+    SensorFailure,
+    Internal
 };
 
 // Class to hold an error and its associated group
 class Error {
 public:
-    // Default constructor (required for constexpr)
-    constexpr Error()
-        : group_(ErrorGroupType::None), error_(ErrorType::NoError) {}
+    // default constructor
+    constexpr Error() : group_(ErrorGroupType::None), error_(ErrorType::None){};
 
     // Constructor to initialize the error and its group
     constexpr Error(ErrorGroupType group, ErrorType error)
@@ -82,7 +92,7 @@ public:
 
     // Cast to bool operator
     explicit constexpr operator bool() const {
-        return group_ != ErrorGroupType::None || error_ != ErrorType::NoError;
+        return group_ != ErrorGroupType::None || error_ != ErrorType::None;
     }
 
 private:
@@ -92,35 +102,24 @@ private:
 
 static_assert(sizeof(Error) == 4);
 
-constexpr Error Success;
+constexpr Error Success{};
 
 constexpr Error InternalError(ErrorGroupType::Software, ErrorType::Internal);
 
 constexpr Error InternalHardwareError(ErrorGroupType::Hardware,
                                       ErrorType::Internal);
 
-// Template class to hold either a value or an error
-// Simplified version for std::expected
-template <typename T> class Result {
-public:
-    // Constructor for a successful result
-    Result(const T &value) : success_(true), value_(value), errorInfo_() {}
+constexpr Error NetworkConnectionFailed(ErrorGroupType::Network,
+                                        ErrorType::NetworkConnectionFailed);
 
-    // Constructor for an error result
-    Result(const Error &errorInfo)
-        : success_(false), value_(), errorInfo_(errorInfo) {}
+constexpr Error NetworkInvalidIP(ErrorGroupType::Network,
+                                 ErrorType::NetworkInvalidIP);
 
-    // Check if the result is an error
-    bool isError() const { return !success_; }
+constexpr Error ModbusIPNotSet(ErrorGroupType::Modbus,
+                               ErrorType::ModbusIPNotSet);
 
-    // Retrieve the value (only call if not an error)
-    const T &value() const { return value_; }
+constexpr Error ModbusRequestFailed(ErrorGroupType::Modbus,
+                                    ErrorType::ModbusRequestFailed);
 
-    // Retrieve the error (only call if isError() returns true)
-    const Error &error() const { return errorInfo_; }
-
-private:
-    bool success_;
-    T value_;
-    Error errorInfo_;
-};
+constexpr Error ModbusResponseFailed(ErrorGroupType::Modbus,
+                                     ErrorType::ModbusResponseFailed);

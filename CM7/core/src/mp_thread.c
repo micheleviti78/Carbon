@@ -249,8 +249,7 @@ int mp_carbon_stdint() {
                 return c;
             } else {
                 DIAG(MP "error while receiving data %d", err);
-                close_connection();
-                return 0;
+                return 4;
             }
         } else {
             char c = *((char *)carbon_mp_console_recv_buf);

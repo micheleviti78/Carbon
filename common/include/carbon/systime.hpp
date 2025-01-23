@@ -24,7 +24,9 @@
 #include <stdint.h>
 #endif
 
-#define DWT_CLOCKS(dwt) dwt->CYCCNT;
+#include <stm32h7xx_hal.h>
+
+#define DWT_CLOCKS DWT->CYCCNT;
 
 #ifdef __cplusplus
 extern "C" {

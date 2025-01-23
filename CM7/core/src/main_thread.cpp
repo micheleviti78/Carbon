@@ -78,7 +78,7 @@ void MainThread::run() {
 
     ftpThread.start();
 
-    tcpTestThread.start();
+    // tcpTestThread.start();
 
     while (1) {
         BSP_LED_Toggle(LED_GREEN);

@@ -41,7 +41,7 @@ void carbon_diag_pull();
 #define TRACE_DIAG "[trace] "
 #define TEST_DIAG "[test] "
 #define SD "[sd] "
-#define MP "[mp] "
+#define MP "[uPy] "
 #define SPI_DIAG "[spi] "
 #define MATRIX_DIS_DIAG "[md] "
 #define FTP "[ftp] "

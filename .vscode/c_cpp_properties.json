@@ -26,8 +26,8 @@
                 "TIM2=1",
                 "USE_FULL_LL_DRIVER=1",
                 "LWIP_NETIF_LINK_CALLBACK=1",
-                "MICROPY_VFS_FAT=1",
-                "MICROPY_VFS=1",
+                "MICROPY_PY_BUILTINS_HELP=1",
+                "MICROPY_PY_BUILTINS_COMPILE=1",
                 "LWIP_NETCONN=1",
                 "LWIP_SOCKET=1"
             ],

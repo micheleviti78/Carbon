@@ -22,7 +22,6 @@
 #include <carbon/sync.hpp>
 #include <carbon/systime.hpp>
 
-#include <stm32h7xx_hal.h>
 #include <stm32h7xx_ll_tim.h>
 
 // NOTE: These functions are called during early init before static C++

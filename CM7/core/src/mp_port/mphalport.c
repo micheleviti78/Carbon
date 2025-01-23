@@ -19,10 +19,9 @@
 #include <mphalport.h>
 #include <py/mphal.h>
 
-#include <printf.h>
-
 #include <cmsis_os.h>
 
+#include <carbon/diag.hpp>
 #include <carbon/systime.hpp>
 
 mp_uint_t mp_carbon_stdout(const char *str, size_t len);
@@ -34,42 +33,22 @@ mp_uint_t mp_hal_stdout_tx_strn(const char *str, size_t len) {
 }
 
 inline void mp_hal_set_interrupt_char(int c) {
-    // printf_("\r\nmp_hal_set_interrupt_char, char:  %d", c);
+    // DIAG(MP "mp_hal_set_interrupt_char, char:  %d", c);
 }
 
 int mp_hal_stdin_rx_chr(void) { return mp_carbon_stdint(); }
 
-uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
-    printf_("\r\nmp_hal_stdio_poll");
-    return 0;
-}
+uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) { return 0; }
 
-void mp_hal_delay_ms(mp_uint_t ms) {
-    osDelay(ms);
-}
+void mp_hal_delay_ms(mp_uint_t ms) { osDelay(ms); }
 
-void mp_hal_delay_us(mp_uint_t us) {
-    printf_("\r\nmp_hal_delay_us");
-    delayUs(us);
-}
+void mp_hal_delay_us(mp_uint_t us) { delayUs(us); }
 
-mp_uint_t mp_hal_ticks_ms(void) {
-    printf_("\r\nmp_hal_ticks_ms");
-    return 0;
-}
+mp_uint_t mp_hal_ticks_ms(void) { return HAL_GetTick(); }
 
-mp_uint_t mp_hal_ticks_us(void) {
-    printf_("\r\nmp_hal_ticks_us");
-    return 0;
-}
+mp_uint_t mp_hal_ticks_us(void) { return HAL_GetTick() * 1000; }
 
 mp_uint_t mp_hal_ticks_cpu(void) {
-    printf_("\r\nmp_hal_ticks_cpu");
-    return 0;
+    DIAG(MP "mp_hal_ticks_cpu");
+    return DWT_CLOCKS;
 }
-
-mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args,
-                         mp_map_t *kwargs) {
-    return mp_const_none;
-}
-MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);

@@ -103,9 +103,15 @@ void nlr_jump_fail(void *val) {
     }
 }
 
+void mp_reader_new_file(mp_reader_t *reader, qstr filename) {
+    DIAG(MP "mp_reader_new_file");
+}
+
 // There is no filesystem so opening a file raises an exception.
 mp_lexer_t *mp_lexer_new_from_file(qstr filename) {
-    mp_raise_OSError(MP_ENOENT);
+    mp_reader_t reader;
+    mp_reader_new_file(&reader, filename);
+    return mp_lexer_new(filename, reader);
 }
 
 mp_import_stat_t mp_import_stat(const char *path) {

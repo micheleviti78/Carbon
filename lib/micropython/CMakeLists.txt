@@ -17,8 +17,6 @@ set(SOURCE_SHARED
 	${MICROPY_DIR}/shared/runtime/gchelper_thumb2.s
 	${MICROPY_DIR}/shared/runtime/gchelper_native.c
 	${MICROPY_DIR}/shared/runtime/pyexec.c
-	${MICROPY_DIR}/shared/runtime/sys_stdio_mphal.c
-	${MICROPY_DIR}/shared/runtime/interrupt_char.c
 	${MICROPY_DIR}/shared/runtime/stdout_helpers.c
 	${MICROPY_DIR}/shared/readline/readline.c
 )

@@ -1157,9 +1157,9 @@ void carbon_lwip_link_thread(void const *argument) {
         phyLinkState = LAN8742_GetLinkState(&lan8742);
         if (netif_is_link_up(netif) &&
             (phyLinkState <= LAN8742_STATUS_LINK_DOWN)) {
-            carbon_hw_ethernet_stop(&eth_handle);
             netif_set_down(netif);
             netif_set_link_down(netif);
+            carbon_hw_ethernet_stop(&eth_handle);
         } else if (!netif_is_link_up(netif) &&
                    (phyLinkState > LAN8742_STATUS_LINK_DOWN)) {
             switch (phyLinkState) {

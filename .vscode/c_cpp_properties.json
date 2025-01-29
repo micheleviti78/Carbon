@@ -29,7 +29,8 @@
                 "MICROPY_PY_BUILTINS_HELP=1",
                 "MICROPY_PY_BUILTINS_COMPILE=1",
                 "LWIP_NETCONN=1",
-                "LWIP_SOCKET=1"
+                "LWIP_SOCKET=1",
+                "MICROPY_VFS=1"
             ],
             "compilerPath": "/opt/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gcc",
             "cStandard": "c23",

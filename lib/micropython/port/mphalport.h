@@ -38,6 +38,4 @@ mp_uint_t mp_hal_ticks_us(void);
 
 mp_uint_t mp_hal_ticks_cpu(void);
 
-mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args, mp_map_t *kwargs);
-
 #endif

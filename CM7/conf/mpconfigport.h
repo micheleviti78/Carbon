@@ -36,14 +36,17 @@
 #define MICROPY_FLOAT_IMPL (MICROPY_FLOAT_IMPL_FLOAT)
 #define MICROPY_PY_CMATH (1)
 
+#define MICROPY_PY_RE (1)
+
 #define MICROPY_HELPER_REPL (1)
 #define MICROPY_REPL_INFO (1)
-#define MICROPY_HELPER_REPL (1)
 #define MICROPY_REPL_AUTO_INDENT (1)
-#define MICROPY_READLINE_HISTORY_SIZE (256)
+#define MICROPY_READLINE_HISTORY_SIZE (16)
 #define MICROPY_PY_SYS_PS1_PS2 (1)
 
-#define MICROPY_PY_RE (1)
+// extra builtin names to add to the global namespace
+#define MICROPY_PORT_BUILTINS                                                  \
+    {MP_ROM_QSTR(MP_QSTR_open), MP_ROM_PTR(&mp_builtin_open_obj)},
 
 #define MICROPY_BANNER_MACHINE "Carbon"
 

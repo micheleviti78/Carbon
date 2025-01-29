@@ -96,13 +96,17 @@ void DHCP_Thread(void const *argument) {
                 if (dhcp->tries > MAX_DHCP_TRIES) {
                     DHCP_state = DHCP_TIMEOUT;
 
+                    dhcp_stop(netif);
+
                     /* Static address used */
                     IP_ADDR4(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
                     IP_ADDR4(&netmask, NETMASK_ADDR0, NETMASK_ADDR1,
                              NETMASK_ADDR2, NETMASK_ADDR3);
                     IP_ADDR4(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+
                     netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask),
                                    ip_2_ip4(&gw));
+
                     DIAG(LWIP_DIAG "static address %s",
                          ip4addr_ntoa(netif_ip4_addr(netif)));
                 }
@@ -110,6 +114,7 @@ void DHCP_Thread(void const *argument) {
         } break;
         case DHCP_LINK_DOWN: {
             DHCP_state = DHCP_OFF;
+            dhcp_stop(netif);
             DIAG(LWIP_DIAG "The network cable is not connected");
         } break;
         default:

@@ -96,7 +96,7 @@ void DHCP_Thread(void const *argument) {
                 if (dhcp->tries > MAX_DHCP_TRIES) {
                     DHCP_state = DHCP_TIMEOUT;
 
-                    dhcp_stop(netif);
+                    dhcp_release_and_stop(netif);
 
                     /* Static address used */
                     IP_ADDR4(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
@@ -114,7 +114,7 @@ void DHCP_Thread(void const *argument) {
         } break;
         case DHCP_LINK_DOWN: {
             DHCP_state = DHCP_OFF;
-            dhcp_stop(netif);
+            dhcp_release_and_stop(netif);
             DIAG(LWIP_DIAG "The network cable is not connected");
         } break;
         default:

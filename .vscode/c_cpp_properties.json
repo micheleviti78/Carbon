@@ -3,21 +3,22 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
-                "/home/michele/Software/Carbon/CM7/conf/",
-                "/home/michele/Software/Carbon/lib/CMSIS/include",
-                "/home/michele/Software/Carbon/lib/CMSIS/device/ST/STM32H7xx/include",
-                "/home/michele/Software/Carbon/lib/hal/Inc/Legacy",
-                "/home/michele/Software/Carbon/lib/hal/Inc",
-                "/home/michele/Software/Carbon/lib/printf",
-                "/home/michele/Software/Carbon/CM7/core/include",
-                "/home/michele/Software/Carbon/CM4/core/include"
+                "${workspaceFolder}/CM7/conf/",
+                "${workspaceFolder}/CM7/core/include",
+                "${workspaceFolder}/lib/CMSIS/include",
+                "${workspaceFolder}/lib/CMSIS/device/ST/STM32H7xx/include",
+                "${workspaceFolder}/lib/hal/Inc/Legacy",
+                "${workspaceFolder}/lib/hal/Inc",
+                "${workspaceFolder}/lib/printf",
+                "${workspaceFolder}/lib/lwip/src/include",
+                "${workspaceFolder}/CM4/core/include"
             ],
             "defines": [
                 "CORE_CM7=1",
                 "CORE_CM4=1",
                 "HAL_TIM_MODULE_ENABLED=1",
                 "DUAL_CORE=1",
+                "NO_SYS=0",
                 "LWIP_DHCP=1",
                 "HAL_ETH_MODULE_ENABLED=1",
                 "ETH=1",
@@ -41,8 +42,7 @@
         {
             "name": "custom tool chain",
             "includePath": [
-                "${workspaceFolder}/**",
-                "/home/michele/Software/Carbon/Drivers/CMSIS/Include"
+                "${workspaceFolder}/**"
             ],
             "defines": [],
             "compilerPath": "/opt/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gcc",

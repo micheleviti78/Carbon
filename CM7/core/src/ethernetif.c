@@ -104,6 +104,7 @@ static osSemaphoreId rxPktSemaphore =
 static osSemaphoreId txPktSemaphore =
     NULL; /* Semaphore to signal outcome packets */
 static osMutexId rx_ptk_mutex;
+static osMutexId tx_ptk_mutex;
 
 static volatile bool isInitialized = false;
 
@@ -416,6 +417,8 @@ unsigned carbon_hw_ethernet_low_level_init(struct netif *netif) {
 
     osMutexDef(rx_ptk_mutex);
     rx_ptk_mutex = osMutexCreate(osMutex(rx_ptk_mutex));
+    osMutexDef(tx_ptk_mutex);
+    tx_ptk_mutex = osMutexCreate(osMutex(tx_ptk_mutex));
 
     /* create the task that handles the ETH_MAC */
     osThreadDef(EthIf, carbon_lwip_input, osPriorityRealtime, 0,
@@ -1370,12 +1373,15 @@ err_t carbon_lwip_output(struct netif *netif, struct pbuf *p) {
         return ERR_IF;
     struct pbuf *q;
 
+    osMutexWait(tx_ptk_mutex, osWaitForever);
+
     uint32_t size = 0;
     uint32_t total_size = p->tot_len;
     uint8_t *current_buf_ptr = (uint8_t *)&tx_Buff[0];
 
     if (total_size > (ETH_RX_BUFFER_SIZE_ALIGNED)) {
         DIAG(ETH_DIAG "tx_Buff too small, data lenght %lu", p->tot_len);
+        osMutexRelease(tx_ptk_mutex);
         return ERR_IF;
     }
 
@@ -1383,6 +1389,7 @@ err_t carbon_lwip_output(struct netif *netif, struct pbuf *p) {
         if (size >= total_size) {
             DIAG(ETH_DIAG "p->tot_len %lu not equal to actual data size %lu ",
                  total_size, size);
+            osMutexRelease(tx_ptk_mutex);
             return ERR_IF;
         }
 
@@ -1401,6 +1408,7 @@ err_t carbon_lwip_output(struct netif *netif, struct pbuf *p) {
     if ((READ_BIT(tail_pointer->DESC3, ETH_DMATXNDESCWBF_OWN) ==
          ETH_DMATXNDESCWBF_OWN)) {
         DIAG(ETH_DIAG "tail pointer owned by the DMA");
+        osMutexRelease(tx_ptk_mutex);
         return ERR_IF;
     }
 
@@ -1430,8 +1438,10 @@ err_t carbon_lwip_output(struct netif *netif, struct pbuf *p) {
 
     if (osSemaphoreWait(txPktSemaphore, ETH_DMA_TRANSMIT_TIMEOUT) != osOK) {
         DIAG(ETH_DIAG "error sending data");
+        osMutexRelease(tx_ptk_mutex);
         return ERR_IF;
     }
 
+    osMutexRelease(tx_ptk_mutex);
     return ERR_OK;
 }

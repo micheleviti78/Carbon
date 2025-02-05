@@ -379,7 +379,7 @@ unsigned carbon_hw_ethernet_low_level_init(struct netif *netif) {
 
     eth_handle.errorCode = HAL_ETH_ERROR_NONE;
     eth_handle.gState = HAL_ETH_STATE_READY;
-    eth_handle.rxState = HAL_ETH_STATE_READY;
+    eth_handle.txState = HAL_ETH_STATE_READY;
 
     LWIP_MEMPOOL_INIT(rx_pool);
 
@@ -471,7 +471,6 @@ unsigned carbon_hw_ethernet_low_level_init(struct netif *netif) {
         macConf.DuplexMode = duplex;
         macConf.Speed = speed;
         carbon_hw_ethernet_set_mac_config(&eth_handle, &macConf);
-
         carbon_hw_ethernet_start(&eth_handle);
         netif_set_up(netif);
         netif_set_link_up(netif);
@@ -895,13 +894,6 @@ void carbon_hw_ethernet_prepare_rx_desc(Eth_Handle *heth,
 
 void carbon_hw_ethernet_start(Eth_Handle *heth) {
     if (heth->gState == HAL_ETH_STATE_READY) {
-        heth->gState = HAL_ETH_STATE_BUSY;
-
-        // for (unsigned i = 0; i < ETH_RX_DESC_CNT; i++) {
-        //     ETH_DMADescTypeDef *descr_ptr = &(dmaRxDscrTab[i]);
-        //     DIAG(ETH_DIAG "descr %p, buffer %p, DESC3 %lu", descr_ptr,
-        //          (uint32_t *)descr_ptr->DESC0, descr_ptr->DESC3);
-        // }
 
         /* Enable the MAC transmission */
         SET_BIT(heth->Instance->MACCR, ETH_MACCR_TE);
@@ -930,14 +922,19 @@ void carbon_hw_ethernet_start(Eth_Handle *heth) {
                                        ETH_DMACIER_TIE | ETH_DMACIER_FBEE |
                                        ETH_DMACIER_AIE));
 
-        heth->gState = HAL_ETH_STATE_READY;
-        heth->rxState = HAL_ETH_STATE_BUSY_RX;
+        heth->gState = HAL_ETH_STATE_BUSY;
+        osMutexWait(tx_ptk_mutex, osWaitForever);
+        heth->txState = HAL_ETH_STATE_BUSY_TX;
+        osMutexRelease(tx_ptk_mutex);
+        DIAG(ETH_DIAG "ethernet started");
+    } else {
+        DIAG(ETH_DIAG "ethernet in error state could not be started");
     }
 }
 
 void carbon_hw_ethernet_stop(Eth_Handle *heth) {
-    ETH_DMADescTypeDef *dmarxdesc;
-    uint32_t descindex;
+    // ETH_DMADescTypeDef *dmarxdesc;
+    // uint32_t descindex;
 
     /* Disable interrupts:
     - Tx complete interrupt
@@ -964,13 +961,15 @@ void carbon_hw_ethernet_stop(Eth_Handle *heth) {
     CLEAR_BIT(heth->Instance->MACCR, ETH_MACCR_TE);
 
     /* Clear IOC bit to all Rx descriptors */
-    for (descindex = 0; descindex < (uint32_t)ETH_RX_DESC_CNT; descindex++) {
-        dmarxdesc = (ETH_DMADescTypeDef *)heth->rxDescList.rxDesc[descindex];
-        CLEAR_BIT(dmarxdesc->DESC3, ETH_DMARXNDESCRF_IOC);
-    }
+    // for (descindex = 0; descindex < (uint32_t)ETH_RX_DESC_CNT; descindex++) {
+    //     dmarxdesc = (ETH_DMADescTypeDef *)heth->rxDescList.rxDesc[descindex];
+    //     CLEAR_BIT(dmarxdesc->DESC3, ETH_DMARXNDESCRF_IOC);
+    // }
 
     heth->gState = HAL_ETH_STATE_READY;
-    heth->rxState = HAL_ETH_STATE_READY;
+    osMutexWait(tx_ptk_mutex, osWaitForever);
+    heth->txState = HAL_ETH_STATE_READY;
+    osMutexRelease(tx_ptk_mutex);
 }
 
 /*******************************************************************************
@@ -1201,7 +1200,7 @@ void carbon_lwip_link_thread(void const *argument) {
                 macConf.DuplexMode = duplex;
                 macConf.Speed = speed;
                 carbon_hw_ethernet_set_mac_config(&eth_handle, &macConf);
-
+                carbon_hw_ethernet_tx_dec_list_init(&eth_handle);
                 carbon_hw_ethernet_start(&eth_handle);
                 netif_set_up(netif);
                 netif_set_link_up(netif);
@@ -1374,6 +1373,11 @@ err_t carbon_lwip_output(struct netif *netif, struct pbuf *p) {
     struct pbuf *q;
 
     osMutexWait(tx_ptk_mutex, osWaitForever);
+
+    if (eth_handle.txState != HAL_ETH_STATE_BUSY_TX) {
+        osMutexRelease(tx_ptk_mutex);
+        return ERR_IF;
+    }
 
     uint32_t size = 0;
     uint32_t total_size = p->tot_len;

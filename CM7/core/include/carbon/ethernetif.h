@@ -41,7 +41,7 @@ typedef struct {
     Eth_Tx_Desc_List_TypeDef txDescList;
     Eth_Rx_Desc_List_TypeDef rxDescList;
     __IO HAL_ETH_StateTypeDef gState;
-    __IO HAL_ETH_StateTypeDef rxState;
+    __IO HAL_ETH_StateTypeDef txState;
     __IO uint32_t lostReceivedPackets;
     __IO uint32_t errorCode;
     __IO uint32_t dmaErrorCode;

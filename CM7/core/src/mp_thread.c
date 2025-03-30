@@ -128,6 +128,7 @@ void TASK_MicroPython(void *pvParameters) {
 }
 
 void start_micropython() {
+    DIAG(MP "starting micropython");
     FIL fs_read;
     UINT byte_read;
     uint8_t *readBuffer = NULL;

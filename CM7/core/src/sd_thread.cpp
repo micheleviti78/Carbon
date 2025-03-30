@@ -43,6 +43,7 @@ SDThread::SDThread()
     : Thread("sd_thread", osPriorityNormal, configMINIMAL_STACK_SIZE * 64) {}
 
 void SDThread::run() {
+    DIAG(SD "starting SD thread");
     while (1) {
         int32_t res = BSP_SD_Init(0);
 

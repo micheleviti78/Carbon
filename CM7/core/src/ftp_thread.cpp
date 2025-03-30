@@ -16,6 +16,7 @@
  ******************************************************************************
  */
 
+#include <carbon/diag.hpp>
 #include <carbon/ftp_thread.hpp>
 
 #include <cmsis_os.h>
@@ -27,4 +28,7 @@ extern "C" {
 FTPThread::FTPThread()
     : Thread("ftp_thread", osPriorityNormal, configMINIMAL_STACK_SIZE * 8) {}
 
-void FTPThread::run() { ftp_server(); }
+void FTPThread::run() {
+    DIAG(FTP "starting FTP server");
+    ftp_server();
+}

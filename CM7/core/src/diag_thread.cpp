@@ -24,6 +24,7 @@ DiagThread::DiagThread()
              configMINIMAL_STACK_SIZE * 10) {}
 
 void DiagThread::run() {
+    DIAG(SYSTEM_DIAG "starting pulling thread");
     while (1) {
         carbon_diag_pull();
         osDelay(1);

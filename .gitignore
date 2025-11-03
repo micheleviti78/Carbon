@@ -7,5 +7,6 @@ CubeCode/
 .project
 .settings/
 builds/
+build/
 Carbon Default.launch
 misc/trace/build
